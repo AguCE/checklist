@@ -201,6 +201,11 @@ https://github.com/nodeca/pako/blob/main/LICENSE
   .dlg-head h2 { font-size: 15.5px; font-weight: 700; }
   .dlg-body { padding: 13px 16px; }
   .dlg-body textarea { width: 100%; min-height: 110px; background: var(--surface-2); border: 1px solid var(--line); border-radius: 9px; padding: 10px; font-size: 16px; resize: vertical; }
+  .dlg-body pre {
+    margin: 0; white-space: pre-wrap; word-break: break-word; font-family: inherit;
+    font-size: 13px; background: var(--surface-2); border: 1px solid var(--line-2);
+    border-radius: 9px; padding: 11px; max-height: 38vh; overflow: auto;
+  }
   .dlg-foot { display: flex; gap: 8px; justify-content: flex-end; padding: 0 16px 15px; }
 
   @media (max-width: 420px) { .fields { grid-template-columns: 1fr; } }
@@ -270,6 +275,20 @@ https://github.com/nodeca/pako/blob/main/LICENSE
   <div class="dlg-foot">
     <button type="button" class="btn ghost" id="notaCancel">Cancelar</button>
     <button type="button" class="btn" id="notaOk">Añadir</button>
+  </div>
+</dialog>
+
+<dialog id="dlgEnviar">
+  <div class="dlg-head">
+    <h2>Enviar el parte</h2>
+    <p id="envSub" class="note"></p>
+  </div>
+  <div class="dlg-body"><pre id="envTexto"></pre></div>
+  <div class="dlg-foot">
+    <button type="button" class="btn" id="envShare">Compartir</button>
+    <button type="button" class="btn ghost" id="envDescargar">Descargar</button>
+    <button type="button" class="btn ghost" id="envCopiar">Copiar</button>
+    <button type="button" class="btn ghost" id="envCerrar">Cerrar</button>
   </div>
 </dialog>
 
@@ -987,75 +1006,196 @@ https://github.com/nodeca/pako/blob/main/LICENSE
   /* =====================================================================
      13. ENVÍO
      ===================================================================== */
+  var paquete = null;
+
+  function resumenTexto(json) {
+    var L = [];
+    L.push("PARTE DE CAMPO — " + PLANTILLA.nombre.toUpperCase());
+    L.push("Centro: " + (json.centro.nombre || "—") + (json.centro.zona ? " · " + json.centro.zona : ""));
+    L.push("Fecha: " + (json.fecha || "—") + (json.visita ? " · " + json.visita : ""));
+    L.push("Técnico: " + (json.tecnico.nombre || "—"));
+    L.push("Cumplimiento: " + (json.resumen.cumplimientoPct === null ? "—" : json.resumen.cumplimientoPct + " %") +
+           " (" + json.resumen.respondidas + "/" + json.resumen.preguntas + " respondidas)");
+    if (json.gps) L.push("Ubicación: " + json.gps.lat.toFixed(5) + ", " + json.gps.lon.toFixed(5));
+
+    var nc = [], mej = [], notas = [];
+    json.secciones.forEach(function (s) {
+      s.preguntas.forEach(function (p) {
+        if (p.respuesta === "nc") nc.push("• " + s.titulo + ": " + p.enunciado);
+        else if (p.respuesta === "mej") mej.push("• " + s.titulo + ": " + p.enunciado);
+        (p.notas || []).forEach(function (n) { notas.push("• " + p.enunciado + " → " + n.texto); });
+      });
+    });
+    L.push(""); L.push("NO CONFORMES (" + nc.length + ")");
+    L.push(nc.length ? nc.join("\n") : "• Ninguno");
+    L.push(""); L.push("MEJORABLES (" + mej.length + ")");
+    L.push(mej.length ? mej.join("\n") : "• Ninguno");
+    if (notas.length) { L.push(""); L.push("NOTAS"); L.push(notas.join("\n")); }
+    return L.join("\n");
+  }
+
+  /* Prepara de una vez el ZIP (para descargar) y la lista de ficheros sueltos
+     (para compartir). Los móviles NO dejan compartir un .zip: solo admiten
+     imágenes, audio, vídeo, PDF y texto. Por eso el parte se comparte como
+     parte.json declarado text/plain, más cada foto y cada audio por separado. */
+  function prepararPaquete() {
+    var json = construirJson();
+    var textoJson = JSON.stringify(json, null, 2);
+
+    var zip = new JSZip();
+    zip.file("parte.json", textoJson);
+    var media = zip.folder("media");
+
+    var ficheros = [new File([textoJson], "parte.json", { type: "text/plain" })];
+    var pend = [];
+
+    Object.keys(parte.adjuntos).forEach(function (k) {
+      (parte.adjuntos[k] || []).forEach(function (a) {
+        pend.push(DB.leerMedio(a.id).then(function (m) {
+          if (!m || !m.blob) return;
+          media.file(a.nombre, m.blob);
+          ficheros.push(new File([m.blob], a.nombre, { type: a.mime || m.blob.type || "application/octet-stream" }));
+        }));
+      });
+    });
+
+    return Promise.all(pend)
+      .then(function () {
+        return zip.generateAsync({ type: "blob", compression: "DEFLATE", compressionOptions: { level: 6 } });
+      })
+      .then(function (blob) {
+        return { json: json, texto: resumenTexto(json), zip: blob, ficheros: ficheros };
+      });
+  }
+
+  function marcarEnviado() {
+    parte.estado = "enviado";
+    parte.enviadoEn = new Date().toISOString();
+    return guardar(false).then(function () {
+      banner("Parte enviado. Queda archivado en la bandeja de este móvil.", "ok");
+      window.scrollTo(0, 0);
+    });
+  }
+
   $("btnEnviar").addEventListener("click", function () {
     var faltan = PLANTILLA.cabecera.filter(function (c) {
       return c.requerido && !String(parte.cabecera[c.id] || "").trim();
     });
-    if (faltan.length) { banner("Falta rellenar: " + faltan.map(function (c) { return c.etiqueta; }).join(", ") + ".", "bad"); window.scrollTo(0, 0); return; }
-    var c = calcular();
-    if (!c.resp) { banner("Responde al menos una pregunta antes de enviar.", "bad"); window.scrollTo(0, 0); return; }
-    enviar(parte);
+    if (faltan.length) {
+      banner("Falta rellenar: " + faltan.map(function (c) { return c.etiqueta; }).join(", ") + ".", "bad");
+      window.scrollTo(0, 0); return;
+    }
+    if (!calcular().resp) {
+      banner("Responde al menos una pregunta antes de enviar.", "bad");
+      window.scrollTo(0, 0); return;
+    }
+    banner("");
+
+    var btn = this;
+    btn.disabled = true;
+    btn.textContent = "Preparando…";
+
+    prepararPaquete().then(function (paq) {
+      paquete = paq;
+      parte.estado = "pendiente";
+      return guardar(false).then(function () {
+        if (CONFIG.destino === "flow")  return subirFlow(paq).then(marcarEnviado);
+        if (CONFIG.destino === "graph") return subirGraph(paq).then(marcarEnviado);
+        abrirDialogoEnvio(paq);
+      });
+    }).catch(function (err) {
+      banner("No se ha podido enviar (" + esc((err && err.message) || "error") +
+             "). El parte queda pendiente y puedes reintentarlo desde la bandeja.", "bad");
+      window.scrollTo(0, 0);
+    }).then(function () {
+      btn.disabled = false;
+      btn.textContent = "Enviar";
+    });
   });
 
-  function enviar(p) {
-    var btn = $("btnEnviar");
-    btn.disabled = true; btn.textContent = "Enviando…";
-    p.estado = "pendiente";
+  /* --- a) Compartir. El botón del diálogo llama a navigator.share DIRECTAMENTE,
+         con el paquete ya construido: el permiso para abrir la hoja de compartir
+         caduca en cuanto se pierde el gesto del usuario. --- */
+  function abrirDialogoEnvio(paq) {
+    var hayShare = typeof navigator.share === "function";
+    var hayFicheros = hayShare && navigator.canShare && navigator.canShare({ files: paq.ficheros });
 
-    return guardar(false)
-      .then(construirZip)
-      .then(function (paq) {
-        if (CONFIG.destino === "flow")  return subirFlow(paq);
-        if (CONFIG.destino === "graph") return subirGraph(paq);
-        return compartir(paq);
-      })
-      .then(function (ok) {
-        if (ok === false) { banner("Envío cancelado. El parte sigue guardado.", "warn"); return; }
-        p.estado = "enviado";
-        p.enviadoEn = new Date().toISOString();
-        return guardar(false).then(function () {
-          banner("Parte enviado. Queda archivado en la bandeja de este móvil.", "ok");
-          window.scrollTo(0, 0);
-        });
-      })
-      .catch(function (err) {
-        banner("No se ha podido enviar (" + esc((err && err.message) || "error") +
-               "). El parte queda pendiente y puedes reintentarlo desde la bandeja.", "bad");
-        window.scrollTo(0, 0);
-      })
-      .then(function () { btn.disabled = false; btn.textContent = "Enviar"; });
+    $("envSub").textContent = hayFicheros
+      ? "Se enviarán " + paq.ficheros.length + " archivo(s): el parte y sus fotos y audios."
+      : (hayShare
+          ? "Este móvil no deja adjuntar los archivos solos: se manda el resumen y tú adjuntas el paquete descargado."
+          : "Este navegador no tiene hoja de compartir: descarga el paquete y adjúntalo al correo o al mensaje.");
+
+    $("envShare").hidden = !hayShare;
+    $("envTexto").textContent = paq.texto;
+
+    var d = $("dlgEnviar");
+    if (d.showModal) d.showModal(); else d.setAttribute("open", "");
   }
 
-  /* --- a) Compartir: sin nada montado --- */
-  function compartir(paq) {
-    var f = new File([paq.blob], nombreBase() + ".zip", { type: "application/zip" });
-    if (navigator.canShare && navigator.canShare({ files: [f] }) && navigator.share) {
-      return navigator.share({ files: [f], title: "Parte de campo", text: "Parte de " + (parte.cabecera.centro || "") })
-        .then(function () { return true; })
-        .catch(function () { return false; });
-    }
-    var url = URL.createObjectURL(paq.blob);
+  function cerrarEnvio() {
+    var d = $("dlgEnviar");
+    if (d.close) d.close(); else d.removeAttribute("open");
+  }
+
+  $("envShare").addEventListener("click", function () {
+    if (!paquete) return;
+    var datos = { title: "Parte de campo", text: paquete.texto };
+    if (navigator.canShare && navigator.canShare({ files: paquete.ficheros })) datos.files = paquete.ficheros;
+
+    navigator.share(datos).then(function () {
+      cerrarEnvio();
+      marcarEnviado();
+    }).catch(function (err) {
+      if (err && err.name === "AbortError") return;   // lo ha cancelado el usuario
+      cerrarEnvio();
+      banner("El móvil no ha dejado abrir la hoja de compartir (" + esc((err && err.name) || "error") +
+             "). Pulsa «Descargar» y adjunta tú el paquete.", "warn");
+      window.scrollTo(0, 0);
+    });
+  });
+
+  $("envDescargar").addEventListener("click", function () {
+    if (!paquete) return;
+    var url = URL.createObjectURL(paquete.zip);
     var a = document.createElement("a");
-    a.href = url; a.download = nombreBase() + ".zip";
-    document.body.appendChild(a); a.click(); a.remove();
-    setTimeout(function () { URL.revokeObjectURL(url); }, 4000);
-    return Promise.resolve(true);
-  }
+    a.href = url;
+    a.download = nombreBase() + ".zip";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(function () { URL.revokeObjectURL(url); }, 5000);
+    cerrarEnvio();
+    marcarEnviado();
+  });
+
+  $("envCopiar").addEventListener("click", function () {
+    var b = this;
+    navigator.clipboard.writeText(paquete ? paquete.texto : "").then(function () {
+      b.textContent = "Copiado ✓";
+      setTimeout(function () { b.textContent = "Copiar"; }, 2500);
+    }).catch(function () {
+      b.textContent = "No se pudo";
+      setTimeout(function () { b.textContent = "Copiar"; }, 2500);
+    });
+  });
+
+  $("envCerrar").addEventListener("click", cerrarEnvio);
 
   /* --- b) Flujo de Power Automate --- */
   function subirFlow(paq) {
     if (!CONFIG.flowUrl) return Promise.reject(new Error("falta la URL del flujo"));
-    return blobABase64(paq.blob).then(function (b64) {
+    return blobABase64(paq.zip).then(function (b64) {
       return fetch(CONFIG.flowUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           nombre: nombreBase() + ".zip",
-          resumen: paq.json.resumen,
           centro: paq.json.centro.nombre,
           tecnico: paq.json.tecnico.nombre,
           fecha: paq.json.fecha,
           gps: paq.json.gps,
+          resumen: paq.json.resumen,
           zipBase64: b64
         })
       });
@@ -1093,7 +1233,11 @@ https://github.com/nodeca/pako/blob/main/LICENSE
     return cargarMsal().then(function () {
       if (!msalApp) {
         msalApp = new window.msal.PublicClientApplication({
-          auth: { clientId: g.clientId, authority: "https://login.microsoftonline.com/" + g.tenantId, redirectUri: location.href.split("#")[0] },
+          auth: {
+            clientId: g.clientId,
+            authority: "https://login.microsoftonline.com/" + g.tenantId,
+            redirectUri: location.href.split("#")[0].split("?")[0]
+          },
           cache: { cacheLocation: "localStorage" }
         });
         return msalApp.initialize().then(function () { return msalApp.handleRedirectPromise(); });
@@ -1152,17 +1296,30 @@ https://github.com/nodeca/pako/blob/main/LICENSE
     });
   }
 
-  /* --- Reintento de los pendientes --- */
+  /* --- Reintento de los pendientes (solo con subida automática) --- */
   $("btnReintentar").addEventListener("click", function () {
+    if (CONFIG.destino === "compartir") {
+      banner("Con el envío por compartir, abre el parte pendiente en la lista y pulsa Enviar.", "warn");
+      return;
+    }
     DB.listarPartes().then(function (ps) {
       var pend = ps.filter(function (p) { return p.estado === "pendiente"; });
       if (!pend.length) { banner("No hay partes pendientes de enviar.", "ok"); return; }
       banner("Reintentando " + pend.length + " parte(s)…");
-      var orig = parte;
+      var original = parte;
       (function siguiente(i) {
-        if (i >= pend.length) { parte = orig; pintarBandeja(); return; }
+        if (i >= pend.length) {
+          parte = original;
+          pintarBandeja();
+          banner("Reintento terminado.", "ok");
+          return;
+        }
         parte = pend[i];
-        enviar(pend[i]).then(function () { siguiente(i + 1); });
+        prepararPaquete()
+          .then(function (paq) { return CONFIG.destino === "flow" ? subirFlow(paq) : subirGraph(paq); })
+          .then(marcarEnviado)
+          .catch(function () { /* sigue pendiente */ })
+          .then(function () { siguiente(i + 1); });
       })(0);
     });
   });
@@ -1170,7 +1327,7 @@ https://github.com/nodeca/pako/blob/main/LICENSE
   window.addEventListener("online", function () {
     DB.listarPartes().then(function (ps) {
       var n = ps.filter(function (p) { return p.estado === "pendiente"; }).length;
-      if (n) banner("Hay " + n + " parte(s) pendientes de enviar. Pulsa «Reintentar envíos» en la bandeja.", "warn");
+      if (n) banner("Hay " + n + " parte(s) pendientes de enviar.", "warn");
     });
   });
 
