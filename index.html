@@ -4,7 +4,6 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0C6B5B">
-<meta name="description" content="Partes de campo de UNEI: checklist, fotos, audio y GPS.">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-192.png">
 <link rel="icon" href="icon-192.png">
@@ -1038,6 +1037,19 @@ https://github.com/nodeca/pako/blob/main/LICENSE
      (para compartir). Los móviles NO dejan compartir un .zip: solo admiten
      imágenes, audio, vídeo, PDF y texto. Por eso el parte se comparte como
      parte.json declarado text/plain, más cada foto y cada audio por separado. */
+  /* El móvil valida la EXTENSIÓN y el tipo de cada archivo antes de dejar
+     compartirlo, y su lista es corta. Un .json queda fuera aunque lo declares
+     como texto: por eso el parte se comparte como .txt. */
+  var EXT_OK = ["jpg", "jpeg", "png", "gif", "webp", "bmp", "mp3", "ogg", "wav",
+                "webm", "flac", "m4a", "mp4", "mpeg", "txt", "csv", "pdf"];
+  var MIME_OK = /^(image\/(jpeg|png|gif|webp|bmp)|audio\/(mpeg|ogg|wav|webm|flac|mp4)|video\/(mp4|mpeg|ogg|webm)|text\/(plain|csv)|application\/pdf)$/;
+
+  function compartible(f) {
+    var ext = String(f.name || "").split(".").pop().toLowerCase();
+    var mime = String(f.type || "").split(";")[0].trim();
+    return EXT_OK.indexOf(ext) >= 0 && MIME_OK.test(mime);
+  }
+
   function prepararPaquete() {
     var json = construirJson();
     var textoJson = JSON.stringify(json, null, 2);
@@ -1046,7 +1058,7 @@ https://github.com/nodeca/pako/blob/main/LICENSE
     zip.file("parte.json", textoJson);
     var media = zip.folder("media");
 
-    var ficheros = [new File([textoJson], "parte.json", { type: "text/plain" })];
+    var ficheros = [new File([textoJson], nombreBase() + ".txt", { type: "text/plain" })];
     var pend = [];
 
     Object.keys(parte.adjuntos).forEach(function (k) {
@@ -1054,7 +1066,8 @@ https://github.com/nodeca/pako/blob/main/LICENSE
         pend.push(DB.leerMedio(a.id).then(function (m) {
           if (!m || !m.blob) return;
           media.file(a.nombre, m.blob);
-          ficheros.push(new File([m.blob], a.nombre, { type: a.mime || m.blob.type || "application/octet-stream" }));
+          var mime = String(a.mime || m.blob.type || "").split(";")[0].trim();
+          ficheros.push(new File([m.blob], a.nombre, { type: mime }));
         }));
       });
     });
@@ -1064,7 +1077,10 @@ https://github.com/nodeca/pako/blob/main/LICENSE
         return zip.generateAsync({ type: "blob", compression: "DEFLATE", compressionOptions: { level: 6 } });
       })
       .then(function (blob) {
-        return { json: json, texto: resumenTexto(json), zip: blob, ficheros: ficheros };
+        return {
+          json: json, texto: resumenTexto(json), zip: blob,
+          ficheros: ficheros, compartibles: ficheros.filter(compartible)
+        };
       });
   }
 
@@ -1118,13 +1134,14 @@ https://github.com/nodeca/pako/blob/main/LICENSE
          caduca en cuanto se pierde el gesto del usuario. --- */
   function abrirDialogoEnvio(paq) {
     var hayShare = typeof navigator.share === "function";
-    var hayFicheros = hayShare && navigator.canShare && navigator.canShare({ files: paq.ficheros });
+    var hayFicheros = hayShare && paq.compartibles.length > 0 &&
+                      navigator.canShare && navigator.canShare({ files: paq.compartibles });
 
-    $("envSub").textContent = hayFicheros
-      ? "Se enviarán " + paq.ficheros.length + " archivo(s): el parte y sus fotos y audios."
+    aviso(hayFicheros
+      ? "Se enviarán " + paq.compartibles.length + " archivo(s): el parte y sus fotos y audios."
       : (hayShare
-          ? "Este móvil no deja adjuntar los archivos solos: se manda el resumen y tú adjuntas el paquete descargado."
-          : "Este navegador no tiene hoja de compartir: descarga el paquete y adjúntalo al correo o al mensaje.");
+          ? "Este móvil no deja adjuntar archivos: se manda el resumen y tú adjuntas el paquete de Descargar."
+          : "Este navegador no tiene hoja de compartir: descarga el paquete y adjúntalo al correo o al mensaje."), false);
 
     $("envShare").hidden = !hayShare;
     $("envTexto").textContent = paq.texto;
@@ -1138,20 +1155,43 @@ https://github.com/nodeca/pako/blob/main/LICENSE
     if (d.close) d.close(); else d.removeAttribute("open");
   }
 
+  function aviso(txt, esError) {
+    var el = $("envSub");
+    el.textContent = txt;
+    el.className = esError ? "banner bad" : "note";
+  }
+
   $("envShare").addEventListener("click", function () {
     if (!paquete) return;
+
     var datos = { title: "Parte de campo", text: paquete.texto };
-    if (navigator.canShare && navigator.canShare({ files: paquete.ficheros })) datos.files = paquete.ficheros;
+    if (paquete.compartibles.length && navigator.canShare &&
+        navigator.canShare({ files: paquete.compartibles })) {
+      datos.files = paquete.compartibles;
+    }
 
     navigator.share(datos).then(function () {
       cerrarEnvio();
       marcarEnviado();
     }).catch(function (err) {
       if (err && err.name === "AbortError") return;   // lo ha cancelado el usuario
-      cerrarEnvio();
-      banner("El móvil no ha dejado abrir la hoja de compartir (" + esc((err && err.name) || "error") +
-             "). Pulsa «Descargar» y adjunta tú el paquete.", "warn");
-      window.scrollTo(0, 0);
+
+      // El diálogo se queda abierto: el botón Descargar sigue ahí, a mano.
+      if (datos.files) {
+        // Reintento sin archivos: al menos el resumen sí viaja.
+        delete datos.files;
+        navigator.share(datos).then(function () {
+          cerrarEnvio();
+          marcarEnviado();
+        }).catch(function (err2) {
+          if (err2 && err2.name === "AbortError") return;
+          aviso("Este móvil no deja compartir desde la web (" + ((err2 && err2.name) || "error") +
+                "). Pulsa Descargar, aquí abajo, y adjunta tú el archivo.", true);
+        });
+        return;
+      }
+      aviso("Este móvil no deja compartir desde la web (" + ((err && err.name) || "error") +
+            "). Pulsa Descargar, aquí abajo, y adjunta tú el archivo.", true);
     });
   });
 
@@ -1355,7 +1395,7 @@ https://github.com/nodeca/pako/blob/main/LICENSE
 <script>
   if ("serviceWorker" in navigator) {
     window.addEventListener("load", function () {
-      navigator.serviceWorker.register("./sw.js").catch(function () { /* sin sw, la app sigue funcionando */ });
+      navigator.serviceWorker.register("./sw.js").catch(function () {});
     });
   }
 </script>
