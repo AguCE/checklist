@@ -1,0 +1,661 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0C6B5B">
+<title>Parte de Limpieza UNEI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+  :root {
+    --ground:#F4F2EC; --surface:#FFFFFF; --surface-2:#FAF9F5;
+    --ink:#17211E; --ink-2:#5A6A64; --ink-3:#8A968F;
+    --line:#DEDACE; --line-2:#EAE7DD;
+    --accent:#0C6B5B; --accent-soft:#E2EFEB;
+    --ok:#2C7A54; --ok-soft:#E4F0E8;
+    --warn:#9C6A05; --warn-soft:#F7EDD8;
+    --bad:#A4362D; --bad-soft:#F6E3E0;
+    --na:#6E7A74; --na-soft:#EBEBE6;
+    --shadow:0 1px 2px rgba(23,33,30,.06), 0 6px 18px rgba(23,33,30,.05);
+    color-scheme: light;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground:#0E1412; --surface:#161E1B; --surface-2:#1B2421;
+      --ink:#E7EDE9; --ink-2:#A3B0AA; --ink-3:#78857F;
+      --line:#2A3531; --line-2:#222C29;
+      --accent:#3CB69C; --accent-soft:#14312B;
+      --ok:#5FC08C; --ok-soft:#14301F;
+      --warn:#D9A33F; --warn-soft:#33270E;
+      --bad:#E27A6E; --bad-soft:#341C19;
+      --na:#93A09A; --na-soft:#222B28;
+      --shadow:0 1px 2px rgba(0,0,0,.3), 0 6px 18px rgba(0,0,0,.25);
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --ground:#0E1412; --surface:#161E1B; --surface-2:#1B2421;
+    --ink:#E7EDE9; --ink-2:#A3B0AA; --ink-3:#78857F;
+    --line:#2A3531; --line-2:#222C29;
+    --accent:#3CB69C; --accent-soft:#14312B;
+    --ok:#5FC08C; --ok-soft:#14301F;
+    --warn:#D9A33F; --warn-soft:#33270E;
+    --bad:#E27A6E; --bad-soft:#341C19;
+    --na:#93A09A; --na-soft:#222B28;
+    --shadow:0 1px 2px rgba(0,0,0,.3), 0 6px 18px rgba(0,0,0,.25);
+    color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  img { max-width: 100%; }
+  body {
+    margin: 0; background: var(--ground); color: var(--ink);
+    font-family: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-size: 15px; line-height: 1.45; -webkit-text-size-adjust: 100%;
+  }
+  h1, h2 { font-family: "Archivo", system-ui, sans-serif; margin: 0; text-wrap: balance; }
+  button, input, select, textarea { font: inherit; color: inherit; }
+  button { cursor: pointer; }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  .topbar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20; background: var(--surface); border-bottom: 1px solid var(--line); }
+  .topbar-inner { max-width: 720px; margin: 0 auto; padding: 10px 16px; display: flex; align-items: baseline; gap: 9px; }
+  .org { font-size: 10px; text-transform: uppercase; letter-spacing: .12em; color: var(--accent); font-weight: 600; }
+  .topbar h1 { font-size: 16px; font-weight: 700; letter-spacing: -.01em; }
+  .meter-wrap { max-width: 720px; margin: 0 auto; padding: 0 16px 9px; display: flex; align-items: center; gap: 10px; }
+  .meter { flex: 1; height: 6px; background: var(--line-2); border-radius: 999px; overflow: hidden; }
+  .meter > i { display: block; height: 100%; width: 0%; background: var(--accent); transition: width .25s ease; }
+  .meter-txt { font-size: 12px; color: var(--ink-2); font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+  .page { max-width: 720px; margin: 0 auto; padding: 16px 16px 130px; }
+
+  .card { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; box-shadow: var(--shadow); margin-bottom: 14px; overflow: hidden; }
+  .card-head { padding: 13px 15px; display: flex; align-items: center; gap: 11px; border-bottom: 1px solid var(--line-2); }
+  .step { flex: none; width: 24px; height: 24px; border-radius: 6px; background: var(--accent-soft); color: var(--accent); font-family: "Archivo", sans-serif; font-weight: 700; font-size: 12px; display: grid; place-items: center; }
+  .card-head h2 { font-size: 14.5px; font-weight: 600; }
+  .card-head .count { margin-left: auto; font-size: 11.5px; color: var(--ink-3); font-variant-numeric: tabular-nums; }
+  .card-body { padding: 4px 15px 13px; }
+
+  .fields { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 11px; }
+  .field { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+  .field.wide { grid-column: 1 / -1; }
+  .field label { font-size: 11.5px; font-weight: 600; color: var(--ink-2); }
+  .field input, .field select, .field textarea {
+    background: var(--surface-2); border: 1px solid var(--line); border-radius: 8px;
+    padding: 10px; font-size: 16px; width: 100%;
+  }
+  .field textarea { resize: vertical; min-height: 76px; line-height: 1.4; }
+  .withmic { position: relative; }
+  .withmic textarea { padding-right: 46px; }
+  .mic {
+    position: absolute; top: 6px; right: 6px; width: 34px; height: 34px;
+    border-radius: 8px; border: 1px solid var(--line); background: var(--surface);
+    display: grid; place-items: center; padding: 0;
+  }
+  .mic svg { width: 17px; height: 17px; fill: var(--ink-2); }
+  .mic[data-rec="1"] { background: var(--bad-soft); border-color: var(--bad); }
+  .mic[data-rec="1"] svg { fill: var(--bad); }
+
+  .item { padding: 11px 0; border-bottom: 1px solid var(--line-2); }
+  .item:last-child { border-bottom: 0; }
+  .item-txt { font-size: 14px; margin-bottom: 8px; }
+  .seg { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; }
+  .seg > div { position: relative; }
+  .seg input { position: absolute; inset: 0; opacity: 0; width: 100%; height: 100%; margin: 0; }
+  .seg label {
+    display: grid; place-items: center; text-align: center; min-height: 42px; padding: 5px 3px;
+    border: 1px solid var(--line); border-radius: 8px; background: var(--surface-2);
+    color: var(--ink-2); font-size: 12px; line-height: 1.15; font-weight: 500;
+  }
+  .seg input:focus-visible + label { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .seg input:checked + label { font-weight: 600; }
+  .seg input[value="ok"]:checked + label  { background: var(--ok-soft);  border-color: var(--ok);  color: var(--ok); }
+  .seg input[value="mej"]:checked + label { background: var(--warn-soft); border-color: var(--warn); color: var(--warn); }
+  .seg input[value="nc"]:checked + label  { background: var(--bad-soft); border-color: var(--bad); color: var(--bad); }
+  .seg input[value="na"]:checked + label  { background: var(--na-soft);  border-color: var(--na);  color: var(--na); }
+
+  .photo-btn {
+    display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%;
+    min-height: 48px; border: 1px dashed var(--line); border-radius: 10px;
+    background: var(--surface-2); color: var(--accent); font-weight: 600; font-size: 14.5px;
+  }
+  .photo-btn svg { width: 18px; height: 18px; fill: currentColor; }
+  .thumbs { display: grid; grid-template-columns: repeat(auto-fill, minmax(88px, 1fr)); gap: 8px; margin-top: 11px; }
+  .thumb { position: relative; aspect-ratio: 1; border-radius: 9px; overflow: hidden; border: 1px solid var(--line); background: var(--surface-2); }
+  .thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .thumb button {
+    position: absolute; top: 3px; right: 3px; width: 24px; height: 24px; border-radius: 6px;
+    border: 0; background: rgba(20,26,24,.72); color: #fff; font-size: 15px; line-height: 1; padding: 0;
+  }
+
+  .actionbar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 30; background: var(--surface); border-top: 1px solid var(--line); padding: 10px 16px; padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px)); }
+  .actionbar-inner { max-width: 720px; margin: 0 auto; display: flex; align-items: center; gap: 11px; }
+  .score { font-family: "Archivo", sans-serif; font-variant-numeric: tabular-nums; line-height: 1.05; }
+  .score b { display: block; font-size: 21px; font-weight: 700; }
+  .score span { font-size: 10px; text-transform: uppercase; letter-spacing: .09em; color: var(--ink-3); font-weight: 600; }
+  .btn { border: 1px solid transparent; border-radius: 9px; padding: 12px 17px; font-weight: 600; font-size: 15px; background: var(--accent); color: #fff; }
+  :root[data-theme="dark"] .btn, :root:not([data-theme="light"]) .btn { color: #08201C; }
+  .btn.ghost { background: transparent; color: var(--ink-2); border-color: var(--line); }
+  .btn[disabled] { opacity: .5; }
+  .actionbar .btn.primary { margin-left: auto; }
+
+  .banner { border-radius: 10px; padding: 11px 13px; font-size: 13.5px; margin-bottom: 14px; border: 1px solid var(--line); background: var(--surface-2); color: var(--ink-2); }
+  .banner.ok { background: var(--ok-soft); border-color: var(--ok); color: var(--ok); }
+  .banner.bad { background: var(--bad-soft); border-color: var(--bad); color: var(--bad); }
+  .note { font-size: 12.5px; color: var(--ink-3); margin: 0; }
+
+  dialog::backdrop { background: rgba(10,16,14,.55); }
+  dialog {
+    border: 1px solid var(--line); border-radius: 14px; background: var(--surface); color: var(--ink);
+    padding: 0; width: min(560px, calc(100vw - 32px)); max-height: 82vh;
+  }
+  .dlg-head { padding: 14px 16px 10px; border-bottom: 1px solid var(--line-2); }
+  .dlg-head h2 { font-size: 15.5px; font-weight: 700; }
+  .dlg-head p { margin: 4px 0 0; font-size: 12.5px; color: var(--ink-3); }
+  .dlg-body { padding: 13px 16px; }
+  .dlg-body pre {
+    margin: 0; white-space: pre-wrap; word-break: break-word; font-family: inherit;
+    font-size: 13px; background: var(--surface-2); border: 1px solid var(--line-2);
+    border-radius: 9px; padding: 11px; max-height: 40vh; overflow: auto;
+  }
+  .dlg-foot { display: flex; gap: 8px; flex-wrap: wrap; padding: 0 16px 15px; }
+
+  @media (max-width: 420px) { .fields { grid-template-columns: 1fr; } }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <span class="org">UNEI</span>
+    <h1>Parte de limpieza</h1>
+  </div>
+  <div class="meter-wrap">
+    <div class="meter"><i id="meterBar"></i></div>
+    <div class="meter-txt" id="meterTxt">0 / 0</div>
+  </div>
+</header>
+
+<main class="page">
+  <div id="banner"></div>
+
+  <div class="card">
+    <div class="card-head"><span class="step">·</span><h2>Datos de la visita</h2></div>
+    <div class="card-body">
+      <div class="fields">
+        <div class="field wide">
+          <label for="f-centro">Centro o cliente</label>
+          <input id="f-centro" type="text" placeholder="Ej.: Residencia Ntra. Sra. — Sevilla" autocomplete="off">
+        </div>
+        <div class="field">
+          <label for="f-zona">Edificio o planta</label>
+          <input id="f-zona" type="text" placeholder="Planta 2 — ala este" autocomplete="off">
+        </div>
+        <div class="field">
+          <label for="f-tipo">Tipo de visita</label>
+          <select id="f-tipo">
+            <option>Rutinaria</option>
+            <option>Incidencia o reclamación</option>
+            <option>Recepción de servicio</option>
+            <option>Auditoría interna</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="f-tecnico">Técnico</label>
+          <input id="f-tecnico" type="text" placeholder="Nombre y apellidos" autocomplete="name">
+        </div>
+        <div class="field">
+          <label for="f-fecha">Fecha</label>
+          <input id="f-fecha" type="date">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="blocks"></div>
+
+  <div class="card">
+    <div class="card-head"><span class="step">📷</span><h2>Fotos</h2><span class="count" id="photoCount">0</span></div>
+    <div class="card-body">
+      <button type="button" class="photo-btn" id="btnPhoto">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3 7.2 5H4a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-3.2L15 3H9Zm3 5.5a5 5 0 1 1 0 10 5 5 0 0 1 0-10Zm0 2a3 3 0 1 0 0 6 3 3 0 0 0 0-6Z"/></svg>
+        Hacer foto o elegir del carrete
+      </button>
+      <input type="file" id="fileInput" accept="image/*" multiple hidden>
+      <div class="thumbs" id="thumbs"></div>
+      <p class="note" id="photoNote" style="margin-top:10px">Las fotos se reducen de tamaño para que se puedan enviar sin problema.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="step">·</span><h2>Cierre</h2></div>
+    <div class="card-body">
+      <div class="fields">
+        <div class="field wide withmic">
+          <label for="f-obs">Observaciones</label>
+          <textarea id="f-obs" placeholder="Qué has visto, comentarios del centro, estado general…"></textarea>
+          <button type="button" class="mic" data-target="f-obs" aria-label="Dictar observaciones" hidden>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 14a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v5a3 3 0 0 0 3 3Zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.92V21h2v-3.08A7 7 0 0 0 19 11h-2Z"/></svg>
+          </button>
+        </div>
+        <div class="field wide withmic">
+          <label for="f-acc">Acciones a realizar y plazo</label>
+          <textarea id="f-acc" placeholder="Ej.: refuerzo de desengrase en office antes del 24/09."></textarea>
+          <button type="button" class="mic" data-target="f-acc" aria-label="Dictar acciones" hidden>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 14a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v5a3 3 0 0 0 3 3Zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.92V21h2v-3.08A7 7 0 0 0 19 11h-2Z"/></svg>
+          </button>
+        </div>
+      </div>
+      <p class="note" id="micNote" style="margin-top:10px">Para dictar también puedes usar el micrófono del teclado del móvil.</p>
+    </div>
+  </div>
+</main>
+
+<div class="actionbar">
+  <div class="actionbar-inner">
+    <div class="score"><b id="scoreVal">—</b><span>Cumplimiento</span></div>
+    <button type="button" class="btn ghost" id="btnClear">Vaciar</button>
+    <button type="button" class="btn primary" id="btnSend">Enviar parte</button>
+  </div>
+</div>
+
+<dialog id="dlg">
+  <div class="dlg-head">
+    <h2>Enviar el parte</h2>
+    <p id="dlgSub">Elige por dónde lo mandas.</p>
+  </div>
+  <div class="dlg-body"><pre id="dlgText"></pre></div>
+  <div class="dlg-foot">
+    <button type="button" class="btn" id="dlgShare" hidden>Compartir</button>
+    <button type="button" class="btn ghost" id="dlgWa">WhatsApp</button>
+    <button type="button" class="btn ghost" id="dlgMail">Correo</button>
+    <button type="button" class="btn ghost" id="dlgCopy">Copiar texto</button>
+    <button type="button" class="btn ghost" id="dlgClose">Cerrar</button>
+  </div>
+</dialog>
+
+<script>
+(function () {
+  "use strict";
+
+  /* ================= CONFIGURACIÓN — editar aquí ================= */
+  var DESTINO_EMAIL = "agustin.chacon@unei.com";  // a quién llega el parte por correo
+  var DESTINO_WHATSAPP = "";                       // opcional: "34600111222" (sin + ni espacios)
+  /* ============================================================== */
+
+  var BLOQUES = [
+    { t: "Aseos y vestuarios", items: [
+      "Inodoros, urinarios y cisternas sin restos ni cal",
+      "Lavabos, grifería y encimeras sin cal ni manchas",
+      "Espejos y mamparas sin marcas",
+      "Suelos y alicatado limpios, sin acumulación en rincones",
+      "Dispensadores de jabón, papel y secamanos repuestos",
+      "Papeleras vaciadas y con bolsa",
+      "Ausencia de malos olores"
+    ]},
+    { t: "Despachos y administración", items: [
+      "Superficies y mobiliario desempolvados",
+      "Equipos informáticos y teléfonos limpios",
+      "Papeleras y reciclaje vaciados",
+      "Suelos barridos, fregados o aspirados",
+      "Cristales interiores y mamparas sin huellas",
+      "Rodapiés y patas de mobiliario sin suciedad acumulada"
+    ]},
+    { t: "Zonas comunes y circulaciones", items: [
+      "Hall y accesos: felpudos y puertas de entrada",
+      "Suelos de pasillos sin marcas ni restos",
+      "Escaleras, peldaños y barandillas",
+      "Ascensor: cabina, espejo, botonera y guías",
+      "Puntos de contacto desinfectados (manillas, pulsadores)",
+      "Mobiliario de espera y señalética sin polvo"
+    ]},
+    { t: "Office, comedor y cocina", items: [
+      "Encimeras, fregadero y grifería desengrasados",
+      "Microondas por dentro y frigorífico por fuera",
+      "Mesas y sillas del comedor",
+      "Suelo desengrasado, sin restos bajo el mobiliario",
+      "Contenedores de residuos limpios, con bolsa y tapa"
+    ]},
+    { t: "Producto, maquinaria y prevención", items: [
+      "Dosificación de producto conforme a ficha técnica",
+      "Fichas de seguridad accesibles en el centro",
+      "Almacén ordenado, ventilado y cerrado con llave",
+      "Productos etiquetados y en envases originales",
+      "Código de colores de bayetas y mopas respetado",
+      "Maquinaria limpia y operativa",
+      "EPI en uso y señalización de suelo mojado"
+    ]},
+    { t: "Equipo y documentación", items: [
+      "Personal con uniforme e identificación visible",
+      "Presencia conforme al cuadrante contratado",
+      "Partes de trabajo cumplimentados y firmados",
+      "Frecuencias contratadas cumplidas",
+      "Incidencias de la visita anterior resueltas",
+      "Stock de consumibles suficiente"
+    ]}
+  ];
+
+  var OPCIONES = [
+    { v: "ok",  l: "Bien" },
+    { v: "mej", l: "Mejorable" },
+    { v: "nc",  l: "No conforme" },
+    { v: "na",  l: "N/A" }
+  ];
+
+  var DRAFT = "unei-parte-limpieza-v1";
+  var TOTAL = BLOQUES.reduce(function (n, b) { return n + b.items.length; }, 0);
+  var $ = function (id) { return document.getElementById(id); };
+  var esc = function (s) {
+    return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
+      return ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c];
+    });
+  };
+  var iid = function (b, i) { return "b" + (b + 1) + "i" + (i + 1); };
+
+  /* ---------------- Render ---------------- */
+  var h = "";
+  BLOQUES.forEach(function (b, bi) {
+    h += '<div class="card"><div class="card-head"><span class="step">' + (bi + 1) + "</span><h2>" + esc(b.t) +
+         '</h2><span class="count" id="cnt-' + bi + '">0/' + b.items.length + "</span></div><div class=\"card-body\">";
+    b.items.forEach(function (txt, ii) {
+      var id = iid(bi, ii);
+      h += '<div class="item"><div class="item-txt" id="lbl-' + id + '">' + esc(txt) + "</div>" +
+           '<div class="seg" role="radiogroup" aria-labelledby="lbl-' + id + '">';
+      OPCIONES.forEach(function (o) {
+        h += '<div><input type="radio" id="' + id + "-" + o.v + '" name="' + id + '" value="' + o.v + '">' +
+             '<label for="' + id + "-" + o.v + '">' + o.l + "</label></div>";
+      });
+      h += "</div></div>";
+    });
+    h += "</div></div>";
+  });
+  $("blocks").innerHTML = h;
+
+  var hoy = new Date();
+  $("f-fecha").value = hoy.getFullYear() + "-" + String(hoy.getMonth() + 1).padStart(2, "0") + "-" + String(hoy.getDate()).padStart(2, "0");
+
+  /* ---------------- Estado ---------------- */
+  function respuestas() {
+    var r = {};
+    BLOQUES.forEach(function (b, bi) {
+      b.items.forEach(function (_, ii) {
+        var sel = document.querySelector('input[name="' + iid(bi, ii) + '"]:checked');
+        if (sel) r[iid(bi, ii)] = sel.value;
+      });
+    });
+    return r;
+  }
+
+  function calcular(r) {
+    var suma = 0, base = 0, nc = 0, mej = 0, n = 0;
+    Object.keys(r).forEach(function (k) {
+      n++;
+      if (r[k] === "na") return;
+      base++;
+      if (r[k] === "ok") suma += 1;
+      else if (r[k] === "mej") { suma += 0.5; mej++; }
+      else nc++;
+    });
+    return { n: n, pct: base ? Math.round(suma / base * 100) : null, nc: nc, mej: mej };
+  }
+
+  function cabecera() {
+    return {
+      centro: $("f-centro").value.trim(), zona: $("f-zona").value.trim(),
+      tipo: $("f-tipo").value, tecnico: $("f-tecnico").value.trim(),
+      fecha: $("f-fecha").value, obs: $("f-obs").value.trim(), acc: $("f-acc").value.trim()
+    };
+  }
+
+  function refrescar() {
+    var r = respuestas(), c = calcular(r);
+    $("meterBar").style.width = Math.round(c.n / TOTAL * 100) + "%";
+    $("meterTxt").textContent = c.n + " / " + TOTAL;
+    $("scoreVal").textContent = c.pct === null ? "—" : c.pct + " %";
+    BLOQUES.forEach(function (b, bi) {
+      var k = 0;
+      b.items.forEach(function (_, ii) { if (r[iid(bi, ii)]) k++; });
+      $("cnt-" + bi).textContent = k + "/" + b.items.length;
+    });
+    try { localStorage.setItem(DRAFT, JSON.stringify({ cab: cabecera(), resp: r })); } catch (e) {}
+    return c;
+  }
+
+  (function cargar() {
+    var raw = null;
+    try { raw = localStorage.getItem(DRAFT); } catch (e) { return; }
+    if (!raw) return;
+    var d; try { d = JSON.parse(raw); } catch (e) { return; }
+    if (!d) return;
+    var m = { centro: "f-centro", zona: "f-zona", tipo: "f-tipo", tecnico: "f-tecnico", fecha: "f-fecha", obs: "f-obs", acc: "f-acc" };
+    Object.keys(m).forEach(function (k) { if (d.cab && d.cab[k]) $(m[k]).value = d.cab[k]; });
+    Object.keys(d.resp || {}).forEach(function (k) {
+      var el = document.getElementById(k + "-" + d.resp[k]);
+      if (el) el.checked = true;
+    });
+  })();
+
+  document.addEventListener("change", refrescar);
+  document.addEventListener("input", function (e) { if (e.target && e.target.tagName === "TEXTAREA") refrescar(); });
+  refrescar();
+
+  /* ---------------- Fotos ---------------- */
+  var fotos = [];
+
+  $("btnPhoto").addEventListener("click", function () { $("fileInput").click(); });
+
+  $("fileInput").addEventListener("change", function (e) {
+    var files = Array.prototype.slice.call(e.target.files || []);
+    e.target.value = "";
+    files.forEach(function (f) {
+      if (fotos.length >= 10) return;
+      comprimir(f, function (blob, url) {
+        if (!blob) return;
+        fotos.push({ blob: blob, url: url });
+        pintarFotos();
+      });
+    });
+  });
+
+  function comprimir(file, cb) {
+    var fr = new FileReader();
+    fr.onload = function () {
+      var img = new Image();
+      img.onload = function () {
+        var max = 1280;
+        var w = img.width, ht = img.height;
+        if (w > ht && w > max) { ht = Math.round(ht * max / w); w = max; }
+        else if (ht >= w && ht > max) { w = Math.round(w * max / ht); ht = max; }
+        var cv = document.createElement("canvas");
+        cv.width = w; cv.height = ht;
+        cv.getContext("2d").drawImage(img, 0, 0, w, ht);
+        cv.toBlob(function (blob) {
+          if (!blob) { cb(null); return; }
+          cb(blob, cv.toDataURL("image/jpeg", 0.5));
+        }, "image/jpeg", 0.72);
+      };
+      img.onerror = function () { cb(null); };
+      img.src = fr.result;
+    };
+    fr.onerror = function () { cb(null); };
+    fr.readAsDataURL(file);
+  }
+
+  function pintarFotos() {
+    $("photoCount").textContent = fotos.length;
+    $("thumbs").innerHTML = fotos.map(function (f, i) {
+      return '<div class="thumb"><img src="' + f.url + '" alt="Foto ' + (i + 1) + '">' +
+             '<button type="button" data-i="' + i + '" aria-label="Quitar foto ' + (i + 1) + '">×</button></div>';
+    }).join("");
+  }
+
+  $("thumbs").addEventListener("click", function (e) {
+    var b = e.target.closest("button[data-i]");
+    if (!b) return;
+    fotos.splice(Number(b.dataset.i), 1);
+    pintarFotos();
+  });
+
+  /* ---------------- Dictado por voz ---------------- */
+  var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (SR) {
+    document.querySelectorAll(".mic").forEach(function (btn) {
+      btn.hidden = false;
+      var rec = null;
+      btn.addEventListener("click", function () {
+        var ta = $(btn.dataset.target);
+        if (rec) { rec.stop(); return; }
+        try { rec = new SR(); } catch (err) { rec = null; return; }
+        rec.lang = "es-ES";
+        rec.interimResults = false;
+        rec.continuous = true;
+        var base = ta.value;
+        btn.dataset.rec = "1";
+        rec.onresult = function (ev) {
+          var t = "";
+          for (var i = ev.resultIndex; i < ev.results.length; i++) {
+            if (ev.results[i].isFinal) t += ev.results[i][0].transcript;
+          }
+          if (t) { base = (base ? base.replace(/\s*$/, "") + " " : "") + t.trim(); ta.value = base; refrescar(); }
+        };
+        rec.onerror = function () { limpiar(); };
+        rec.onend = function () { limpiar(); };
+        function limpiar() { btn.dataset.rec = "0"; rec = null; }
+        try { rec.start(); } catch (err) { limpiar(); }
+      });
+    });
+  } else {
+    $("micNote").textContent = "Para dictar, usa el micrófono del teclado del móvil en cualquier campo de texto.";
+  }
+
+  /* ---------------- Texto del parte ---------------- */
+  function fechaES(v) { var p = (v || "").split("-"); return p.length === 3 ? p[2] + "/" + p[1] + "/" + p[0] : ""; }
+
+  function generarTexto() {
+    var cab = cabecera(), r = respuestas(), c = calcular(r);
+    var L = [];
+    L.push("PARTE DE LIMPIEZA — UNEI");
+    L.push("Centro: " + (cab.centro || "—") + (cab.zona ? " · " + cab.zona : ""));
+    L.push("Fecha: " + (fechaES(cab.fecha) || "—") + " · Visita " + cab.tipo.toLowerCase());
+    L.push("Técnico: " + (cab.tecnico || "—"));
+    L.push("Cumplimiento: " + (c.pct === null ? "—" : c.pct + " %") + " (" + c.n + "/" + TOTAL + " puntos valorados)");
+    L.push("");
+
+    var nc = [], mej = [];
+    BLOQUES.forEach(function (b, bi) {
+      b.items.forEach(function (txt, ii) {
+        var v = r[iid(bi, ii)];
+        if (v === "nc") nc.push("• " + b.t + ": " + txt);
+        else if (v === "mej") mej.push("• " + b.t + ": " + txt);
+      });
+    });
+
+    L.push("NO CONFORMES (" + nc.length + ")");
+    L.push(nc.length ? nc.join("\n") : "• Ninguno");
+    L.push("");
+    L.push("MEJORABLES (" + mej.length + ")");
+    L.push(mej.length ? mej.join("\n") : "• Ninguno");
+    if (cab.obs) { L.push(""); L.push("OBSERVACIONES"); L.push(cab.obs); }
+    if (cab.acc) { L.push(""); L.push("ACCIONES Y PLAZO"); L.push(cab.acc); }
+    if (fotos.length) { L.push(""); L.push("Se adjuntan " + fotos.length + " foto(s)."); }
+    return L.join("\n");
+  }
+
+  /* ---------------- Envío ---------------- */
+  function banner(t, cls) { $("banner").innerHTML = t ? '<div class="banner ' + (cls || "") + '">' + t + "</div>" : ""; }
+
+  var dlg = $("dlg");
+
+  $("btnSend").addEventListener("click", async function () {
+    var cab = cabecera(), c = calcular(respuestas());
+    if (!cab.centro) { banner("Pon el centro antes de enviar.", "bad"); $("f-centro").focus(); window.scrollTo(0, 0); return; }
+    if (!cab.tecnico) { banner("Pon tu nombre antes de enviar.", "bad"); $("f-tecnico").focus(); window.scrollTo(0, 0); return; }
+    if (c.n === 0) { banner("Valora al menos un punto del checklist.", "bad"); window.scrollTo(0, 0); return; }
+    banner("");
+
+    var texto = generarTexto();
+    $("dlgText").textContent = texto;
+
+    var archivos = fotos.map(function (f, i) {
+      return new File([f.blob], "foto-" + (i + 1) + ".jpg", { type: "image/jpeg" });
+    });
+
+    var puedeCompartirFotos = archivos.length > 0 && navigator.canShare && navigator.canShare({ files: archivos });
+    var puedeCompartir = typeof navigator.share === "function";
+
+    $("dlgShare").hidden = !puedeCompartir;
+    $("dlgSub").textContent = archivos.length === 0
+      ? "Sin fotos adjuntas."
+      : (puedeCompartirFotos
+          ? "Se enviarán " + archivos.length + " foto(s) junto al texto."
+          : "Este móvil no deja adjuntar las fotos automáticamente: envía el texto y añade las fotos desde el carrete.");
+
+    $("dlgShare").onclick = async function () {
+      try {
+        if (puedeCompartirFotos) await navigator.share({ text: texto, files: archivos });
+        else await navigator.share({ text: texto, title: "Parte de limpieza — " + cab.centro });
+        hecho();
+      } catch (err) { /* el usuario ha cancelado */ }
+    };
+
+    if (typeof dlg.showModal === "function") dlg.showModal(); else dlg.setAttribute("open", "");
+  });
+
+  $("dlgWa").addEventListener("click", function () {
+    var url = "https://wa.me/" + (DESTINO_WHATSAPP || "") + "?text=" + encodeURIComponent($("dlgText").textContent);
+    window.open(url, "_blank", "noopener");
+  });
+
+  $("dlgMail").addEventListener("click", function () {
+    var cab = cabecera();
+    var asunto = "Parte de limpieza — " + (cab.centro || "") + " — " + (fechaES(cab.fecha) || "");
+    window.location.href = "mailto:" + DESTINO_EMAIL +
+      "?subject=" + encodeURIComponent(asunto) +
+      "&body=" + encodeURIComponent($("dlgText").textContent);
+  });
+
+  $("dlgCopy").addEventListener("click", async function () {
+    var t = $("dlgText").textContent;
+    try {
+      await navigator.clipboard.writeText(t);
+      this.textContent = "Copiado ✓";
+    } catch (err) {
+      var r = document.createRange();
+      r.selectNodeContents($("dlgText"));
+      var s = window.getSelection(); s.removeAllRanges(); s.addRange(r);
+      this.textContent = "Selecciona y copia";
+    }
+    var b = this;
+    setTimeout(function () { b.textContent = "Copiar texto"; }, 2500);
+  });
+
+  $("dlgClose").addEventListener("click", function () { cerrar(); });
+
+  function cerrar() { if (typeof dlg.close === "function") dlg.close(); else dlg.removeAttribute("open"); }
+
+  function hecho() {
+    cerrar();
+    banner("Parte enviado. Puedes vaciar el formulario para el siguiente centro.", "ok");
+    window.scrollTo(0, 0);
+  }
+
+  $("btnClear").addEventListener("click", function () {
+    document.querySelectorAll(".seg input:checked").forEach(function (el) { el.checked = false; });
+    ["f-zona", "f-obs", "f-acc"].forEach(function (id) { $(id).value = ""; });
+    fotos = [];
+    pintarFotos();
+    try { localStorage.removeItem(DRAFT); } catch (e) {}
+    banner("");
+    refrescar();
+  });
+})();
+</script>
+
+</body>
+</html>
