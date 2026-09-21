@@ -46,6 +46,19 @@
       "expediente": {},
       "centro": {},
       "version": 3
-    }
+    },
+    {
+    "id": "exp-1726-26-campillos-zona",
+    "fichero": "exp-1726-26-campillos-zona.json",
+    "nombre": "Visita técnica — Campillos — recorrido por zona",
+    "expediente": {
+      "codigo": "1726/2026",
+      "lote": "único"
+    },
+    "centro": {
+      "nombre": "Campillos — recorrido por zona"
+    },
+    "version": 1
+  }
   ]
 }
