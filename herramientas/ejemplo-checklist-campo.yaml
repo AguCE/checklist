@@ -1,0 +1,129 @@
+checklist:
+  expediente: "2026/014"
+  lote: "2 — Limpieza"
+  objeto: "Servicio de limpieza integral de los centros residenciales de la Agencia, por lotes."
+  secciones:
+    - id: "Z1"
+      nombre: "Superficies y alcance real"
+      preguntas:
+        - id: "Z1-Q01"
+          type: number
+          label: "Superficie útil medida en la visita"
+          maps_to: "1. Descripción del servicio y dimensionamiento"
+          required: true
+          unit: "m2"
+          allow_attachment: true
+          help: "Si difiere de la del pliego, anótalo: sostiene el dimensionamiento de la oferta."
+        - id: "Z1-Q02"
+          type: multi_select
+          label: "Tipos de pavimento presentes"
+          maps_to: "1. Descripción del servicio y dimensionamiento"
+          required: true
+          options: ["Terrazo", "Gres", "PVC/vinílico", "Linóleo", "Moqueta", "Madera"]
+          allow_attachment: true
+        - id: "Z1-Q03"
+          type: textarea
+          label: "Zonas de tratamiento especial detectadas"
+          maps_to: "1. Descripción del servicio y dimensionamiento"
+          required: false
+          help: "Cocina industrial, sótanos, cubiertas, zonas de acceso restringido."
+
+    - id: "Z2"
+      nombre: "Estado actual del servicio"
+      preguntas:
+        - id: "Z2-Q01"
+          type: scale
+          label: "Estado general de limpieza observado"
+          maps_to: "2. Diagnóstico del estado actual"
+          required: true
+          allow_attachment: true
+        - id: "Z2-Q02"
+          type: scale
+          label: "Cristales y carpinterías exteriores"
+          maps_to: "2. Diagnóstico del estado actual"
+          required: true
+          allow_attachment: true
+        - id: "Z2-Q03"
+          type: photo
+          label: "Fotografía de las deficiencias más representativas"
+          maps_to: "ECE-02"
+          required: true
+          help: "Dos o tres fotos bastan. Son la evidencia del apartado de mejoras."
+        - id: "Z2-Q04"
+          type: boolean
+          label: "¿Se aprecian tratamientos periódicos al día (cristalizado, abrillantado)?"
+          maps_to: "2. Diagnóstico del estado actual"
+          required: true
+
+    - id: "Z3"
+      nombre: "Personal y subrogación"
+      preguntas:
+        - id: "Z3-Q01"
+          type: number
+          label: "Personas observadas prestando el servicio"
+          maps_to: "3. Organización del equipo"
+          required: true
+          unit: "ud"
+        - id: "Z3-Q02"
+          type: multi_select
+          label: "Turnos cubiertos actualmente"
+          maps_to: "3. Organización del equipo"
+          required: true
+          options: ["Mañana", "Tarde", "Noche", "Fin de semana", "Festivos"]
+        - id: "Z3-Q03"
+          type: boolean
+          label: "¿El listado de subrogación del pliego cuadra con lo observado?"
+          maps_to: "ECE-04"
+          required: true
+          help: "Una discrepancia aquí es una alerta económica de primer orden."
+        - id: "Z3-Q04"
+          type: note
+          label: "Comentarios del responsable del centro sobre el equipo actual"
+          maps_to: "ECE-04"
+          required: false
+
+    - id: "Z4"
+      nombre: "Medios, almacén y accesos"
+      preguntas:
+        - id: "Z4-Q01"
+          type: single_select
+          label: "Maquinaria: ¿la cede el organismo o la aporta el adjudicatario?"
+          maps_to: "4. Medios materiales"
+          required: true
+          options: ["La cede el organismo", "La aporta el adjudicatario", "Mixto", "No queda claro en el pliego"]
+        - id: "Z4-Q02"
+          type: scale
+          label: "Almacén de producto con condiciones adecuadas"
+          maps_to: "4. Medios materiales"
+          required: true
+          allow_attachment: true
+        - id: "Z4-Q03"
+          type: boolean
+          label: "¿Hay acceso de vehículo para carga y descarga?"
+          maps_to: "4. Medios materiales"
+          required: true
+        - id: "Z4-Q04"
+          type: geo
+          label: "Ubicación del acceso de servicio"
+          maps_to: "4. Medios materiales"
+          required: false
+
+    - id: "Z5"
+      nombre: "Contraste con el pliego"
+      preguntas:
+        - id: "Z5-Q01"
+          type: scale
+          label: "Las frecuencias del pliego son realizables con la plantilla prevista"
+          maps_to: "5. Plan de trabajo y frecuencias"
+          required: true
+        - id: "Z5-Q02"
+          type: textarea
+          label: "Riesgos detectados para la ejecución"
+          maps_to: "6. Gestión de riesgos"
+          required: true
+        - id: "Z5-Q03"
+          type: textarea
+          label: "Dudas que trasladar al órgano por la vía de consultas"
+          maps_to: "preguntas-telematicas"
+          required: false
+          help: "Se incorporan al checklist de preguntas telemáticas del expediente."

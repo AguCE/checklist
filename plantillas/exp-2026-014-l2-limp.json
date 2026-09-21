@@ -1,0 +1,250 @@
+{
+  "id": "exp-2026-014-l2-limp",
+  "version": 1,
+  "nombre": "Visita técnica — Residencia Ntra. Sra. de la Paz",
+  "origen": {
+    "generadoDesde": "checklist-campo.yaml",
+    "skill": "planificacion-oferta",
+    "convertidoEl": "2026-09-21"
+  },
+  "expediente": {
+    "codigo": "2026/014",
+    "objeto": "Servicio de limpieza integral de los centros residenciales de la Agencia, por lotes.",
+    "lote": "2 — Limpieza",
+    "organismo": "Agencia de Servicios Sociales y Dependencia de Andalucía"
+  },
+  "centro": {
+    "nombre": "Residencia Ntra. Sra. de la Paz",
+    "direccion": "Avda. de la Paz, 14 — 41010 Sevilla"
+  },
+  "escala": [
+    {
+      "v": "ok",
+      "l": "Bien",
+      "peso": 1,
+      "tono": "ok",
+      "significado": "cumple lo exigido"
+    },
+    {
+      "v": "mej",
+      "l": "Mejorable",
+      "peso": 0.5,
+      "tono": "warn",
+      "significado": "cumple con deficiencias"
+    },
+    {
+      "v": "nc",
+      "l": "No conforme",
+      "peso": 0,
+      "tono": "bad",
+      "significado": "no cumple"
+    },
+    {
+      "v": "na",
+      "l": "N/A",
+      "peso": null,
+      "tono": "na",
+      "significado": "no aplica; no puntúa"
+    }
+  ],
+  "secciones": [
+    {
+      "id": "z1",
+      "titulo": "Superficies y alcance real",
+      "preguntas": [
+        {
+          "id": "z1-q01",
+          "enunciado": "Superficie útil medida en la visita",
+          "tipo": "numero",
+          "requerido": true,
+          "unidad": "m2",
+          "ayuda": "En m2. Si difiere de la del pliego, anótalo: sostiene el dimensionamiento de la oferta.",
+          "mapea_a": "1. Descripción del servicio y dimensionamiento"
+        },
+        {
+          "id": "z1-q02",
+          "enunciado": "Tipos de pavimento presentes",
+          "tipo": "opcion_multiple",
+          "opciones": [
+            "Terrazo",
+            "Gres",
+            "PVC/vinílico",
+            "Linóleo",
+            "Moqueta",
+            "Madera"
+          ],
+          "requerido": true,
+          "mapea_a": "1. Descripción del servicio y dimensionamiento"
+        },
+        {
+          "id": "z1-q03",
+          "enunciado": "Zonas de tratamiento especial detectadas",
+          "tipo": "texto",
+          "largo": true,
+          "ayuda": "Cocina industrial, sótanos, cubiertas, zonas de acceso restringido.",
+          "mapea_a": "1. Descripción del servicio y dimensionamiento"
+        }
+      ]
+    },
+    {
+      "id": "z2",
+      "titulo": "Estado actual del servicio",
+      "preguntas": [
+        {
+          "id": "z2-q01",
+          "enunciado": "Estado general de limpieza observado",
+          "tipo": "escala",
+          "requerido": true,
+          "mapea_a": "2. Diagnóstico del estado actual"
+        },
+        {
+          "id": "z2-q02",
+          "enunciado": "Cristales y carpinterías exteriores",
+          "tipo": "escala",
+          "requerido": true,
+          "mapea_a": "2. Diagnóstico del estado actual"
+        },
+        {
+          "id": "z2-q03",
+          "enunciado": "Fotografía de las deficiencias más representativas",
+          "tipo": "adjunto",
+          "requerido": true,
+          "ayuda": "Dos o tres fotos bastan. Son la evidencia del apartado de mejoras. Adjunta las fotos con el botón Foto.",
+          "mapea_a": "ECE-02"
+        },
+        {
+          "id": "z2-q04",
+          "enunciado": "¿Se aprecian tratamientos periódicos al día (cristalizado, abrillantado)?",
+          "tipo": "opcion",
+          "opciones": [
+            "Sí",
+            "No"
+          ],
+          "requerido": true,
+          "mapea_a": "2. Diagnóstico del estado actual"
+        }
+      ]
+    },
+    {
+      "id": "z3",
+      "titulo": "Personal y subrogación",
+      "preguntas": [
+        {
+          "id": "z3-q01",
+          "enunciado": "Personas observadas prestando el servicio",
+          "tipo": "numero",
+          "requerido": true,
+          "unidad": "ud",
+          "ayuda": "En ud.",
+          "mapea_a": "3. Organización del equipo"
+        },
+        {
+          "id": "z3-q02",
+          "enunciado": "Turnos cubiertos actualmente",
+          "tipo": "opcion_multiple",
+          "opciones": [
+            "Mañana",
+            "Tarde",
+            "Noche",
+            "Fin de semana",
+            "Festivos"
+          ],
+          "requerido": true,
+          "mapea_a": "3. Organización del equipo"
+        },
+        {
+          "id": "z3-q03",
+          "enunciado": "¿El listado de subrogación del pliego cuadra con lo observado?",
+          "tipo": "opcion",
+          "opciones": [
+            "Sí",
+            "No"
+          ],
+          "requerido": true,
+          "ayuda": "Una discrepancia aquí es una alerta económica de primer orden.",
+          "mapea_a": "ECE-04"
+        },
+        {
+          "id": "z3-q04",
+          "enunciado": "Comentarios del responsable del centro sobre el equipo actual",
+          "tipo": "adjunto",
+          "ayuda": "Escribe lo observado con el botón Nota.",
+          "mapea_a": "ECE-04"
+        }
+      ]
+    },
+    {
+      "id": "z4",
+      "titulo": "Medios, almacén y accesos",
+      "preguntas": [
+        {
+          "id": "z4-q01",
+          "enunciado": "Maquinaria: ¿la cede el organismo o la aporta el adjudicatario?",
+          "tipo": "opcion",
+          "opciones": [
+            "La cede el organismo",
+            "La aporta el adjudicatario",
+            "Mixto",
+            "No queda claro en el pliego"
+          ],
+          "requerido": true,
+          "mapea_a": "4. Medios materiales"
+        },
+        {
+          "id": "z4-q02",
+          "enunciado": "Almacén de producto con condiciones adecuadas",
+          "tipo": "escala",
+          "requerido": true,
+          "mapea_a": "4. Medios materiales"
+        },
+        {
+          "id": "z4-q03",
+          "enunciado": "¿Hay acceso de vehículo para carga y descarga?",
+          "tipo": "opcion",
+          "opciones": [
+            "Sí",
+            "No"
+          ],
+          "requerido": true,
+          "mapea_a": "4. Medios materiales"
+        },
+        {
+          "id": "z4-q04",
+          "enunciado": "Ubicación del acceso de servicio",
+          "tipo": "adjunto",
+          "ayuda": "Captura la ubicación con el botón de arriba.",
+          "mapea_a": "4. Medios materiales"
+        }
+      ]
+    },
+    {
+      "id": "z5",
+      "titulo": "Contraste con el pliego",
+      "preguntas": [
+        {
+          "id": "z5-q01",
+          "enunciado": "Las frecuencias del pliego son realizables con la plantilla prevista",
+          "tipo": "escala",
+          "requerido": true,
+          "mapea_a": "5. Plan de trabajo y frecuencias"
+        },
+        {
+          "id": "z5-q02",
+          "enunciado": "Riesgos detectados para la ejecución",
+          "tipo": "texto",
+          "largo": true,
+          "requerido": true,
+          "mapea_a": "6. Gestión de riesgos"
+        },
+        {
+          "id": "z5-q03",
+          "enunciado": "Dudas que trasladar al órgano por la vía de consultas",
+          "tipo": "texto",
+          "largo": true,
+          "ayuda": "Se incorporan al checklist de preguntas telemáticas del expediente.",
+          "mapea_a": "preguntas-telematicas"
+        }
+      ]
+    }
+  ]
+}

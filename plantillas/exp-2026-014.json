@@ -1,0 +1,227 @@
+{
+  "id": "exp-2026-014",
+  "version": 1,
+  "nombre": "Visita técnica previa — Limpieza Residencia Ntra. Sra.",
+  "expediente": {
+    "codigo": "2026/014",
+    "objeto": "Servicio de limpieza integral de los centros residenciales de la Agencia, por lotes.",
+    "lote": "2 — Limpieza",
+    "organismo": "Agencia de Servicios Sociales y Dependencia de Andalucía"
+  },
+  "centro": {
+    "nombre": "Residencia Ntra. Sra. de la Paz",
+    "direccion": "Avda. de la Paz, 14 — 41010 Sevilla"
+  },
+  "escala": [
+    {
+      "v": "ok",
+      "l": "Bien",
+      "peso": 1,
+      "tono": "ok",
+      "significado": "cumple lo exigido"
+    },
+    {
+      "v": "mej",
+      "l": "Mejorable",
+      "peso": 0.5,
+      "tono": "warn",
+      "significado": "cumple con deficiencias"
+    },
+    {
+      "v": "nc",
+      "l": "No conforme",
+      "peso": 0,
+      "tono": "bad",
+      "significado": "no cumple"
+    },
+    {
+      "v": "na",
+      "l": "N/A",
+      "peso": null,
+      "tono": "na",
+      "significado": "no aplica; no puntúa"
+    }
+  ],
+  "secciones": [
+    {
+      "id": "superficies",
+      "titulo": "Superficies y alcance",
+      "preguntas": [
+        {
+          "id": "m2_totales",
+          "enunciado": "Superficie total declarada en el pliego (m²)",
+          "tipo": "numero",
+          "ayuda": "Si difiere de lo medido en la visita, anótalo en una nota."
+        },
+        {
+          "id": "m2_reales",
+          "enunciado": "Superficie estimada tras la visita (m²)",
+          "tipo": "numero"
+        },
+        {
+          "id": "plantas",
+          "enunciado": "Número de plantas",
+          "tipo": "numero"
+        },
+        {
+          "id": "pavimentos",
+          "enunciado": "Tipos de pavimento presentes",
+          "tipo": "opcion_multiple",
+          "opciones": [
+            "Terrazo",
+            "Gres",
+            "PVC/vinílico",
+            "Linóleo",
+            "Moqueta",
+            "Madera",
+            "Hormigón pulido"
+          ]
+        },
+        {
+          "id": "zonas_especiales",
+          "enunciado": "Zonas de tratamiento especial (quirófano, cocina industrial, sótanos)",
+          "tipo": "texto",
+          "largo": true
+        }
+      ]
+    },
+    {
+      "id": "estado",
+      "titulo": "Estado actual del servicio",
+      "preguntas": [
+        {
+          "id": "general",
+          "enunciado": "Estado general de limpieza que se aprecia en la visita"
+        },
+        {
+          "id": "cristales",
+          "enunciado": "Cristales y carpinterías exteriores"
+        },
+        {
+          "id": "suelos_trat",
+          "enunciado": "Suelos con tratamiento adecuado (cristalizado, abrillantado)"
+        },
+        {
+          "id": "aseos",
+          "enunciado": "Aseos: estado y dotación"
+        },
+        {
+          "id": "residuos",
+          "enunciado": "Gestión de residuos y contenedores"
+        },
+        {
+          "id": "deficiencias",
+          "enunciado": "Deficiencias visibles que la oferta debe corregir",
+          "tipo": "texto",
+          "largo": true,
+          "ayuda": "Esto alimenta el apartado de mejoras de la memoria técnica. Sé concreto y adjunta fotos."
+        }
+      ]
+    },
+    {
+      "id": "personal",
+      "titulo": "Personal y subrogación",
+      "preguntas": [
+        {
+          "id": "plantilla_actual",
+          "enunciado": "Personas que presta el servicio actualmente",
+          "tipo": "numero"
+        },
+        {
+          "id": "turnos",
+          "enunciado": "Turnos cubiertos",
+          "tipo": "opcion_multiple",
+          "opciones": [
+            "Mañana",
+            "Tarde",
+            "Noche",
+            "Fin de semana",
+            "Festivos"
+          ]
+        },
+        {
+          "id": "listado_subrog",
+          "enunciado": "El listado de subrogación del pliego coincide con lo observado"
+        },
+        {
+          "id": "vestuario",
+          "enunciado": "Hay vestuario y taquillas para el personal"
+        },
+        {
+          "id": "notas_personal",
+          "enunciado": "Observaciones sobre el equipo actual",
+          "tipo": "texto",
+          "largo": true
+        }
+      ]
+    },
+    {
+      "id": "medios",
+      "titulo": "Medios, almacén y accesos",
+      "preguntas": [
+        {
+          "id": "almacen",
+          "enunciado": "Existe almacén de producto con condiciones adecuadas"
+        },
+        {
+          "id": "agua",
+          "enunciado": "Puntos de agua y desagüe suficientes por planta"
+        },
+        {
+          "id": "enchufes",
+          "enunciado": "Tomas de corriente accesibles para maquinaria"
+        },
+        {
+          "id": "montacargas",
+          "enunciado": "Ascensor o montacargas utilizable por el servicio"
+        },
+        {
+          "id": "acceso_vehiculo",
+          "enunciado": "Acceso de vehículo para carga y descarga"
+        },
+        {
+          "id": "maquinaria_cedida",
+          "enunciado": "El pliego cede maquinaria o la aporta el adjudicatario",
+          "tipo": "opcion",
+          "opciones": [
+            "La cede el organismo",
+            "La aporta el adjudicatario",
+            "Mixto",
+            "No queda claro en el pliego"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "pliego",
+      "titulo": "Contraste con el pliego",
+      "preguntas": [
+        {
+          "id": "frecuencias",
+          "enunciado": "Las frecuencias del pliego son realizables con la plantilla prevista"
+        },
+        {
+          "id": "horarios",
+          "enunciado": "Los horarios exigidos son compatibles con la actividad del centro"
+        },
+        {
+          "id": "criterios",
+          "enunciado": "Hay margen para mejoras valorables en los criterios de adjudicación"
+        },
+        {
+          "id": "riesgos",
+          "enunciado": "Riesgos detectados para la ejecución",
+          "tipo": "texto",
+          "largo": true
+        },
+        {
+          "id": "preguntas_organismo",
+          "enunciado": "Dudas que hay que trasladar al organismo",
+          "tipo": "texto",
+          "largo": true,
+          "ayuda": "Se convertirán en las preguntas telemáticas del expediente."
+        }
+      ]
+    }
+  ]
+}

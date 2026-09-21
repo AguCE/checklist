@@ -1,0 +1,218 @@
+{
+  "id": "limpieza-base",
+  "version": 3,
+  "nombre": "Control de calidad de limpieza",
+  "expediente": {},
+  "centro": {},
+  "escala": [
+    {
+      "v": "ok",
+      "l": "Bien",
+      "peso": 1,
+      "tono": "ok",
+      "significado": "cumple lo exigido"
+    },
+    {
+      "v": "mej",
+      "l": "Mejorable",
+      "peso": 0.5,
+      "tono": "warn",
+      "significado": "cumple con deficiencias"
+    },
+    {
+      "v": "nc",
+      "l": "No conforme",
+      "peso": 0,
+      "tono": "bad",
+      "significado": "no cumple"
+    },
+    {
+      "v": "na",
+      "l": "N/A",
+      "peso": null,
+      "tono": "na",
+      "significado": "no aplica; no puntúa"
+    }
+  ],
+  "secciones": [
+    {
+      "id": "aseos",
+      "titulo": "Aseos y vestuarios",
+      "preguntas": [
+        {
+          "id": "sanitarios",
+          "enunciado": "Inodoros, urinarios y cisternas sin restos ni cal"
+        },
+        {
+          "id": "lavabos",
+          "enunciado": "Lavabos, grifería y encimeras sin cal ni manchas"
+        },
+        {
+          "id": "espejos",
+          "enunciado": "Espejos y mamparas sin marcas"
+        },
+        {
+          "id": "suelos",
+          "enunciado": "Suelos y alicatado limpios, sin acumulación en rincones"
+        },
+        {
+          "id": "dispensadores",
+          "enunciado": "Dispensadores de jabón, papel y secamanos repuestos"
+        },
+        {
+          "id": "papeleras",
+          "enunciado": "Papeleras vaciadas y con bolsa"
+        },
+        {
+          "id": "olores",
+          "enunciado": "Ausencia de malos olores"
+        }
+      ]
+    },
+    {
+      "id": "despachos",
+      "titulo": "Despachos y administración",
+      "preguntas": [
+        {
+          "id": "superficies",
+          "enunciado": "Superficies y mobiliario desempolvados"
+        },
+        {
+          "id": "equipos",
+          "enunciado": "Equipos informáticos y teléfonos limpios"
+        },
+        {
+          "id": "reciclaje",
+          "enunciado": "Papeleras y reciclaje vaciados"
+        },
+        {
+          "id": "suelos",
+          "enunciado": "Suelos barridos, fregados o aspirados"
+        },
+        {
+          "id": "cristales",
+          "enunciado": "Cristales interiores y mamparas sin huellas"
+        }
+      ]
+    },
+    {
+      "id": "comunes",
+      "titulo": "Zonas comunes y circulaciones",
+      "preguntas": [
+        {
+          "id": "accesos",
+          "enunciado": "Hall y accesos: felpudos y puertas de entrada"
+        },
+        {
+          "id": "pasillos",
+          "enunciado": "Suelos de pasillos sin marcas ni restos"
+        },
+        {
+          "id": "escaleras",
+          "enunciado": "Escaleras, peldaños y barandillas"
+        },
+        {
+          "id": "ascensor",
+          "enunciado": "Ascensor: cabina, espejo, botonera y guías"
+        },
+        {
+          "id": "contacto",
+          "enunciado": "Puntos de contacto desinfectados (manillas, pulsadores)"
+        }
+      ]
+    },
+    {
+      "id": "office",
+      "titulo": "Office, comedor y cocina",
+      "preguntas": [
+        {
+          "id": "encimeras",
+          "enunciado": "Encimeras, fregadero y grifería desengrasados"
+        },
+        {
+          "id": "electro",
+          "enunciado": "Microondas por dentro y frigorífico por fuera"
+        },
+        {
+          "id": "mesas",
+          "enunciado": "Mesas y sillas del comedor"
+        },
+        {
+          "id": "suelo",
+          "enunciado": "Suelo desengrasado, sin restos bajo el mobiliario"
+        },
+        {
+          "id": "residuos",
+          "enunciado": "Contenedores de residuos limpios, con bolsa y tapa"
+        }
+      ]
+    },
+    {
+      "id": "producto",
+      "titulo": "Producto, maquinaria y prevención",
+      "preguntas": [
+        {
+          "id": "dosificacion",
+          "enunciado": "Dosificación de producto conforme a ficha técnica"
+        },
+        {
+          "id": "fds",
+          "enunciado": "Fichas de seguridad accesibles en el centro"
+        },
+        {
+          "id": "almacen",
+          "enunciado": "Almacén ordenado, ventilado y cerrado con llave"
+        },
+        {
+          "id": "etiquetado",
+          "enunciado": "Productos etiquetados y en envases originales"
+        },
+        {
+          "id": "colores",
+          "enunciado": "Código de colores de bayetas y mopas respetado"
+        },
+        {
+          "id": "maquinaria",
+          "enunciado": "Maquinaria limpia y operativa"
+        },
+        {
+          "id": "epi",
+          "enunciado": "EPI en uso y señalización de suelo mojado"
+        }
+      ]
+    },
+    {
+      "id": "equipo",
+      "titulo": "Equipo y documentación",
+      "preguntas": [
+        {
+          "id": "uniforme",
+          "enunciado": "Personal con uniforme e identificación visible"
+        },
+        {
+          "id": "presencia",
+          "enunciado": "Presencia conforme al cuadrante contratado"
+        },
+        {
+          "id": "partes",
+          "enunciado": "Partes de trabajo cumplimentados y firmados"
+        },
+        {
+          "id": "anteriores",
+          "enunciado": "Incidencias de la visita anterior resueltas"
+        },
+        {
+          "id": "personas",
+          "enunciado": "Número de personas en el turno",
+          "tipo": "numero"
+        },
+        {
+          "id": "cierre",
+          "enunciado": "Observaciones y acciones acordadas",
+          "tipo": "texto",
+          "largo": true
+        }
+      ]
+    }
+  ]
+}

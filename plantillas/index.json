@@ -1,0 +1,39 @@
+{
+  "actualizado": "2026-09-21",
+  "plantillas": [
+    {
+      "id": "exp-2026-014-l2-limp",
+      "fichero": "exp-2026-014-l2-limp.json",
+      "nombre": "Visita técnica — Residencia Ntra. Sra. de la Paz",
+      "expediente": {
+        "codigo": "2026/014",
+        "lote": "2 — Limpieza"
+      },
+      "centro": {
+        "nombre": "Residencia Ntra. Sra. de la Paz"
+      },
+      "version": 1
+    },
+    {
+      "id": "exp-2026-014",
+      "fichero": "exp-2026-014.json",
+      "nombre": "Visita técnica — Limpieza Residencia Ntra. Sra.",
+      "expediente": {
+        "codigo": "2026/014",
+        "lote": "2 — Limpieza"
+      },
+      "centro": {
+        "nombre": "Residencia Ntra. Sra. de la Paz"
+      },
+      "version": 1
+    },
+    {
+      "id": "limpieza-base",
+      "fichero": "limpieza-base.json",
+      "nombre": "Control de calidad de limpieza (genérico)",
+      "expediente": {},
+      "centro": {},
+      "version": 3
+    }
+  ]
+}
