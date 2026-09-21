@@ -1,0 +1,273 @@
+{
+  "id": "exp-2076-2025",
+  "version": 1,
+  "nombre": "Visita técnica — Zonas verdes de Campillos",
+  "origen": {
+    "generadoDesde": "checklist-campillos.xlsx",
+    "skill": "checklist-campo",
+    "convertidoEl": "2026-09-21"
+  },
+  "expediente": {
+    "codigo": "2076/2025",
+    "objeto": "Servicio de mantenimiento integral de jardines y zonas verdes de Campillos",
+    "organismo": "Ayuntamiento de Campillos (Málaga)"
+  },
+  "centro": {
+    "nombre": "Zonas verdes de Campillos"
+  },
+  "escala": [
+    {
+      "v": "ok",
+      "l": "Bien",
+      "peso": 1,
+      "tono": "ok",
+      "significado": "cumple lo exigido"
+    },
+    {
+      "v": "mej",
+      "l": "Mejorable",
+      "peso": 0.5,
+      "tono": "warn",
+      "significado": "cumple con deficiencias"
+    },
+    {
+      "v": "nc",
+      "l": "No conforme",
+      "peso": 0,
+      "tono": "bad",
+      "significado": "no cumple"
+    },
+    {
+      "v": "na",
+      "l": "N/A",
+      "peso": null,
+      "tono": "na",
+      "significado": "no aplica; no puntúa"
+    }
+  ],
+  "secciones": [
+    {
+      "id": "arbolado-y-poda",
+      "titulo": "Arbolado y poda",
+      "preguntas": [
+        {
+          "id": "q017",
+          "enunciado": "Nº de árboles que requieren poda en altura (camión grúa)",
+          "tipo": "numero",
+          "unidad": "ud",
+          "mapea_a": "5. Arbolado, arbustos y herbáceas"
+        },
+        {
+          "id": "q018",
+          "enunciado": "Zonas con recogida de frutos necesaria y frecuencia observada",
+          "tipo": "texto",
+          "mapea_a": "11. Recogida de frutos (frecuencia, personal y gestión)"
+        }
+      ]
+    },
+    {
+      "id": "cierre",
+      "titulo": "Cierre",
+      "preguntas": [
+        {
+          "id": "q021",
+          "enunciado": "Riesgos o particularidades del sitio no previstas en el pliego",
+          "tipo": "texto",
+          "largo": true,
+          "mapea_a": "General"
+        },
+        {
+          "id": "q022",
+          "enunciado": "Dudas para trasladar al órgano por la vía de consultas",
+          "tipo": "texto",
+          "largo": true,
+          "mapea_a": "preguntas-telematicas"
+        },
+        {
+          "id": "q023",
+          "enunciado": "Notas ad hoc y fotos generales del técnico",
+          "tipo": "adjunto",
+          "mapea_a": "General"
+        }
+      ]
+    },
+    {
+      "id": "datos-generales-y-ac",
+      "titulo": "Datos generales y accesos",
+      "preguntas": [
+        {
+          "id": "q001",
+          "enunciado": "Superficie total de zona verde mantenida, contrastada con el PPT",
+          "tipo": "numero",
+          "requerido": true,
+          "unidad": "m2",
+          "ayuda": "Contrastar con la superficie declarada; si difiere, anotar",
+          "mapea_a": "ECE-01"
+        },
+        {
+          "id": "q002",
+          "enunciado": "Nº de zonas del Anexo II verificadas in situ",
+          "tipo": "numero",
+          "requerido": true,
+          "unidad": "ud",
+          "ayuda": "Las 5 zonas: parques, plazas, avenidas, arboleda…",
+          "mapea_a": "ECE-01"
+        },
+        {
+          "id": "q003",
+          "enunciado": "Croquis/plano de las zonas con accesos y puntos de agua",
+          "tipo": "adjunto",
+          "ayuda": "Sostiene el inventario por zona del ECE-01",
+          "mapea_a": "ECE-01"
+        }
+      ]
+    },
+    {
+      "id": "frecuencias-y-calend",
+      "titulo": "Frecuencias y calendario",
+      "preguntas": [
+        {
+          "id": "q019",
+          "enunciado": "Frecuencia de siega/mantenimiento apreciable en el estado actual",
+          "tipo": "texto",
+          "ayuda": "Calibra el calendario estacional (ECE-02)",
+          "mapea_a": "ECE-02"
+        },
+        {
+          "id": "q020",
+          "enunciado": "Estado del césped y praderas",
+          "tipo": "escala",
+          "requerido": true,
+          "mapea_a": "2. Mantenimiento, reposición de césped, praderas y cubiertas vegetales"
+        }
+      ]
+    },
+    {
+      "id": "recorrido-por-zona-r",
+      "titulo": "Recorrido por zona (repetir por zona)",
+      "preguntas": [
+        {
+          "id": "q004",
+          "enunciado": "Superficie de césped/pradera de la zona",
+          "tipo": "numero",
+          "requerido": true,
+          "unidad": "m2",
+          "mapea_a": "2. Mantenimiento, reposición de césped, praderas y cubiertas vegetales"
+        },
+        {
+          "id": "q005",
+          "enunciado": "Especies y nº de arbolado de la zona",
+          "tipo": "texto",
+          "largo": true,
+          "requerido": true,
+          "ayuda": "Inventario por zona (ECE-01)",
+          "mapea_a": "5. Arbolado, arbustos y herbáceas"
+        },
+        {
+          "id": "q006",
+          "enunciado": "Estado general de conservación de la zona",
+          "tipo": "escala",
+          "requerido": true,
+          "mapea_a": "ECE-01"
+        },
+        {
+          "id": "q007",
+          "enunciado": "Reportaje fotográfico de la zona",
+          "tipo": "adjunto",
+          "mapea_a": "ECE-01"
+        },
+        {
+          "id": "q008",
+          "enunciado": "¿Hay parterres o jardineras con flor de temporada en la zona?",
+          "tipo": "opcion",
+          "opciones": [
+            "Sí",
+            "No"
+          ],
+          "mapea_a": "12. Parterres y jardineras con flor"
+        }
+      ]
+    },
+    {
+      "id": "riego-y-redes",
+      "titulo": "Riego y redes",
+      "preguntas": [
+        {
+          "id": "q009",
+          "enunciado": "Tipo de riego presente por zona",
+          "tipo": "opcion_multiple",
+          "opciones": [
+            "Automático",
+            "Goteo",
+            "Aspersión",
+            "Manual",
+            "Sin riego"
+          ],
+          "requerido": true,
+          "mapea_a": "3. Riego de zonas verdes y elementos vegetales"
+        },
+        {
+          "id": "q010",
+          "enunciado": "Estado de la red de riego y programadores",
+          "tipo": "escala",
+          "requerido": true,
+          "mapea_a": "4. Conservación de redes y sistemas de riego"
+        },
+        {
+          "id": "q011",
+          "enunciado": "¿Existe telegestión o sensores de humedad instalados?",
+          "tipo": "opcion",
+          "opciones": [
+            "Sí",
+            "No",
+            "Parcial"
+          ],
+          "ayuda": "Sostiene la gestión hídrica eficiente (ECE-03)",
+          "mapea_a": "ECE-03"
+        },
+        {
+          "id": "q012",
+          "enunciado": "Fugas, averías o tramos deteriorados observados",
+          "tipo": "texto",
+          "largo": true,
+          "mapea_a": "4. Conservación de redes y sistemas de riego"
+        }
+      ]
+    },
+    {
+      "id": "sanidad-vegetal",
+      "titulo": "Sanidad vegetal",
+      "preguntas": [
+        {
+          "id": "q013",
+          "enunciado": "Plagas o focos fitosanitarios observados por zona",
+          "tipo": "texto",
+          "largo": true,
+          "requerido": true,
+          "ayuda": "Nombrar plaga y emplazamiento",
+          "mapea_a": "ECE-04"
+        },
+        {
+          "id": "q014",
+          "enunciado": "Estado fitosanitario general del arbolado",
+          "tipo": "escala",
+          "requerido": true,
+          "mapea_a": "1. Sanidad vegetal"
+        },
+        {
+          "id": "q015",
+          "enunciado": "Arbolado candidato a endoterapia",
+          "tipo": "numero",
+          "unidad": "ud",
+          "mapea_a": "1. Sanidad vegetal"
+        },
+        {
+          "id": "q016",
+          "enunciado": "Evidencia fotográfica de daños fitosanitarios",
+          "tipo": "adjunto",
+          "mapea_a": "ECE-04"
+        }
+      ]
+    }
+  ]
+}
