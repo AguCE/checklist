@@ -1,0 +1,429 @@
+{
+  "id": "exp-1726-26-campillos-zona",
+  "version": 1,
+  "nombre": "Visita técnica — Campillos — recorrido por zona",
+  "origen": {
+    "generadoDesde": "checklist-campillos-zona.xlsx",
+    "skill": "checklist-campo",
+    "convertidoEl": "2026-09-21"
+  },
+  "expediente": {
+    "codigo": "1726/2026",
+    "objeto": "Servicio de limpieza viaria del municipio de Campillos (Málaga)",
+    "lote": "único",
+    "organismo": "Ayuntamiento de Campillos (Málaga)"
+  },
+  "centro": {
+    "nombre": "Campillos — recorrido por zona",
+    "direccion": "Campillos (Málaga)"
+  },
+  "escala": [
+    {
+      "v": "ok",
+      "l": "Bien",
+      "peso": 1,
+      "tono": "ok",
+      "significado": "cumple lo exigido"
+    },
+    {
+      "v": "mej",
+      "l": "Mejorable",
+      "peso": 0.5,
+      "tono": "warn",
+      "significado": "cumple con deficiencias"
+    },
+    {
+      "v": "nc",
+      "l": "No conforme",
+      "peso": 0,
+      "tono": "bad",
+      "significado": "no cumple"
+    },
+    {
+      "v": "na",
+      "l": "N/A",
+      "peso": null,
+      "tono": "na",
+      "significado": "no aplica; no puntúa"
+    }
+  ],
+  "secciones": [
+    {
+      "id": "a-identificacion-de-",
+      "titulo": "A · Identificación de la zona",
+      "preguntas": [
+        {
+          "id": "q001",
+          "enunciado": "Zona recorrida",
+          "tipo": "opcion",
+          "opciones": [
+            "Zona 1 · vías principales, comercio, colegios e institutos",
+            "Zona 2 · casco antiguo",
+            "Zona 3 · guardería municipal y cuartel de la Guardia Civil",
+            "Zona 4 · instalaciones deportivas",
+            "Zona 5 · residencial y parque 25 de Noviembre",
+            "Zona 6 · polígono industrial (tres recintos separados al NO)"
+          ],
+          "requerido": true,
+          "ayuda": "Una plantilla por zona: se rellena un parte por cada una de las seis del plano del Anexo VII del PCAP (p. 51).",
+          "mapea_a": "0. Bases del proyecto: ámbito, inventario y dimensionamiento"
+        },
+        {
+          "id": "q002",
+          "enunciado": "Plano o croquis de la zona con sus límites y los sectores en que se subdivide",
+          "tipo": "adjunto",
+          "requerido": true,
+          "ayuda": "Foto del plano del Anexo VII con los sectores marcados a mano. Es la base del inventario por zona del ECE-01.",
+          "mapea_a": "ECE-01"
+        }
+      ]
+    },
+    {
+      "id": "b-inventario-del-via",
+      "titulo": "B · Inventario del viario",
+      "preguntas": [
+        {
+          "id": "q003",
+          "enunciado": "Metros lineales de acerado de la zona",
+          "tipo": "numero",
+          "requerido": true,
+          "unidad": "ml",
+          "ayuda": "Medición o estimación sobre plano de ambas aceras de cada calle. El pliego no publica este dato: es el que sostiene la frecuencia propuesta.",
+          "mapea_a": "2. Frecuencia de barrido por sector en el núcleo urbano"
+        },
+        {
+          "id": "q004",
+          "enunciado": "Superficie de calzada, plazas y áreas peatonales objeto de barrido",
+          "tipo": "numero",
+          "requerido": true,
+          "unidad": "m2",
+          "ayuda": "Incluye glorietas, medianas, aparcamientos públicos no concesionados y pasajes (cl. 1, p. 3). No incluyas zonas verdes: van en la sección F.",
+          "mapea_a": "2. Frecuencia de barrido por sector en el núcleo urbano"
+        },
+        {
+          "id": "q005",
+          "enunciado": "Metros lineales de viales de urbanizaciones periféricas y polígono industrial dentro de esta zona",
+          "tipo": "numero",
+          "unidad": "ml",
+          "ayuda": "Deja 0 si la zona no tiene periferia. En la zona 6 anota por separado en la nota cada uno de los tres recintos del polígono.",
+          "mapea_a": "3. Frecuencia de barrido en urbanizaciones residenciales y espacios públicos periféricos"
+        },
+        {
+          "id": "q006",
+          "enunciado": "Pavimento dominante de la zona",
+          "tipo": "opcion",
+          "opciones": [
+            "Asfalto",
+            "Hormigón",
+            "Adoquín",
+            "Terrizo",
+            "Mixto"
+          ],
+          "ayuda": "Condiciona el método de barrido y el rendimiento por hora: el adoquín del casco antiguo no se barre igual que el asfalto.",
+          "mapea_a": "2. Frecuencia de barrido por sector en el núcleo urbano"
+        },
+        {
+          "id": "q007",
+          "enunciado": "Estado del acerado y del bordillo en cuanto a herbáceos",
+          "tipo": "escala",
+          "requerido": true,
+          "ayuda": "Bien = sin hierba visible · Mejorable = brotes aislados · No conforme = hierba establecida en juntas y bordillo.",
+          "mapea_a": "13. Frecuencia y eficacia en tratamientos de eliminación de herbáceos en acerados y bordillos"
+        }
+      ]
+    },
+    {
+      "id": "c-papeleras-alcorque",
+      "titulo": "C · Papeleras, alcorques y mobiliario",
+      "preguntas": [
+        {
+          "id": "q008",
+          "enunciado": "Número de papeleras instaladas en la zona",
+          "tipo": "numero",
+          "requerido": true,
+          "unidad": "ud",
+          "ayuda": "Cuenta física durante el recorrido. El pliego no publica la red de papeleras y el subcriterio 11 pide frecuencia de vaciado.",
+          "mapea_a": "11. Frecuencia de mantenimiento, vaciado, limpieza y reposición de papeleras urbanas"
+        },
+        {
+          "id": "q009",
+          "enunciado": "Estado de conservación y limpieza de las papeleras de la zona",
+          "tipo": "escala",
+          "requerido": true,
+          "ayuda": "Mira soporte, bolsa, tapa y limpieza exterior. Fotografía las que estén no conformes.",
+          "mapea_a": "11. Frecuencia de mantenimiento, vaciado, limpieza y reposición de papeleras urbanas"
+        },
+        {
+          "id": "q010",
+          "enunciado": "Número de alcorques con arbolado viario en la zona",
+          "tipo": "numero",
+          "unidad": "ud",
+          "ayuda": "Anota en la nota la especie dominante: marca los meses de caída de hoja y la intensificación estacional del ECE-02.",
+          "mapea_a": "12. Limpieza integral del mobiliario urbano exterior"
+        },
+        {
+          "id": "q011",
+          "enunciado": "Número de elementos de mobiliario urbano objeto de limpieza",
+          "tipo": "numero",
+          "unidad": "ud",
+          "ayuda": "Bancos, marquesinas, fuentes, juegos infantiles, hitos y señalización. Las papeleras no cuentan aquí, ya van aparte.",
+          "mapea_a": "12. Limpieza integral del mobiliario urbano exterior"
+        },
+        {
+          "id": "q012",
+          "enunciado": "Estado del mobiliario urbano y presencia de pintadas o carteles",
+          "tipo": "escala",
+          "requerido": true,
+          "ayuda": "No conforme si hay pintadas o cartelería adherida sin retirar. Fotografía cada caso: alimenta el subcriterio 12.",
+          "mapea_a": "12. Limpieza integral del mobiliario urbano exterior"
+        }
+      ]
+    },
+    {
+      "id": "d-deficiencias-obser",
+      "titulo": "D · Deficiencias observadas",
+      "preguntas": [
+        {
+          "id": "q013",
+          "enunciado": "Estado general de limpieza de la zona el día del recorrido",
+          "tipo": "escala",
+          "requerido": true,
+          "ayuda": "Juicio de conjunto de la zona, no de un punto concreto. Es el hallazgo que abre el cuadro de visita técnica de cada zona.",
+          "mapea_a": "0. Bases del proyecto: ámbito, inventario y dimensionamiento"
+        },
+        {
+          "id": "q014",
+          "enunciado": "Tramos concretos con reaparición recurrente de herbáceos",
+          "tipo": "texto",
+          "ayuda": "Nombre de calle y tramo. El subcriterio 13 pide eficacia: sin tramos identificados no hay indicador de reaparición que medir.",
+          "mapea_a": "ECE-07"
+        },
+        {
+          "id": "q015",
+          "enunciado": "Puntos con acumulación recurrente de impropios en el entorno de los contenedores",
+          "tipo": "texto",
+          "ayuda": "Ubicación concreta. El pliego obliga a recoger desbordamientos e impropios (cl. 20.1, pp. 23-24) y condiciona la frecuencia de la zona.",
+          "mapea_a": "2. Frecuencia de barrido por sector en el núcleo urbano"
+        }
+      ]
+    },
+    {
+      "id": "e-servicio-que-se-ej",
+      "titulo": "E · Servicio que se ejecuta hoy en la zona",
+      "preguntas": [
+        {
+          "id": "q016",
+          "enunciado": "Frecuencia de barrido que se ejecuta hoy en la zona",
+          "tipo": "texto",
+          "requerido": true,
+          "ayuda": "Pasadas por semana y por tramo, diferenciando calles principales y secundarias. Es la base del cuadrante mes a mes del ECE-02.",
+          "mapea_a": "ECE-02"
+        },
+        {
+          "id": "q017",
+          "enunciado": "Operarios asignados hoy a la zona, turno y días de la semana",
+          "tipo": "texto",
+          "requerido": true,
+          "ayuda": "Cuadra con la estructura del pliego: 11 personas de lunes a viernes de 07:00 a 14:00 y retén de 3 en fin de semana.",
+          "mapea_a": "1. Operarios adscritos, horarios y bolsa de horas anuales de servicio"
+        },
+        {
+          "id": "q018",
+          "enunciado": "Tiempo medio de una pasada completa de la zona (h:min)",
+          "tipo": "texto",
+          "ayuda": "Dato de ejecución del encargado o cronometrado en el recorrido. Con el acerado y la calzada da el rendimiento que justifica las 22.281 h.",
+          "mapea_a": "0. Bases del proyecto: ámbito, inventario y dimensionamiento"
+        },
+        {
+          "id": "q019",
+          "enunciado": "Horas semanales de sopladora que se emplean hoy en la zona",
+          "tipo": "numero",
+          "ayuda": "Horas por semana. El subcriterio 9 pide la asignación por zona y su criterio: sin el dato de partida es una cifra inventada.",
+          "mapea_a": "9. Horas de apoyo semanales con maquinaria sopladora"
+        },
+        {
+          "id": "q020",
+          "enunciado": "Cobertura de la zona por el retén de domingos y festivos",
+          "tipo": "opcion",
+          "opciones": [
+            "Completa",
+            "Solo tramos principales",
+            "Solo si hay evento",
+            "No se cubre"
+          ],
+          "ayuda": "El retén son 3 peones, 7 horas. Lo que no cubre hoy es lo que hay que justificar en el subcriterio 5.",
+          "mapea_a": "5. Frecuencia de barrido en domingos y días festivos"
+        }
+      ]
+    },
+    {
+      "id": "f-zonas-verdes-y-par",
+      "titulo": "F · Zonas verdes y parques (alcance pendiente de P-05)",
+      "preguntas": [
+        {
+          "id": "q021",
+          "enunciado": "Superficie de zonas verdes, parques y parques infantiles de la zona",
+          "tipo": "numero",
+          "unidad": "m2",
+          "ayuda": "Alcance pendiente de la consulta P-05: el PPT los incluye (cl. 1, p. 1) y el PCAP no. Toma el dato igualmente; si P-05 los excluye, se descarta.",
+          "mapea_a": "0. Bases del proyecto: ámbito, inventario y dimensionamiento"
+        },
+        {
+          "id": "q022",
+          "enunciado": "Estado de limpieza de las zonas verdes y de los parques infantiles de la zona",
+          "tipo": "escala",
+          "ayuda": "Mira arena de juegos, papeleras del parque y restos vegetales. Sujeto a la misma reserva de la P-05.",
+          "mapea_a": "0. Bases del proyecto: ámbito, inventario y dimensionamiento"
+        }
+      ]
+    },
+    {
+      "id": "g-mercadillo-y-event",
+      "titulo": "G · Mercadillo y eventos (solo en la zona del Parque J. M. Hinojosa)",
+      "preguntas": [
+        {
+          "id": "q023",
+          "enunciado": "Superficie del recinto del mercadillo y número aproximado de puestos",
+          "tipo": "numero",
+          "unidad": "m2",
+          "ayuda": "Recinto del Parque José María Hinojosa. Anota el nº de puestos en la nota; la superficie va en el campo numérico.",
+          "mapea_a": "4. Dispositivo y limpieza en la zona del mercadillo ambulante de los martes (Parque José María Hinojosa) y reparto de bolsas"
+        },
+        {
+          "id": "q024",
+          "enunciado": "Horario real del martes: montaje, apertura, desmontaje y ventana de limpieza disponible",
+          "tipo": "texto",
+          "requerido": true,
+          "ayuda": "El ECE-03 exige un dispositivo con hora. Sin la ventana real de limpieza el cronograma del martes no se sostiene.",
+          "mapea_a": "ECE-03"
+        },
+        {
+          "id": "q025",
+          "enunciado": "Bolsas repartidas por martes a los puestos y criterio de reposición",
+          "tipo": "numero",
+          "unidad": "ud",
+          "ayuda": "El pliego nombra expresamente el reparto de bolsas. Anota el criterio de reposición en la nota.",
+          "mapea_a": "4. Dispositivo y limpieza en la zona del mercadillo ambulante de los martes (Parque José María Hinojosa) y reparto de bolsas"
+        },
+        {
+          "id": "q026",
+          "enunciado": "Estado del recinto y de su entorno inmediato tras el desmontaje",
+          "tipo": "escala",
+          "ayuda": "Visita un martes a la hora del desmontaje. Es el hallazgo que justifica la dotación de la fase final.",
+          "mapea_a": "4. Dispositivo y limpieza en la zona del mercadillo ambulante de los martes (Parque José María Hinojosa) y reparto de bolsas"
+        },
+        {
+          "id": "q027",
+          "enunciado": "Perímetro de calles afectado por cada evento: San Benito, Feria de Agosto, Semana Santa y Feria del Jamón",
+          "tipo": "texto",
+          "ayuda": "Una línea por evento con las calles concretas. El ECE-04 se sostiene sobre el perímetro, no sobre el 'refuerzo del servicio'.",
+          "mapea_a": "6. Plan de actuación para Ferias y Fiestas (Feria de Agosto, Feria del Jamón, etc.) antes, durante y después"
+        },
+        {
+          "id": "q028",
+          "enunciado": "Horas de refuerzo empleadas en el último ejercicio en cada evento",
+          "tipo": "texto",
+          "ayuda": "Dato de ejecución propia. Permite encajar el refuerzo en la bolsa anual sin desatender el resto del municipio.",
+          "mapea_a": "ECE-04"
+        }
+      ]
+    },
+    {
+      "id": "h-datos-generales-de",
+      "titulo": "H · Datos generales del servicio (solo en el parte de la zona 1)",
+      "preguntas": [
+        {
+          "id": "q029",
+          "enunciado": "Presencia diaria del encargado: horario, ubicación habitual y cobertura de sus ausencias",
+          "tipo": "texto",
+          "requerido": true,
+          "ayuda": "Solo en el parte de la zona 1. Sostiene el subcriterio 7 y la localización que exige el dispositivo de urgencias.",
+          "mapea_a": "7. Disponibilidad diaria y anual del encargado del servicio"
+        },
+        {
+          "id": "q030",
+          "enunciado": "Canal por el que el Ayuntamiento avisa hoy de una urgencia y tiempo real de llegada",
+          "tipo": "texto",
+          "requerido": true,
+          "ayuda": "Solo en la zona 1. La no intervención en media hora es incumplimiento muy grave (cl. 23.2, pp. 28-29): no comprometas por debajo de lo ejecutable.",
+          "mapea_a": "ECE-05"
+        },
+        {
+          "id": "q031",
+          "enunciado": "Ubicación de la base de material y punto de entrega de los residuos, con la distancia desde el núcleo",
+          "tipo": "texto",
+          "ayuda": "Solo en la zona 1. Prohibido acopiar restos en solares del término municipal: el traslado a vertedero autorizado es obligatorio (cl. 20.1, p. 24).",
+          "mapea_a": "8. Tiempo de respuesta del equipo ante emergencias o accidentes viales"
+        }
+      ]
+    },
+    {
+      "id": "i-dotacion-material-",
+      "titulo": "I · Dotación material (solo en el parte de la zona 1)",
+      "preguntas": [
+        {
+          "id": "q032",
+          "enunciado": "Número de carros portabolsas ergonómicos en servicio",
+          "tipo": "numero",
+          "requerido": true,
+          "unidad": "ud",
+          "ayuda": "Solo en la zona 1. El pliego exige uno por operario en servicio (cl. 20.5, p. 25). Compáralo con los 14 efectivos.",
+          "mapea_a": "10. Dotación y renovación de herramientas y carros manuales portabolsas"
+        },
+        {
+          "id": "q033",
+          "enunciado": "Estado y antigüedad de los carros portabolsas",
+          "tipo": "escala",
+          "requerido": true,
+          "ayuda": "Solo en la zona 1. Es el punto de partida del plan de renovación fechado del ECE-06, que vale 4 puntos.",
+          "mapea_a": "ECE-06"
+        },
+        {
+          "id": "q034",
+          "enunciado": "Número de sopladoras disponibles y en servicio",
+          "tipo": "numero",
+          "unidad": "ud",
+          "ayuda": "Solo en la zona 1. El pliego exige tres (cl. 20.5, p. 25). Anota en la nota el tipo de energía de cada una.",
+          "mapea_a": "9. Horas de apoyo semanales con maquinaria sopladora"
+        },
+        {
+          "id": "q035",
+          "enunciado": "Estado de la herramienta manual del operario tipo",
+          "tipo": "escala",
+          "requerido": true,
+          "ayuda": "Solo en la zona 1. Recogedores, escobas viarias, cepillos, palas, escobón de alambre, rascadores y espátulas.",
+          "mapea_a": "10. Dotación y renovación de herramientas y carros manuales portabolsas"
+        },
+        {
+          "id": "q036",
+          "enunciado": "Vehículo auxiliar: estado general y estado de la rotulación municipal",
+          "tipo": "escala",
+          "ayuda": "Solo en la zona 1. La rotulación debe ser visible a media distancia y el vehículo eléctrico o de bajas emisiones (cl. 20.5, pp. 25-26).",
+          "mapea_a": "10. Dotación y renovación de herramientas y carros manuales portabolsas"
+        }
+      ]
+    },
+    {
+      "id": "j-cierre-de-la-zona",
+      "titulo": "J · Cierre de la zona",
+      "preguntas": [
+        {
+          "id": "q037",
+          "enunciado": "Fotografías generales de la zona y de cada deficiencia anotada",
+          "tipo": "adjunto",
+          "requerido": true,
+          "ayuda": "Al menos una panorámica por sector y una foto por cada respuesta 'No conforme'. Nombra en la nota la calle de cada foto.",
+          "mapea_a": "ECE-01"
+        },
+        {
+          "id": "q038",
+          "enunciado": "Observaciones del técnico sobre la zona",
+          "tipo": "texto",
+          "largo": true,
+          "ayuda": "Lo que no encaje arriba: equipamientos que condicionan el horario (colegios, cuartel, deportivas), obras, cortes de tráfico, quejas vecinales oídas.",
+          "mapea_a": "General"
+        }
+      ]
+    }
+  ]
+}
