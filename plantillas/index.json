@@ -17,7 +17,7 @@
     {
       "id": "exp-2026-014",
       "fichero": "exp-2026-014.json",
-      "nombre": "Visita técnica — Limpieza Residencia Ntra. Sra.",
+      "nombre": "Visita técnica previa — Limpieza Residencia Ntra. Sra.",
       "expediente": {
         "codigo": "2026/014",
         "lote": "2 — Limpieza"
@@ -28,9 +28,21 @@
       "version": 1
     },
     {
+      "id": "exp-2076-2025",
+      "fichero": "exp-2076-2025.json",
+      "nombre": "Visita técnica — Zonas verdes de Campillos",
+      "expediente": {
+        "codigo": "2076/2025"
+      },
+      "centro": {
+        "nombre": "Zonas verdes de Campillos"
+      },
+      "version": 1
+    },
+    {
       "id": "limpieza-base",
       "fichero": "limpieza-base.json",
-      "nombre": "Control de calidad de limpieza (genérico)",
+      "nombre": "Control de calidad de limpieza",
       "expediente": {},
       "centro": {},
       "version": 3
