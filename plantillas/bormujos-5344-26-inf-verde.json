@@ -1,0 +1,390 @@
+{
+  "id": "bormujos-5344-26-inf-verde",
+  "version": 1,
+  "nombre": "Visita técnica — Infraestructura verde de Bormujos",
+  "origen": {
+    "generadoDesde": "checklist-Infraestructura verde de Bormujos.xlsx",
+    "skill": "checklist-campo",
+    "convertidoEl": "2026-09-23"
+  },
+  "expediente": {
+    "codigo": "5344/2026",
+    "objeto": "Conservacion y limpieza de la infraestructura verde",
+    "organismo": "Ayuntamiento de Bormujos"
+  },
+  "centro": {
+    "nombre": "Infraestructura verde de Bormujos",
+    "direccion": "Bormujos (Sevilla)"
+  },
+  "escala": [
+    {
+      "v": "ok",
+      "l": "Bien",
+      "peso": 1,
+      "tono": "ok",
+      "significado": "cumple lo exigido"
+    },
+    {
+      "v": "mej",
+      "l": "Mejorable",
+      "peso": 0.5,
+      "tono": "warn",
+      "significado": "cumple con deficiencias"
+    },
+    {
+      "v": "nc",
+      "l": "No conforme",
+      "peso": 0,
+      "tono": "bad",
+      "significado": "no cumple"
+    },
+    {
+      "v": "na",
+      "l": "N/A",
+      "peso": null,
+      "tono": "na",
+      "significado": "no aplica; no puntúa"
+    }
+  ],
+  "secciones": [
+    {
+      "id": "a-datos-de-la-visita",
+      "titulo": "A. Datos de la visita y ambito general",
+      "preguntas": [
+        {
+          "id": "q001",
+          "enunciado": "Fecha de la visita tecnica al ambito",
+          "tipo": "fecha",
+          "requerido": true,
+          "ayuda": "Fecha de la jornada; el DAFO y el conocimiento del ambito deben partir EXCLUSIVAMENTE de esta visita y del PPT (PCAP cl.12.B). Si el recorrido son varias jornadas, la primera.",
+          "mapea_a": "1. Conocimiento del estado del ámbito de la actuación"
+        },
+        {
+          "id": "q002",
+          "enunciado": "Tecnico(s) que realiza(n) la visita",
+          "tipo": "texto",
+          "requerido": true,
+          "ayuda": "Nombre y perfil. Supuesto por defecto: 1 tecnico de jardineria recorriendo sectores en varias jornadas.",
+          "mapea_a": "1. Conocimiento del estado del ámbito de la actuación"
+        },
+        {
+          "id": "q003",
+          "enunciado": "Ambito real confirmado frente al plano del Anexo (excepciones y solapes de arbolado municipal)",
+          "tipo": "escala",
+          "requerido": true,
+          "ayuda": "A-11/P-02: arbolado de C/Pablo Coso Calero y Av. del Aljarafe lo mantiene el Ayto; C/Camino de Gines la adjudicataria; recogida de naranja de TODO el arbolado municipal. Marcar Bien si el ambito recorrido coincide con el plano.",
+          "mapea_a": "ECE-06"
+        },
+        {
+          "id": "q004",
+          "enunciado": "Numero de zonas/sectores recorridos e inventariados en la visita",
+          "tipo": "numero",
+          "requerido": true,
+          "unidad": "ud",
+          "ayuda": "Total de zonas para las que se ha rellenado el bloque repetible de la seccion B.",
+          "mapea_a": "1. Conocimiento del estado del ámbito de la actuación"
+        },
+        {
+          "id": "q005",
+          "enunciado": "Vista general del municipio y de los accesos a las zonas verdes (foto)",
+          "tipo": "adjunto",
+          "ayuda": "Panoramica de contexto para el informe de reconocimiento del ambito.",
+          "mapea_a": "ECE-06"
+        }
+      ]
+    },
+    {
+      "id": "b-recorrido-por-zona",
+      "titulo": "B. Recorrido por zona/sector (bloque repetible)",
+      "preguntas": [
+        {
+          "id": "q006",
+          "enunciado": "Identificacion de la zona/sector (nombre y codigo del inventario)",
+          "tipo": "texto",
+          "requerido": true,
+          "ayuda": "Repetir todo este bloque por cada zona/sector recorrido. Usar el nombre y codigo del Anexo/inventario municipal cuando exista.",
+          "mapea_a": "1. Conocimiento del estado del ámbito de la actuación"
+        },
+        {
+          "id": "q007",
+          "enunciado": "Tipologia de mantenimiento de la zona",
+          "tipo": "opcion",
+          "opciones": [
+            "Esmerado",
+            "Ordinario",
+            "Reducido",
+            "Desbroce",
+            "Solar",
+            "Rotonda/mediana",
+            "Bosque de naranjos"
+          ],
+          "requerido": true,
+          "ayuda": "Clasificacion por intensidad (esmerado/ordinario/reducido) que determina frecuencias y dimensionamiento.",
+          "mapea_a": "1. Conocimiento del estado del ámbito de la actuación"
+        },
+        {
+          "id": "q008",
+          "enunciado": "Superficie real de zona verde del sector",
+          "tipo": "numero",
+          "requerido": true,
+          "unidad": "m2",
+          "ayuda": "Contrastar con el plano/inventario. Entrada del dimensionamiento por sector x labor (ECE-01: horas = superficie x intervenciones/ano / rendimiento) y del apartado 8 (Organizacion). Total ambito 345.305 m2.",
+          "mapea_a": "ECE-01"
+        },
+        {
+          "id": "q009",
+          "enunciado": "Superficie a desbrozar en el sector",
+          "tipo": "numero",
+          "unidad": "m2",
+          "ayuda": "Total ambito 180.257 m2 de desbroce; dimensiona brigada de desbroce (rendimiento 180 m2/h).",
+          "mapea_a": "2. Programa de conservación de los elementos vegetales"
+        },
+        {
+          "id": "q010",
+          "enunciado": "Especies vegetales concretas presentes (cespedes, arbustos, setos, vivaces) y densidad",
+          "tipo": "texto",
+          "largo": true,
+          "requerido": true,
+          "ayuda": "Inventario pormenorizado de especies por zona: es lo que llevo a Hospitales Malaga a 5/5 (rubrica 7). Nombrar especies, no 'vegetacion diversa'. Base del riego por especie (ECE-02).",
+          "mapea_a": "2. Programa de conservación de los elementos vegetales"
+        },
+        {
+          "id": "q011",
+          "enunciado": "Numero de arboles en el sector",
+          "tipo": "numero",
+          "unidad": "ud",
+          "ayuda": "Total ambito aprox. 4.948 arboles. Base del dimensionamiento de poda y de la sanidad vegetal.",
+          "mapea_a": "2. Programa de conservación de los elementos vegetales"
+        },
+        {
+          "id": "q012",
+          "enunciado": "Especies de arbolado y porte predominante; ejemplares singulares o del bosque de naranjos",
+          "tipo": "texto",
+          "largo": true,
+          "ayuda": "Distinguir arbolado viario, de parque y el bosque urbano de naranjos (recogida de naranja de TODO el arbolado municipal).",
+          "mapea_a": "2. Programa de conservación de los elementos vegetales"
+        },
+        {
+          "id": "q013",
+          "enunciado": "Numero de palmeras en el sector",
+          "tipo": "numero",
+          "unidad": "ud",
+          "ayuda": "Nº y ubicacion de palmeras dimensiona el tratamiento del picudo rojo (ECE-03: endoterapia uds/ejemplar); alimenta el apartado 2 (sanidad vegetal).",
+          "mapea_a": "ECE-03"
+        },
+        {
+          "id": "q014",
+          "enunciado": "Estado fitosanitario general de la vegetacion del sector",
+          "tipo": "escala",
+          "requerido": true,
+          "ayuda": "Hallazgo de estado (Bien/Mejorable/No conforme/N-A) que alimenta el DAFO del apartado 1.",
+          "mapea_a": "1. Conocimiento del estado del ámbito de la actuación"
+        },
+        {
+          "id": "q015",
+          "enunciado": "Plagas/enfermedades observadas en la zona",
+          "tipo": "opcion_multiple",
+          "opciones": [
+            "Picudo rojo (palmeras)",
+            "Procesionaria (pinos)",
+            "Cochinilla",
+            "Pulgon",
+            "Hongos",
+            "Otras",
+            "Ninguna"
+          ],
+          "ayuda": "Foco en picudo rojo en palmeras y procesionaria en pinos (bolsones: retirada en 24 h, penalidad A-08). Cuantificar ejemplares afectados en observaciones.",
+          "mapea_a": "2. Programa de conservación de los elementos vegetales"
+        },
+        {
+          "id": "q016",
+          "enunciado": "Sistema de riego existente en la zona",
+          "tipo": "opcion",
+          "opciones": [
+            "Goteo",
+            "Aspersion",
+            "Difusor",
+            "Manual/manguera",
+            "Boca de riego",
+            "Sin riego"
+          ],
+          "requerido": true,
+          "ayuda": "Determina el plan de riego por zona y especie (ECE-02) y la reutilizacion de la red automatizada existente; alimenta el apartado 2 (riego).",
+          "mapea_a": "ECE-02"
+        },
+        {
+          "id": "q017",
+          "enunciado": "Estado de la red/sistema de riego de la zona",
+          "tipo": "escala",
+          "ayuda": "Hallazgo de estado. Fugas, programadores, sectores sin caudal: deficiencias que van al DAFO.",
+          "mapea_a": "1. Conocimiento del estado del ámbito de la actuación"
+        },
+        {
+          "id": "q018",
+          "enunciado": "Estado del arbolado del sector (ejemplares de riesgo, poda pendiente, apeos)",
+          "tipo": "escala",
+          "ayuda": "Hallazgo de estado. Marca No conforme si hay arbol peligroso (apeo 48 h, penalidad A-08).",
+          "mapea_a": "2. Programa de conservación de los elementos vegetales"
+        },
+        {
+          "id": "q019",
+          "enunciado": "Numero de alcorques vacios o a clausurar en la zona",
+          "tipo": "numero",
+          "unidad": "ud",
+          "ayuda": "Base de la clausura de alcorques (apartado 3.2: cantidad anual, materiales).",
+          "mapea_a": "3. Programa de conservación de los elementos no vegetales"
+        },
+        {
+          "id": "q020",
+          "enunciado": "Estado del mobiliario urbano y obra civil de la zona (bancos, juegos, vallado, fuentes)",
+          "tipo": "escala",
+          "ayuda": "Hallazgo de estado. Base del programa de conservacion de mobiliario y obra civil (apartado 3).",
+          "mapea_a": "3. Programa de conservación de los elementos no vegetales"
+        },
+        {
+          "id": "q021",
+          "enunciado": "Estado de zonas terrizas, caminos, pavimentos y zonas estanciales de la zona",
+          "tipo": "escala",
+          "ayuda": "Hallazgo de estado. Superficies terrizas a recebar/reconstruir; cuantifica el apartado 4.",
+          "mapea_a": "4. Reparación, recebo y reconstrucción de zonas terrizas y caminos, pavimentos, rotondas y zonas estanciales"
+        },
+        {
+          "id": "q022",
+          "enunciado": "Estado de la red de drenaje y saneamiento superficial de la zona (cunetas, canaletas, imbornales)",
+          "tipo": "escala",
+          "ayuda": "Hallazgo de estado. Puntos con encharcamiento o drenaje obstruido.",
+          "mapea_a": "5. Conservación de redes de drenaje y saneamiento superficial"
+        },
+        {
+          "id": "q023",
+          "enunciado": "Numero de papeleras en la zona",
+          "tipo": "numero",
+          "unidad": "ud",
+          "ayuda": "Volumen de papeleras dimensiona el flujo de residuos urbanos (ECE-07) y las labores de limpieza.",
+          "mapea_a": "6. Labores de limpieza"
+        },
+        {
+          "id": "q024",
+          "enunciado": "Estado de limpieza y residuos acumulados en la zona",
+          "tipo": "escala",
+          "ayuda": "Hallazgo de estado de las labores de limpieza (residuos, restos vegetales sin retirar).",
+          "mapea_a": "6. Labores de limpieza"
+        },
+        {
+          "id": "q025",
+          "enunciado": "Deficiencias y carencias detectadas en la zona (carencias vegetales, danos, seguridad)",
+          "tipo": "texto",
+          "largo": true,
+          "requerido": true,
+          "ayuda": "Deficiencias por emplazamiento: es lo que la mesa premia (rubrica 7). Alimenta directamente el DAFO y las medidas correctoras.",
+          "mapea_a": "1. Conocimiento del estado del ámbito de la actuación"
+        },
+        {
+          "id": "q026",
+          "enunciado": "Fotografias de la zona (estado general, deficiencias, ejemplares singulares)",
+          "tipo": "adjunto",
+          "requerido": true,
+          "ayuda": "Evidencia grafica por zona para el informe de reconocimiento del ambito.",
+          "mapea_a": "ECE-06"
+        }
+      ]
+    },
+    {
+      "id": "c-solares-y-frentes-",
+      "titulo": "C. Solares y frentes de desbroce",
+      "preguntas": [
+        {
+          "id": "q027",
+          "enunciado": "Numero de solares municipales a limpiar identificados",
+          "tipo": "numero",
+          "unidad": "ud",
+          "ayuda": "La limpieza de solares es obligatoria (apartado 6.1). Dimensiona la brigada de limpieza y el flujo de residuos.",
+          "mapea_a": "6. Labores de limpieza"
+        },
+        {
+          "id": "q028",
+          "enunciado": "Superficie total de desbroce estimada en la visita",
+          "tipo": "numero",
+          "unidad": "m2",
+          "ayuda": "Contrastar con los 180.257 m2 declarados; dimensiona la brigada de desbroce.",
+          "mapea_a": "2. Programa de conservación de los elementos vegetales"
+        },
+        {
+          "id": "q029",
+          "enunciado": "Tipo de residuos y acumulaciones observadas en solares",
+          "tipo": "texto",
+          "largo": true,
+          "ayuda": "Caracterizacion de residuos urbanos/vegetales por flujo (ECE-07): no omitir ningun flujo.",
+          "mapea_a": "7. Programa de gestión de residuos"
+        },
+        {
+          "id": "q030",
+          "enunciado": "Fotografias de solares y frentes de desbroce",
+          "tipo": "adjunto",
+          "ayuda": "Evidencia grafica de solares y desbroce.",
+          "mapea_a": "6. Labores de limpieza"
+        }
+      ]
+    },
+    {
+      "id": "d-logistica-y-organi",
+      "titulo": "D. Logistica y organizacion del servicio (transversal)",
+      "preguntas": [
+        {
+          "id": "q031",
+          "enunciado": "Accesos dificiles, restricciones de horario o de trafico observadas",
+          "tipo": "texto",
+          "largo": true,
+          "ayuda": "Condiciona rutas de brigadas y horarios; entra en el dimensionamiento (ECE-01).",
+          "mapea_a": "8. Organización del servicio: medios personales, medios materiales y gestión del servicio"
+        },
+        {
+          "id": "q032",
+          "enunciado": "Puntos de agua / bocas de riego municipales aprovechables para riego y limpieza",
+          "tipo": "texto",
+          "largo": true,
+          "ayuda": "Ubicacion y estado de bocas de riego; base del riego manual y de la logistica de agua.",
+          "mapea_a": "2. Programa de conservación de los elementos vegetales"
+        },
+        {
+          "id": "q033",
+          "enunciado": "Existe nave/almacen o emplazamiento disponible para base de la contrata y acopio de residuos",
+          "tipo": "escala",
+          "ayuda": "Hallazgo. Disponibilidad de base logistica; afecta a la organizacion y a la gestion de residuos.",
+          "mapea_a": "8. Organización del servicio: medios personales, medios materiales y gestión del servicio"
+        },
+        {
+          "id": "q034",
+          "enunciado": "Puntos de riesgo para el reten 24/7 (zonas inundables, arbolado peligroso sobre viario)",
+          "tipo": "texto",
+          "largo": true,
+          "ayuda": "Dimensiona el reten y los protocolos de emergencia (A-08: apeo 48 h, procesionaria 24 h, balizamiento inmediato).",
+          "mapea_a": "8. Organización del servicio: medios personales, medios materiales y gestión del servicio"
+        }
+      ]
+    },
+    {
+      "id": "e-sintesis-dafo-de-c",
+      "titulo": "E. Sintesis DAFO de campo",
+      "preguntas": [
+        {
+          "id": "q035",
+          "enunciado": "Sintesis DAFO de campo: debilidades, amenazas, fortalezas y oportunidades detectadas en la visita",
+          "tipo": "texto",
+          "largo": true,
+          "requerido": true,
+          "ayuda": "El DAFO debe partir EXCLUSIVAMENTE de esta visita y del PPT (A-10, PCAP cl.12.B). Consolidar los hallazgos por zona en un DAFO transversal.",
+          "mapea_a": "1. Conocimiento del estado del ámbito de la actuación"
+        },
+        {
+          "id": "q036",
+          "enunciado": "Observaciones libres del tecnico sobre el ambito",
+          "tipo": "texto",
+          "largo": true,
+          "ayuda": "Cajon de observaciones al cierre del recorrido; no genera hallazgo.",
+          "mapea_a": "General"
+        }
+      ]
+    }
+  ]
+}
