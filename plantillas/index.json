@@ -59,6 +59,18 @@
       "nombre": "Campillos — recorrido por zona"
     },
     "version": 1
-  }
+  },
+    {
+  "id": "bormujos-5344-26-inf-verde",
+  "fichero": "bormujos-5344-26-inf-verde.json",
+  "nombre": "Visita técnica — Infraestructura verde de Bormujos",
+  "expediente": {
+    "codigo": "5344/2026"
+  },
+  "centro": {
+    "nombre": "Infraestructura verde de Bormujos"
+  },
+  "version": 1
+}
   ]
 }
