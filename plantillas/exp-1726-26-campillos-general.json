@@ -1,0 +1,293 @@
+{
+  "id": "exp-1726-26-campillos-general",
+  "version": 1,
+  "nombre": "Campillos · Servicio general, mercadillo y medios (1726/2026)",
+  "origen": {
+    "generadoDesde": "checklist-campillos-general.xlsx",
+    "skill": "checklist-campo",
+    "convertidoEl": "2026-09-25"
+  },
+  "expediente": {
+    "codigo": "1726/2026",
+    "objeto": "Servicio de limpieza viaria del municipio de Campillos (Málaga)",
+    "lote": "único",
+    "organismo": "Ayuntamiento de Campillos (Málaga)"
+  },
+  "centro": {
+    "nombre": "Campillos — Servicio general, mercadillo y medios",
+    "direccion": "Campillos (Málaga)"
+  },
+  "escala": [
+    {
+      "v": "ok",
+      "l": "Bien",
+      "peso": 1,
+      "tono": "ok",
+      "significado": "cumple lo exigido"
+    },
+    {
+      "v": "mej",
+      "l": "Mejorable",
+      "peso": 0.5,
+      "tono": "warn",
+      "significado": "cumple con deficiencias"
+    },
+    {
+      "v": "nc",
+      "l": "No conforme",
+      "peso": 0,
+      "tono": "bad",
+      "significado": "no cumple"
+    },
+    {
+      "v": "na",
+      "l": "N/A",
+      "peso": null,
+      "tono": "na",
+      "significado": "no aplica; no puntúa"
+    }
+  ],
+  "secciones": [
+    {
+      "id": "a-base-logistica-y-r",
+      "titulo": "A · Base, logística y respuesta",
+      "preguntas": [
+        {
+          "id": "q031",
+          "enunciado": "Base de material: dirección, horario de acceso y restricciones",
+          "tipo": "texto",
+          "requerido": true,
+          "ayuda": "Contéstala estando en la puerta de la base: la respuesta queda geolocalizada. Es el punto de salida de todos los tiempos de respuesta.",
+          "mapea_a": "8. Tiempo de respuesta del equipo ante emergencias o accidentes viales"
+        },
+        {
+          "id": "q065",
+          "enunciado": "Punto de entrega de los residuos: nombre, horario y minutos desde el núcleo",
+          "tipo": "texto",
+          "ayuda": "Vertedero o planta autorizada; está prohibido acopiar en solares municipales (cl. 20.1, p. 24). Si vas, contesta allí y queda geolocalizado.",
+          "mapea_a": "8. Tiempo de respuesta del equipo ante emergencias o accidentes viales"
+        },
+        {
+          "id": "q029",
+          "enunciado": "Presencia diaria del encargado: horario, ubicación habitual y cobertura de sus ausencias",
+          "tipo": "texto",
+          "requerido": true,
+          "ayuda": "Pregúntaselo al encargado; no hace falta estar en la zona para contestarla. Sostiene el subcriterio 7 y la localización que exige el dispositivo de urgencias.",
+          "mapea_a": "7. Disponibilidad diaria y anual del encargado del servicio"
+        },
+        {
+          "id": "q030",
+          "enunciado": "Canal por el que el Ayuntamiento avisa hoy de una urgencia y tiempo real de llegada",
+          "tipo": "texto",
+          "requerido": true,
+          "ayuda": "Pregúntaselo al encargado; no hace falta estar en la zona para contestarla. La no intervención en media hora es incumplimiento muy grave (cl. 23.2, pp. 28-29).",
+          "mapea_a": "ECE-05"
+        },
+        {
+          "id": "q028",
+          "enunciado": "Horas de refuerzo empleadas en el último ejercicio en cada evento",
+          "tipo": "texto",
+          "ayuda": "Pregúntaselo al encargado; no hace falta estar en la zona para contestarla. San Benito, Feria de Agosto, Semana Santa y Feria del Jamón.",
+          "mapea_a": "ECE-04"
+        }
+      ]
+    },
+    {
+      "id": "b-dotacion-material",
+      "titulo": "B · Dotación material",
+      "preguntas": [
+        {
+          "id": "q032",
+          "enunciado": "Número de carros portabolsas ergonómicos en servicio",
+          "tipo": "numero",
+          "requerido": true,
+          "unidad": "ud",
+          "ayuda": "El pliego exige uno por operario en servicio (cl. 20.5, p. 25). Compáralo con los 14 efectivos.",
+          "mapea_a": "10. Dotación y renovación de herramientas y carros manuales portabolsas"
+        },
+        {
+          "id": "q033",
+          "enunciado": "Estado y antigüedad de los carros portabolsas",
+          "tipo": "escala",
+          "requerido": true,
+          "ayuda": "Punto de partida del plan de renovación fechado del ECE-06, que vale 4 puntos.",
+          "mapea_a": "ECE-06"
+        },
+        {
+          "id": "q034",
+          "enunciado": "Número de sopladoras disponibles y en servicio",
+          "tipo": "numero",
+          "unidad": "ud",
+          "ayuda": "El pliego exige tres (cl. 20.5, p. 25). Anota en una nota el tipo de energía de cada una.",
+          "mapea_a": "9. Horas de apoyo semanales con maquinaria sopladora"
+        },
+        {
+          "id": "q035",
+          "enunciado": "Estado de la herramienta manual del operario tipo",
+          "tipo": "escala",
+          "requerido": true,
+          "ayuda": "Recogedores, escobas viarias, cepillos, palas, escobón de alambre, rascadores y espátulas.",
+          "mapea_a": "10. Dotación y renovación de herramientas y carros manuales portabolsas"
+        },
+        {
+          "id": "q036",
+          "enunciado": "Vehículo auxiliar: estado general y estado de la rotulación municipal",
+          "tipo": "escala",
+          "ayuda": "La rotulación debe verse a media distancia y el vehículo debe ser eléctrico o de bajas emisiones (cl. 20.5, pp. 25-26).",
+          "mapea_a": "10. Dotación y renovación de herramientas y carros manuales portabolsas"
+        },
+        {
+          "id": "q066",
+          "enunciado": "Otros medios mecánicos en servicio además del vehículo auxiliar",
+          "tipo": "opcion_multiple",
+          "opciones": [
+            "Barredora mecánica",
+            "Hidrolimpiadora",
+            "Desbrozadora",
+            "Sopladora de mochila adicional",
+            "Ninguno"
+          ],
+          "ayuda": "Marca lo que haya en la base y anota en una nota marca, antigüedad y estado.",
+          "mapea_a": "10. Dotación y renovación de herramientas y carros manuales portabolsas"
+        }
+      ]
+    },
+    {
+      "id": "c-mercadillo-de-los-",
+      "titulo": "C · Mercadillo de los martes (Parque José María Hinojosa)",
+      "preguntas": [
+        {
+          "id": "q023",
+          "enunciado": "Número aproximado de puestos del mercadillo",
+          "tipo": "numero",
+          "unidad": "ud",
+          "ayuda": "Visita un martes. La superficie del recinto del Parque José María Hinojosa se mide en gabinete con cartografía.",
+          "mapea_a": "4. Dispositivo y limpieza en la zona del mercadillo ambulante de los martes (Parque José María Hinojosa) y reparto de bolsas"
+        },
+        {
+          "id": "q024",
+          "enunciado": "Horario real del martes: montaje, apertura, desmontaje y ventana de limpieza disponible",
+          "tipo": "texto",
+          "requerido": true,
+          "ayuda": "El ECE-03 exige un dispositivo con hora. Sin la ventana real de limpieza el cronograma del martes no se sostiene.",
+          "mapea_a": "ECE-03"
+        },
+        {
+          "id": "q025",
+          "enunciado": "Bolsas repartidas por martes a los puestos",
+          "tipo": "numero",
+          "unidad": "ud",
+          "ayuda": "El pliego nombra expresamente el reparto de bolsas. Anota en una nota el criterio de reposición.",
+          "mapea_a": "4. Dispositivo y limpieza en la zona del mercadillo ambulante de los martes (Parque José María Hinojosa) y reparto de bolsas"
+        },
+        {
+          "id": "q026",
+          "enunciado": "Estado del recinto y de su entorno inmediato tras el desmontaje",
+          "tipo": "escala",
+          "ayuda": "A la hora del desmontaje. Es el hallazgo que justifica la dotación de la fase final.",
+          "mapea_a": "4. Dispositivo y limpieza en la zona del mercadillo ambulante de los martes (Parque José María Hinojosa) y reparto de bolsas"
+        }
+      ]
+    },
+    {
+      "id": "d-cierre",
+      "titulo": "D · Cierre",
+      "preguntas": [
+        {
+          "id": "q067",
+          "enunciado": "Conclusiones generales del servicio",
+          "tipo": "texto",
+          "largo": true,
+          "ayuda": "Lo más importante para la oferta de lo visto en la base, los medios y el mercadillo.",
+          "mapea_a": "General"
+        }
+      ]
+    }
+  ],
+  "cabecera": [
+    {
+      "id": "tecnico",
+      "etiqueta": "Técnico",
+      "tipo": "texto",
+      "requerido": true
+    },
+    {
+      "id": "fecha",
+      "etiqueta": "Fecha",
+      "tipo": "fecha"
+    },
+    {
+      "id": "acompanante",
+      "etiqueta": "Acompañado por",
+      "tipo": "texto"
+    },
+    {
+      "id": "visita",
+      "etiqueta": "Tipo de visita",
+      "tipo": "opcion",
+      "opciones": [
+        "Recorrido de comprobación",
+        "Visita técnica previa",
+        "Incidencia"
+      ]
+    }
+  ],
+  "elementos": {
+    "titulo": "Elementos de interés",
+    "ayuda": "Crea un elemento por cada cosa concreta que merezca quedar registrada: una papelera rota, un árbol con el alcorque sucio, una pintada, un punto negro. Foto, una línea de texto y la ubicación se guarda sola.",
+    "estado": true,
+    "tipos": [
+      {
+        "v": "papelera",
+        "l": "Papelera",
+        "mapea_a": "11. Frecuencia de mantenimiento, vaciado, limpieza y reposición de papeleras urbanas"
+      },
+      {
+        "v": "arbol",
+        "l": "Árbol o alcorque",
+        "mapea_a": "12. Limpieza integral del mobiliario urbano exterior"
+      },
+      {
+        "v": "farola",
+        "l": "Farola o señal",
+        "mapea_a": "12. Limpieza integral del mobiliario urbano exterior"
+      },
+      {
+        "v": "mobiliario",
+        "l": "Banco, fuente u otro mobiliario",
+        "mapea_a": "12. Limpieza integral del mobiliario urbano exterior"
+      },
+      {
+        "v": "pintada",
+        "l": "Pintada o cartel",
+        "mapea_a": "12. Limpieza integral del mobiliario urbano exterior"
+      },
+      {
+        "v": "suciedad",
+        "l": "Punto de suciedad recurrente",
+        "mapea_a": "2. Frecuencia de barrido por sector en el núcleo urbano"
+      },
+      {
+        "v": "contenedor",
+        "l": "Contenedor desbordado o con impropios",
+        "mapea_a": "2. Frecuencia de barrido por sector en el núcleo urbano"
+      },
+      {
+        "v": "herbaceos",
+        "l": "Herbáceos en acerado o bordillo",
+        "mapea_a": "13. Frecuencia y eficacia en tratamientos de eliminación de herbáceos en acerados y bordillos"
+      },
+      {
+        "v": "vertido",
+        "l": "Vertido o acopio ilegal",
+        "mapea_a": "3. Frecuencia de barrido en urbanizaciones residenciales y espacios públicos periféricos"
+      },
+      {
+        "v": "otro",
+        "l": "Otro",
+        "mapea_a": "General"
+      }
+    ]
+  },
+  "requiereApp": "2.0"
+}

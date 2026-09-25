@@ -1,0 +1,433 @@
+{
+  "id": "exp-1726-26-campillos-z4",
+  "version": 1,
+  "nombre": "Campillos · Zona 4 · instalaciones deportivas (1726/2026)",
+  "origen": {
+    "generadoDesde": "checklist-campillos-z4.xlsx",
+    "skill": "checklist-campo",
+    "convertidoEl": "2026-09-25"
+  },
+  "expediente": {
+    "codigo": "1726/2026",
+    "objeto": "Servicio de limpieza viaria del municipio de Campillos (Málaga)",
+    "lote": "único",
+    "organismo": "Ayuntamiento de Campillos (Málaga)"
+  },
+  "centro": {
+    "nombre": "Campillos — Zona 4 · instalaciones deportivas",
+    "direccion": "Campillos (Málaga)",
+    "zona": 4
+  },
+  "escala": [
+    {
+      "v": "ok",
+      "l": "Bien",
+      "peso": 1,
+      "tono": "ok",
+      "significado": "cumple lo exigido"
+    },
+    {
+      "v": "mej",
+      "l": "Mejorable",
+      "peso": 0.5,
+      "tono": "warn",
+      "significado": "cumple con deficiencias"
+    },
+    {
+      "v": "nc",
+      "l": "No conforme",
+      "peso": 0,
+      "tono": "bad",
+      "significado": "no cumple"
+    },
+    {
+      "v": "na",
+      "l": "N/A",
+      "peso": null,
+      "tono": "na",
+      "significado": "no aplica; no puntúa"
+    }
+  ],
+  "secciones": [
+    {
+      "id": "a-viario-y-rendimien",
+      "titulo": "A · Viario y rendimiento",
+      "preguntas": [
+        {
+          "id": "q006",
+          "enunciado": "Pavimento dominante de la zona",
+          "tipo": "opcion",
+          "opciones": [
+            "Asfalto",
+            "Hormigón",
+            "Adoquín",
+            "Terrizo",
+            "Mixto"
+          ],
+          "ayuda": "Condiciona el método de barrido y el rendimiento por hora: el adoquín no se barre igual que el asfalto.",
+          "mapea_a": "2. Frecuencia de barrido por sector en el núcleo urbano"
+        },
+        {
+          "id": "q039",
+          "enunciado": "Calles o tramos con más tránsito o más suciedad que el resto de la zona",
+          "tipo": "texto",
+          "requerido": true,
+          "ayuda": "Nombra calle y tramo: salida de colegios, bares con terraza, paradas de autobús, comercio, entorno del mercado. Es lo que justifica una frecuencia más alta donde hay demanda real. Si es un punto concreto, créalo también en Elementos de interés.",
+          "mapea_a": "2. Frecuencia de barrido por sector en el núcleo urbano"
+        },
+        {
+          "id": "q040",
+          "enunciado": "Condicionantes que frenan el barrido en la zona",
+          "tipo": "opcion_multiple",
+          "opciones": [
+            "Coches aparcados sobre la acera",
+            "Aceras estrechas",
+            "Pendientes pronunciadas",
+            "Escalones o escalinatas",
+            "Tráfico intenso",
+            "Obras",
+            "Ninguno relevante"
+          ],
+          "ayuda": "Marca los que veas. Sirven para no dimensionar solo con metros: dos calles iguales en longitud no se barren en el mismo tiempo.",
+          "mapea_a": "2. Frecuencia de barrido por sector en el núcleo urbano"
+        },
+        {
+          "id": "q041",
+          "enunciado": "¿Las calles de la zona admiten barredora mecánica?",
+          "tipo": "opcion",
+          "opciones": [
+            "Sí, la mayoría",
+            "Solo las calles principales",
+            "No (estrechas, adoquín o pendientes)"
+          ],
+          "ayuda": "Hoy el barrido es manual con apoyo. El PPT permite ofertar más medios mecánicos: esta respuesta dimensiona una posible mejora sin coste (subcriterio 14, pendiente de la consulta P-08).",
+          "mapea_a": "14. Servicios complementarios o mejoras sin coste para la administración"
+        },
+        {
+          "id": "q064",
+          "enunciado": "Urbanizaciones o espacios públicos periféricos que dependen de esta zona",
+          "tipo": "texto",
+          "ayuda": "Nombre y acceso. Si la zona no tiene ninguno, marca «No aplica».",
+          "mapea_a": "3. Frecuencia de barrido en urbanizaciones residenciales y espacios públicos periféricos"
+        },
+        {
+          "id": "q007",
+          "enunciado": "Estado del acerado y del bordillo en cuanto a herbáceos",
+          "tipo": "escala",
+          "requerido": true,
+          "ayuda": "Bien = sin hierba visible · Mejorable = brotes aislados · No conforme = hierba establecida en juntas y bordillo.",
+          "mapea_a": "13. Frecuencia y eficacia en tratamientos de eliminación de herbáceos en acerados y bordillos"
+        }
+      ]
+    },
+    {
+      "id": "b-papeleras-alcorque",
+      "titulo": "B · Papeleras, alcorques y mobiliario",
+      "preguntas": [
+        {
+          "id": "q008",
+          "enunciado": "Número de papeleras instaladas en la zona",
+          "tipo": "numero",
+          "requerido": true,
+          "unidad": "ud",
+          "ayuda": "Cuenta física durante el recorrido. El pliego no publica la red de papeleras y el subcriterio 11 pide la frecuencia de vaciado.",
+          "mapea_a": "11. Frecuencia de mantenimiento, vaciado, limpieza y reposición de papeleras urbanas"
+        },
+        {
+          "id": "q009",
+          "enunciado": "Estado de conservación y limpieza de las papeleras",
+          "tipo": "escala",
+          "requerido": true,
+          "ayuda": "Mira soporte, bolsa, tapa y limpieza exterior. Las que estén rotas, créalas en Elementos de interés.",
+          "mapea_a": "11. Frecuencia de mantenimiento, vaciado, limpieza y reposición de papeleras urbanas"
+        },
+        {
+          "id": "q010",
+          "enunciado": "Número de alcorques con arbolado viario",
+          "tipo": "numero",
+          "unidad": "ud",
+          "ayuda": "Anota en una nota la especie dominante: marca los meses de caída de hoja y la intensificación estacional del ECE-02.",
+          "mapea_a": "12. Limpieza integral del mobiliario urbano exterior"
+        },
+        {
+          "id": "q042",
+          "enunciado": "Estado de los alcorques: hoja, frutos, hierba y residuos",
+          "tipo": "escala",
+          "ayuda": "El PPT exige limpieza intensiva de alcorques y refuerzo en la caída de hojas y frutos.",
+          "mapea_a": "12. Limpieza integral del mobiliario urbano exterior"
+        },
+        {
+          "id": "q011",
+          "enunciado": "Número de elementos de mobiliario urbano objeto de limpieza",
+          "tipo": "numero",
+          "unidad": "ud",
+          "ayuda": "Bancos, marquesinas, fuentes, juegos infantiles, hitos y señalización. Las papeleras van aparte.",
+          "mapea_a": "ECE-01"
+        },
+        {
+          "id": "q012",
+          "enunciado": "Estado del mobiliario urbano y presencia de pintadas o carteles",
+          "tipo": "escala",
+          "requerido": true,
+          "ayuda": "No conforme si hay pintadas o cartelería adherida sin retirar. Cada caso, créalo en Elementos de interés con su foto.",
+          "mapea_a": "12. Limpieza integral del mobiliario urbano exterior"
+        }
+      ]
+    },
+    {
+      "id": "c-singularidades-de-",
+      "titulo": "C · Singularidades de la zona 4",
+      "preguntas": [
+        {
+          "id": "q054",
+          "enunciado": "Estado de accesos y aparcamientos de las instalaciones deportivas",
+          "tipo": "escala",
+          "ayuda": "Polideportivo, piscina, pistas de pádel, campo de fútbol y pistas de patinaje. Su uso se concentra en fin de semana (subcriterio 5).",
+          "mapea_a": "5. Frecuencia de barrido en domingos y días festivos"
+        },
+        {
+          "id": "q055",
+          "enunciado": "Días y horas de mayor uso de las instalaciones deportivas",
+          "tipo": "texto",
+          "ayuda": "Pregúntaselo al encargado; no hace falta estar en la zona para contestarla. Partidos, piscina en verano, torneos. Marca la intensificación estacional del calendario.",
+          "mapea_a": "ECE-02"
+        }
+      ]
+    },
+    {
+      "id": "d-deficiencias-y-est",
+      "titulo": "D · Deficiencias y estado general",
+      "preguntas": [
+        {
+          "id": "q013",
+          "enunciado": "Estado general de limpieza de la zona el día del recorrido",
+          "tipo": "escala",
+          "requerido": true,
+          "ayuda": "Juicio de conjunto de la zona, no de un punto concreto. Abre el cuadro de visita técnica de la zona en la memoria.",
+          "mapea_a": "0. Bases del proyecto: ámbito, inventario y dimensionamiento"
+        },
+        {
+          "id": "q014",
+          "enunciado": "Tramos con reaparición recurrente de herbáceos",
+          "tipo": "texto",
+          "ayuda": "Calle y tramo. El subcriterio 13 pide eficacia: sin tramos identificados no hay indicador de reaparición que medir.",
+          "mapea_a": "ECE-07"
+        },
+        {
+          "id": "q015",
+          "enunciado": "Puntos con acumulación recurrente de impropios junto a los contenedores",
+          "tipo": "texto",
+          "ayuda": "Ubicación concreta. El pliego obliga a recoger desbordamientos e impropios (cl. 20.1, pp. 23-24).",
+          "mapea_a": "2. Frecuencia de barrido por sector en el núcleo urbano"
+        },
+        {
+          "id": "q043",
+          "enunciado": "Señales de incidencias recurrentes que se ven en la zona",
+          "tipo": "opcion_multiple",
+          "opciones": [
+            "Excrementos de animales",
+            "Pintadas o carteles",
+            "Vandalismo en mobiliario",
+            "Restos de botellón u ocio nocturno",
+            "Vertidos o restos de accidente",
+            "Animales muertos",
+            "Ninguna visible"
+          ],
+          "ayuda": "Marca lo que veas. Si el encargado o algún vecino te cuenta quejas repetidas, anótalas en una nota de esta pregunta. Alimenta el protocolo de respuesta por tipo de incidencia.",
+          "mapea_a": "8. Tiempo de respuesta del equipo ante emergencias o accidentes viales"
+        }
+      ]
+    },
+    {
+      "id": "e-zonas-verdes-y-par",
+      "titulo": "E · Zonas verdes y parques (alcance pendiente de P-05)",
+      "preguntas": [
+        {
+          "id": "q045",
+          "enunciado": "Tipos de zona verde presentes en la zona",
+          "tipo": "opcion_multiple",
+          "opciones": [
+            "Parque",
+            "Jardín o parterre",
+            "Parque infantil",
+            "Pistas deportivas al aire libre",
+            "Ninguna"
+          ],
+          "ayuda": "Solo caracterizar: la superficie se mide en gabinete con cartografía. Alcance pendiente de la consulta P-05 (el PPT los incluye, el PCAP no).",
+          "mapea_a": "0. Bases del proyecto: ámbito, inventario y dimensionamiento"
+        },
+        {
+          "id": "q022",
+          "enunciado": "Estado de limpieza de las zonas verdes y de los parques infantiles",
+          "tipo": "escala",
+          "ayuda": "Arena de juegos, papeleras del parque y restos vegetales. Misma reserva de la P-05.",
+          "mapea_a": "0. Bases del proyecto: ámbito, inventario y dimensionamiento"
+        }
+      ]
+    },
+    {
+      "id": "f-servicio-actual-pr",
+      "titulo": "F · Servicio actual (pregúntalo al encargado)",
+      "preguntas": [
+        {
+          "id": "q016",
+          "enunciado": "Frecuencia de barrido que se ejecuta hoy en la zona",
+          "tipo": "texto",
+          "requerido": true,
+          "ayuda": "Pregúntaselo al encargado; no hace falta estar en la zona para contestarla. Pasadas por semana y por tramo, diferenciando calles principales y secundarias.",
+          "mapea_a": "ECE-02"
+        },
+        {
+          "id": "q017",
+          "enunciado": "Operarios asignados hoy a la zona, turno y días de la semana",
+          "tipo": "texto",
+          "requerido": true,
+          "ayuda": "Pregúntaselo al encargado; no hace falta estar en la zona para contestarla. Debe cuadrar con 11 personas de lunes a viernes de 07:00 a 14:00 y el retén de 3 en fin de semana.",
+          "mapea_a": "1. Operarios adscritos, horarios y bolsa de horas anuales de servicio"
+        },
+        {
+          "id": "q019",
+          "enunciado": "Horas semanales de sopladora que se emplean hoy en la zona",
+          "tipo": "numero",
+          "ayuda": "Pregúntaselo al encargado; no hace falta estar en la zona para contestarla. Horas por semana.",
+          "mapea_a": "9. Horas de apoyo semanales con maquinaria sopladora"
+        },
+        {
+          "id": "q020",
+          "enunciado": "Cobertura de la zona por el retén de domingos y festivos",
+          "tipo": "opcion",
+          "opciones": [
+            "Completa",
+            "Solo tramos principales",
+            "Solo si hay evento",
+            "No se cubre"
+          ],
+          "ayuda": "Pregúntaselo al encargado; no hace falta estar en la zona para contestarla. El retén son 3 peones, 7 horas.",
+          "mapea_a": "5. Frecuencia de barrido en domingos y días festivos"
+        },
+        {
+          "id": "q044",
+          "enunciado": "Minutos en vehículo desde la base de material hasta el punto más alejado de la zona",
+          "tipo": "numero",
+          "requerido": true,
+          "ayuda": "Haz el trayecto en hora de servicio o pregúntaselo al encargado. Sostiene el compromiso de intervenir en media hora (cl. 23.2, pp. 28-29): no se oferta un tiempo que no se pueda cumplir.",
+          "mapea_a": "ECE-05"
+        },
+        {
+          "id": "q051",
+          "enunciado": "Eventos que afectan a calles de esta zona",
+          "tipo": "opcion_multiple",
+          "opciones": [
+            "Recintos de San Benito",
+            "Feria de Agosto",
+            "Semana Santa",
+            "Feria del Jamón",
+            "Ninguno"
+          ],
+          "ayuda": "Pregúntaselo al encargado; no hace falta estar en la zona para contestarla. Anota en una nota las calles afectadas por cada evento marcado: el ECE-04 se sostiene sobre ese perímetro.",
+          "mapea_a": "6. Plan de actuación para Ferias y Fiestas (Feria de Agosto, Feria del Jamón, etc.) antes, durante y después"
+        }
+      ]
+    },
+    {
+      "id": "g-cierre-de-la-zona",
+      "titulo": "G · Cierre de la zona",
+      "preguntas": [
+        {
+          "id": "q038",
+          "enunciado": "Conclusiones del técnico sobre la zona",
+          "tipo": "texto",
+          "largo": true,
+          "ayuda": "Cierre del recorrido: qué es lo más importante de esta zona para la oferta, obras o cortes de tráfico, lo que no encaje arriba.",
+          "mapea_a": "General"
+        }
+      ]
+    }
+  ],
+  "cabecera": [
+    {
+      "id": "tecnico",
+      "etiqueta": "Técnico",
+      "tipo": "texto",
+      "requerido": true
+    },
+    {
+      "id": "fecha",
+      "etiqueta": "Fecha",
+      "tipo": "fecha"
+    },
+    {
+      "id": "acompanante",
+      "etiqueta": "Acompañado por",
+      "tipo": "texto"
+    },
+    {
+      "id": "visita",
+      "etiqueta": "Tipo de visita",
+      "tipo": "opcion",
+      "opciones": [
+        "Recorrido de comprobación",
+        "Visita técnica previa",
+        "Incidencia"
+      ]
+    }
+  ],
+  "elementos": {
+    "titulo": "Elementos de interés",
+    "ayuda": "Crea un elemento por cada cosa concreta que merezca quedar registrada: una papelera rota, un árbol con el alcorque sucio, una pintada, un punto negro. Foto, una línea de texto y la ubicación se guarda sola.",
+    "estado": true,
+    "tipos": [
+      {
+        "v": "papelera",
+        "l": "Papelera",
+        "mapea_a": "11. Frecuencia de mantenimiento, vaciado, limpieza y reposición de papeleras urbanas"
+      },
+      {
+        "v": "arbol",
+        "l": "Árbol o alcorque",
+        "mapea_a": "12. Limpieza integral del mobiliario urbano exterior"
+      },
+      {
+        "v": "farola",
+        "l": "Farola o señal",
+        "mapea_a": "12. Limpieza integral del mobiliario urbano exterior"
+      },
+      {
+        "v": "mobiliario",
+        "l": "Banco, fuente u otro mobiliario",
+        "mapea_a": "12. Limpieza integral del mobiliario urbano exterior"
+      },
+      {
+        "v": "pintada",
+        "l": "Pintada o cartel",
+        "mapea_a": "12. Limpieza integral del mobiliario urbano exterior"
+      },
+      {
+        "v": "suciedad",
+        "l": "Punto de suciedad recurrente",
+        "mapea_a": "2. Frecuencia de barrido por sector en el núcleo urbano"
+      },
+      {
+        "v": "contenedor",
+        "l": "Contenedor desbordado o con impropios",
+        "mapea_a": "2. Frecuencia de barrido por sector en el núcleo urbano"
+      },
+      {
+        "v": "herbaceos",
+        "l": "Herbáceos en acerado o bordillo",
+        "mapea_a": "13. Frecuencia y eficacia en tratamientos de eliminación de herbáceos en acerados y bordillos"
+      },
+      {
+        "v": "vertido",
+        "l": "Vertido o acopio ilegal",
+        "mapea_a": "3. Frecuencia de barrido en urbanizaciones residenciales y espacios públicos periféricos"
+      },
+      {
+        "v": "otro",
+        "l": "Otro",
+        "mapea_a": "General"
+      }
+    ]
+  },
+  "requiereApp": "2.0"
+}
