@@ -1,5 +1,5 @@
 {
-  "actualizado": "2026-09-21",
+  "actualizado": "2026-09-25",
   "plantillas": [
     {
       "id": "exp-2026-014-l2-limp",
@@ -48,29 +48,107 @@
       "version": 3
     },
     {
-    "id": "exp-1726-26-campillos-zona",
-    "fichero": "exp-1726-26-campillos-zona.json",
-    "nombre": "Visita técnica — Campillos — recorrido por zona",
-    "expediente": {
-      "codigo": "1726/2026",
-      "lote": "único"
+      "id": "bormujos-5344-26-inf-verde",
+      "fichero": "bormujos-5344-26-inf-verde.json",
+      "nombre": "Visita técnica — Infraestructura verde de Bormujos",
+      "expediente": {
+        "codigo": "5344/2026"
+      },
+      "centro": {
+        "nombre": "Infraestructura verde de Bormujos"
+      },
+      "version": 1
     },
-    "centro": {
-      "nombre": "Campillos — recorrido por zona"
-    },
-    "version": 1
-  },
     {
-  "id": "bormujos-5344-26-inf-verde",
-  "fichero": "bormujos-5344-26-inf-verde.json",
-  "nombre": "Visita técnica — Infraestructura verde de Bormujos",
-  "expediente": {
-    "codigo": "5344/2026"
-  },
-  "centro": {
-    "nombre": "Infraestructura verde de Bormujos"
-  },
-  "version": 1
-}
+      "id": "exp-1726-26-campillos-z1",
+      "fichero": "exp-1726-26-campillos-z1.json",
+      "nombre": "Campillos · Zona 1 · vías principales, comercio y entorno escolar (1726/2026)",
+      "expediente": {
+        "codigo": "1726/2026",
+        "lote": "único"
+      },
+      "centro": {
+        "nombre": "Campillos — Zona 1 · vías principales, comercio y entorno escolar"
+      },
+      "version": 1
+    },
+    {
+      "id": "exp-1726-26-campillos-z2",
+      "fichero": "exp-1726-26-campillos-z2.json",
+      "nombre": "Campillos · Zona 2 · casco antiguo (1726/2026)",
+      "expediente": {
+        "codigo": "1726/2026",
+        "lote": "único"
+      },
+      "centro": {
+        "nombre": "Campillos — Zona 2 · casco antiguo"
+      },
+      "version": 1
+    },
+    {
+      "id": "exp-1726-26-campillos-z3",
+      "fichero": "exp-1726-26-campillos-z3.json",
+      "nombre": "Campillos · Zona 3 · guardería municipal y cuartel (1726/2026)",
+      "expediente": {
+        "codigo": "1726/2026",
+        "lote": "único"
+      },
+      "centro": {
+        "nombre": "Campillos — Zona 3 · guardería municipal y cuartel"
+      },
+      "version": 1
+    },
+    {
+      "id": "exp-1726-26-campillos-z4",
+      "fichero": "exp-1726-26-campillos-z4.json",
+      "nombre": "Campillos · Zona 4 · instalaciones deportivas (1726/2026)",
+      "expediente": {
+        "codigo": "1726/2026",
+        "lote": "único"
+      },
+      "centro": {
+        "nombre": "Campillos — Zona 4 · instalaciones deportivas"
+      },
+      "version": 1
+    },
+    {
+      "id": "exp-1726-26-campillos-z5",
+      "fichero": "exp-1726-26-campillos-z5.json",
+      "nombre": "Campillos · Zona 5 · residencial y parque 25 de Noviembre (1726/2026)",
+      "expediente": {
+        "codigo": "1726/2026",
+        "lote": "único"
+      },
+      "centro": {
+        "nombre": "Campillos — Zona 5 · residencial y parque 25 de Noviembre"
+      },
+      "version": 1
+    },
+    {
+      "id": "exp-1726-26-campillos-z6",
+      "fichero": "exp-1726-26-campillos-z6.json",
+      "nombre": "Campillos · Zona 6 · polígono industrial (tres recintos) (1726/2026)",
+      "expediente": {
+        "codigo": "1726/2026",
+        "lote": "único"
+      },
+      "centro": {
+        "nombre": "Campillos — Zona 6 · polígono industrial (tres recintos)"
+      },
+      "version": 1
+    },
+    {
+      "id": "exp-1726-26-campillos-general",
+      "fichero": "exp-1726-26-campillos-general.json",
+      "nombre": "Campillos · Servicio general, mercadillo y medios (1726/2026)",
+      "expediente": {
+        "codigo": "1726/2026",
+        "lote": "único"
+      },
+      "centro": {
+        "nombre": "Campillos — Servicio general, mercadillo y medios"
+      },
+      "version": 1
+    }
   ]
 }
