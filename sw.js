@@ -2,7 +2,7 @@
    Guarda la app en el móvil para que abra sin cobertura.
    Al publicar una versión nueva, sube el número de CACHE. */
 
-var CACHE = "partes-unei-v4";
+var CACHE = "partes-unei-v5";
 
 var ARCHIVOS = [
   "./",
