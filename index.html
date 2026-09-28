@@ -256,6 +256,11 @@
   .dlg-body input[type="text"] { width: 100%; background: var(--surface-2); border: 1px solid var(--line); border-radius: 9px; padding: 10px; font-size: 16px; }
   .elem-dlg-fotos { display: flex; flex-wrap: wrap; gap: 7px; }
 
+  .ajuste { display: flex; gap: 10px; align-items: flex-start; margin-top: 12px; font-size: 13px; color: var(--ink-2); cursor: pointer; }
+  .ajuste input { width: 18px; height: 18px; margin-top: 1px; flex: none; accent-color: var(--accent); }
+  .ajuste small { display: block; font-size: 11.5px; color: var(--ink-3); margin-top: 2px; }
+  .aviso-txt { font-size: 14.5px; line-height: 1.55; color: var(--ink); margin: 0; }
+
   @media (max-width: 420px) { .fields { grid-template-columns: 1fr; } }
   @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 </style>
@@ -320,6 +325,10 @@
           <button type="button" class="btn ghost sm" id="btnGps">Capturar ubicación</button>
           <span id="gpsTxt">Sin ubicación</span>
         </div>
+        <label class="ajuste" for="chkPantalla">
+          <input type="checkbox" id="chkPantalla" checked>
+          <span>Mantener la pantalla encendida durante la visita<small>Así el recorrido no se corta. Gasta algo más de batería.</small></span>
+        </label>
       </div>
     </div>
     <div id="secciones"></div>
@@ -367,6 +376,15 @@
   <div class="dlg-foot">
     <button type="button" class="btn ghost" id="elemCancel">Cancelar</button>
     <button type="button" class="btn" id="elemOk">Guardar elemento</button>
+  </div>
+</dialog>
+
+<dialog id="dlgAviso">
+  <div class="dlg-head"><h2 id="avisoTitulo">Ubicación durante la visita</h2></div>
+  <div class="dlg-body"><p id="avisoTexto" class="aviso-txt"></p></div>
+  <div class="dlg-foot">
+    <button type="button" class="btn ghost" id="avisoNo">Seguir sin ubicación</button>
+    <button type="button" class="btn primary" id="avisoSi">Aceptar y empezar</button>
   </div>
 </dialog>
 
@@ -428,10 +446,34 @@
     avisoAdjuntos: 40,     // a partir de aquí, avisamos
     avisoBytes: 80 * 1024 * 1024,
     geoMaxEdadMs: 120000,  // una posición de hace más de 2 min no sirve para sellar
-    geoEsperaMs: 60000,    // si no hay posición, esperamos hasta 1 min a que llegue
-    geoPrecisionAviso: 50  // metros: por encima, se marca como precisión baja
+    geoPrecisionAviso: 50, // metros: por encima, se marca como precisión baja (y no entra en la línea del recorrido)
+
+    // Recorrido de la visita (formato 2.2). Ver sección 10.
+    traza: {
+      precisionBuenaM: 20,        // R2/R3: posición «buena»
+      edadBuenaMs: 10000,         // R2: la última posición sirve si tiene 10 s o menos
+      esperaMs: 10000,            // R2: lo máximo que se espera a una posición nueva
+      distanciaMinM: 25,          // R3: punto de distancia a partir de max(25 m, 2 × precisión)
+      latidoMs: 4 * 60000,        // R4: latido si pasan 4 min sin puntos
+      huecoMs: 5 * 60000,         // más de 5 min entre dos puntos = hueco
+      sinGpsMs: 60000,            // R8: aviso discreto de «Sin GPS»
+      maxPuntos: 2000             // tope de seguridad de puntos de distancia y latido por parte
+    },
+    pantallaEncendida: true,      // R6: valor por defecto del ajuste «Mantener la pantalla encendida»
+
+    // Aviso de ubicación. Se muestra una vez por móvil; si cambias el texto, cambia también
+    // «version» para que se vuelva a pedir. Pendiente de validación por protección de datos.
+    avisoUbicacion: {
+      version: "2026-09-v1",
+      titulo: "Ubicación durante la visita",
+      texto: "Mientras el parte esté abierto, la app guarda tu posición cada vez que respondes y cada pocos " +
+             "minutos o metros para dibujar el recorrido de la visita. Al cerrar el parte deja de hacerlo.",
+      aceptar: "Aceptar y empezar",
+      rechazar: "Seguir sin ubicación"
+    }
   };
-  var VERSION_APP = "2.0";
+  var VERSION_APP = "2.2";
+  var VERSION_FORMATO = "2.2";
 
   /* =====================================================================
      2. UTILIDADES
@@ -470,12 +512,16 @@
     function abrir() {
       if (dbp) return dbp;
       dbp = new Promise(function (res, rej) {
-        var r = indexedDB.open("unei-partes", 2);
+        var r = indexedDB.open("unei-partes", 3);
         r.onupgradeneeded = function () {
           var db = r.result;
           if (!db.objectStoreNames.contains("partes")) db.createObjectStore("partes", { keyPath: "id" });
           if (!db.objectStoreNames.contains("medios")) db.createObjectStore("medios", { keyPath: "id" });
           if (!db.objectStoreNames.contains("plantillas")) db.createObjectStore("plantillas", { keyPath: "id" });
+          // 2.2: un registro por punto del recorrido, para guardarlo según llega.
+          if (!db.objectStoreNames.contains("traza")) {
+            db.createObjectStore("traza", { keyPath: "id" }).createIndex("parteId", "parteId", { unique: false });
+          }
         };
         r.onsuccess = function () { res(r.result); };
         r.onerror = function () { rej(r.error); };
@@ -502,7 +548,15 @@
       borrarMedio:   function (id) { return tx("medios", "readwrite", function (s) { return s.delete(id); }); },
       guardarPlant:  function (p)  { return tx("plantillas", "readwrite", function (s) { return s.put(p); }); },
       leerPlant:     function (id) { return tx("plantillas", "readonly",  function (s) { return s.get(id); }); },
-      listarPlant:   function ()   { return tx("plantillas", "readonly",  function (s) { return s.getAll(); }); }
+      listarPlant:   function ()   { return tx("plantillas", "readonly",  function (s) { return s.getAll(); }); },
+      guardarPunto:  function (p)  { return tx("traza", "readwrite", function (s) { return s.put(p); }); },
+      leerTraza:     function (id) { return tx("traza", "readonly",  function (s) { return s.index("parteId").getAll(id); }); },
+      borrarTraza:   function (id) {
+        return tx("traza", "readwrite", function (s) {
+          var c = s.index("parteId").openKeyCursor(IDBKeyRange.only(id));
+          c.onsuccess = function () { var k = c.result; if (k) { s.delete(k.primaryKey); k.continue(); } };
+        });
+      }
     };
   })();
 
@@ -648,6 +702,11 @@
       noAplica: {},     // k -> true: la pregunta se ha marcado «No aplica»
       geo: {},          // k -> {lat, lon, precisionM, capturadoEn}: dónde se respondió
       elementos: [],    // elementos de interés creados en campo
+      // 2.2 — el recorrido va en su propio almacén (traza); aquí solo su estado.
+      trazaDesde: null,         // cuándo empezó a registrarse el recorrido
+      avisoUbicacion: null,     // {version, aceptado, en}
+      ubicacionDenegada: false, // el navegador negó el permiso
+      wakeLock: false,          // se consiguió mantener la pantalla encendida
       appVersion: VERSION_APP,
       dispositivo: navigator.userAgent
     };
@@ -897,6 +956,7 @@
       Array.prototype.forEach.call(tr.children, function (p) { SEC.ro.observe(p); });
     }
     medirCabecera();
+    SEC.previa = null;                       // el primer pintado no es un cambio de sección
     activarSeccion(Math.min(SEC.activa, SEC.n - 1), false, true);
   }
 
@@ -917,6 +977,8 @@
     var tr = $("secTrack");
     if (!tr) return;
     i = Math.max(0, Math.min(SEC.n - 1, i));
+    if (SEC.previa !== null && SEC.previa !== undefined && SEC.previa !== i) eventoSeccion(i);
+    SEC.previa = i;
     SEC.activa = i;
     if (desplazar) tr.scrollTo({ left: i * (tr.clientWidth + 16), behavior: "smooth" });
     Array.prototype.forEach.call(document.querySelectorAll(".sec-tab"), function (b, j) {
@@ -1032,7 +1094,7 @@
     if (!t || !t.dataset) return;
     if (t.dataset.resp !== undefined && (t.tagName === "TEXTAREA" || t.type === "text")) {
       parte.respuestas[t.dataset.resp] = t.value;
-      if (!(parte.geo && parte.geo[t.dataset.resp])) sellarRespuesta(t.dataset.resp);
+      if (!(parte.geo && parte.geo[t.dataset.resp]) && !selloEnCurso[t.dataset.resp]) sellarRespuesta(t.dataset.resp);
       guardar(true);
     } else if (t.dataset.cab !== undefined && t.type === "text") {
       parte.cabecera[t.dataset.cab] = t.value;
@@ -1090,10 +1152,15 @@
     if (fd) { descargarPlantilla(fd.dataset.descargar, fd.dataset.fichero); return; }
   });
 
+  // La cámara y los selectores ocultan la página: se anota para no confundirlo con un bloqueo.
+  function marcarCaptura(tipo, conInicio) {
+    GEO.captura = { tipo: tipo, t: Date.now(), ini: conInicio ? posInicio() : null };
+  }
+
   function accionAdjunto(tipo, k, btn) {
     kActual = k;
-    if (tipo === "foto")  { $("inFoto").click();  return; }
-    if (tipo === "video") { $("inVideo").click(); return; }
+    if (tipo === "foto")  { marcarCaptura("camara", false); $("inFoto").click();  return; }
+    if (tipo === "video") { marcarCaptura("video", true);   $("inVideo").click(); return; }
     if (tipo === "nota")  { abrirNota(k);         return; }
     if (tipo === "audio") { grabarAudio(k, btn);  return; }
   }
@@ -1112,12 +1179,14 @@
       });
       return;
     }
+    var kF = kActual;
     if (tipo === "foto") {
       redimensionar(f, CONFIG.maxLadoFoto, CONFIG.calidadFoto, function (blob) {
-        if (blob) anadirMedio(kActual, "foto", blob, "image/jpeg");
+        if (blob) anadirMedio(kF, "foto", blob, "image/jpeg");
       });
     } else {
-      anadirMedio(kActual, tipo, f, (f.type || "").split(";")[0] || (tipo === "video" ? "video/mp4" : "audio/mpeg"));
+      var ini = GEO.captura && (GEO.captura.tipo === tipo) ? GEO.captura.ini : null;
+      anadirMedio(kF, tipo, f, (f.type || "").split(";")[0] || (tipo === "video" ? "video/mp4" : "audio/mpeg"), null, ini);
     }
   }
 
@@ -1154,35 +1223,47 @@
     return "bin";
   }
 
-  function anadirMedio(k, tipo, blob, mime, duracionS) {
-    var id = uid();
+  // ini: {t, f, gps, hecho, cb} de posInicio(), para audio y vídeo (R7: posición al empezar y al parar).
+  function anadirMedio(k, tipo, blob, mime, duracionS, ini) {
+    var id = uid(), parteId = parte.id;
     var meta = { id: id, tipo: tipo, mime: String(mime || "").split(";")[0], bytes: blob.size, creadoEn: new Date().toISOString() };
     if (duracionS) meta.duracionS = duracionS;
-    var g = geoAhora();
-    if (g) meta.gps = g;
     var esJpeg = tipo === "foto" && /jpeg/.test(meta.mime);
+    var g = geoAhora();                                 // si hay una posición reciente, el EXIF sale ya
     var listo = (esJpeg && g) ? jpegConGps(blob, g, new Date()) : Promise.resolve(blob);
 
-    listo.then(function (b) { blob = b; meta.bytes = b.size; return DB.guardarMedio({ id: id, parteId: parte.id, blob: b }); }).then(function () {
-      if (!g) {
-        sellar(function (g2) {
-          meta.gps = g2;
-          pintarAdjuntos(k); guardar(true);
-          if (esJpeg) {
-            DB.leerMedio(id).then(function (m) {
-              if (!m || !m.blob) return;
-              return jpegConGps(m.blob, g2, new Date(meta.creadoEn)).then(function (b2) {
-                return DB.guardarMedio({ id: id, parteId: m.parteId, blob: b2 });
-              });
-            }).catch(function () {});
-          }
-        });
-      }
+    // Primero se guarda el archivo; la posición se añade cuando llegue (como mucho 10 s).
+    listo.then(function (b) { blob = b; meta.bytes = b.size; return DB.guardarMedio({ id: id, parteId: parteId, blob: b }); }).then(function () {
       mediosCache[id] = URL.createObjectURL(blob);
       parte.adjuntos[k] = (parte.adjuntos[k] || []).concat([meta]);
       pintarAdjuntos(k);
       refrescar();
       guardar(true);
+
+      if (ini) {
+        var aplicarIni = function () {
+          if (!ini.gps || !parte || parte.id !== parteId) return;
+          meta.gpsInicio = ini.gps;
+          agregarPunto("evento", ini.f, ini.t, { evento: "adjunto_inicio", k: k, aid: id });
+          guardar(true);
+        };
+        if (ini.hecho) aplicarIni(); else ini.cb = aplicarIni;
+      }
+
+      posEvento("adjunto", { k: k, aid: id }, function (g2) {
+        if (!g2 || !parte || parte.id !== parteId) return;
+        meta.gps = g2;
+        pintarAdjuntos(k); guardar(true);
+        if (esJpeg && (!g || g.lat !== g2.lat || g.lon !== g2.lon)) {
+          DB.leerMedio(id).then(function (m) {
+            if (!m || !m.blob) return;
+            return jpegConGps(m.blob, g2, new Date(meta.creadoEn)).then(function (b2) {
+              meta.bytes = b2.size;
+              return DB.guardarMedio({ id: id, parteId: m.parteId, blob: b2 });
+            });
+          }).catch(function () {});
+        }
+      });
     }).catch(function () {
       banner("No se ha podido guardar el archivo en el móvil. Comprueba que queda espacio.", "bad");
     });
@@ -1200,11 +1281,12 @@
   function grabarAudio(k, btn) {
     if (grabando) { grabando.stop(); return; }
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia || !window.MediaRecorder) {
-      $("inAudio").click();
+      marcarCaptura("audio", true); $("inAudio").click();
       return;
     }
     navigator.mediaDevices.getUserMedia({ audio: true }).then(function (stream) {
       var mr = new MediaRecorder(stream), trozos = [], t0 = Date.now();
+      var ini = posInicio();                            // R7: dónde empieza la grabación
       mr.ondataavailable = function (ev) { if (ev.data && ev.data.size) trozos.push(ev.data); };
       mr.onstop = function () {
         stream.getTracks().forEach(function (t) { t.stop(); });
@@ -1212,12 +1294,12 @@
         grabando = null;
         if (!trozos.length) return;
         var tipo = (mr.mimeType || "audio/webm").split(";")[0];
-        anadirMedio(k, "audio", new Blob(trozos, { type: tipo }), tipo, Math.round((Date.now() - t0) / 1000));
+        anadirMedio(k, "audio", new Blob(trozos, { type: tipo }), tipo, Math.round((Date.now() - t0) / 1000), ini);
       };
       btn.classList.add("rec");
       grabando = mr;
       mr.start();
-    }).catch(function () { $("inAudio").click(); });
+    }).catch(function () { marcarCaptura("audio", true); $("inAudio").click(); });
   }
 
   var notaK = null;
@@ -1233,139 +1315,629 @@
   $("notaOk").addEventListener("click", function () {
     var t = $("notaTexto").value.trim();
     if (t && notaK) {
-      var nota = { id: uid(), texto: t, creadoEn: new Date().toISOString() }, kN = notaK;
-      var gN = geoAhora();
-      if (gN) nota.gps = gN;
-      else sellar(function (g2) { nota.gps = g2; pintarAdjuntos(kN); guardar(true); });
+      var nota = { id: uid(), texto: t, creadoEn: new Date().toISOString() }, kN = notaK, pN = parte.id;
       parte.notas[notaK] = (parte.notas[notaK] || []).concat([nota]);
       pintarAdjuntos(notaK);
       guardar(true);
+      posEvento("nota", { k: kN, aid: nota.id }, function (g2) {
+        if (!g2 || !parte || parte.id !== pN) return;
+        nota.gps = g2; pintarAdjuntos(kN); guardar(true);
+      });
     }
     cerrarNota();
   });
 
   /* =====================================================================
-     10. GPS
+     10. UBICACIÓN Y RECORRIDO (formato 2.2)
+
+     Mientras hay un parte abierto (en pantalla, en borrador y con el aviso aceptado):
+       R1  se sigue la posición con watchPosition y se guarda la última en memoria;
+       R2  cada evento (respuesta, adjunto, nota, elemento, sección, inicio, fin) toma una
+           posición: la última si es reciente y buena, si no una nueva (máx. 10 s), y si no
+           llega, la mejor disponible con su antigüedad;
+       R3  al andar, un punto «distancia» cada ~25 m; parado, nada;
+       R4  un «latido» si pasan 4 min sin puntos;
+       R5  al ocultarse la app, «oculta»; al volver, «visible» con posición nueva;
+       R6  la pantalla se mantiene encendida (Wake Lock), si el ajuste lo permite;
+       R9  cada punto se guarda al momento en IndexedDB.
+     Al cerrar, enviar o salir del parte, todo se para. Nunca se inventa ni se interpola.
      ===================================================================== */
-  function pintarGps() {
-    $("gpsTxt").textContent = parte && parte.gps
-      ? parte.gps.lat.toFixed(5) + ", " + parte.gps.lon.toFixed(5) + " (±" + Math.round(parte.gps.precisionM) + " m)"
-      : "Sin ubicación";
+  var T = CONFIG.traza;
+  var GEO = {
+    sesion: false,      // hay un parte abierto (en pantalla y en borrador)
+    activo: false,      // además, se puede usar la ubicación (aviso aceptado, permiso no denegado)
+    ultima: null,       // {lat, lon, precisionM, altitudM, capturadoEn, _t: hora del fijo, _r: hora de llegada}
+    watchId: null,
+    estado: "off",      // off | buscando | ok | denegado | no
+    esperas: [],        // eventos esperando una posición
+    pidiendo: false,    // hay un getCurrentPosition en marcha
+    pendiente: null,    // {tipo, motivo}: inicio/visible que espera al primer fijo
+    oculta: false,
+    ocultaMotivo: null,
+    captura: null,      // {tipo, t, ini}: la app acaba de abrir la cámara o un selector
+    latidoTmr: null,
+    uiTmr: null,
+    secTmr: null,
+    desde: 0,
+    avisado: false
+  };
+  var TRAZA = { parteId: null, puntos: [], seq: 0 };
+  var WL = { lock: null };
+  var AVISO_MEM = null;   // por si el navegador no deja usar localStorage
+
+  /* ---------- Ajustes del dispositivo ---------- */
+  function leerAjuste(clave, defecto) {
+    try { var v = localStorage.getItem(clave); return v === null ? defecto : v; } catch (e) { return defecto; }
+  }
+  function ponerAjuste(clave, v) { try { localStorage.setItem(clave, v); } catch (e) {} }
+
+  function pantallaEncendidaActivada() {
+    return leerAjuste("unei.pantallaEncendida", CONFIG.pantallaEncendida ? "1" : "0") === "1";
+  }
+  function avisoAceptado() {
+    var v = CONFIG.avisoUbicacion.version;
+    return leerAjuste("unei.avisoUbicacion", AVISO_MEM) === v || AVISO_MEM === v;
   }
 
-  function capturarGps(silencioso) {
-    if (!navigator.geolocation) {
-      if (!silencioso) banner("Este navegador no da la ubicación.", "warn");
-      return;
-    }
-    navigator.geolocation.getCurrentPosition(function (pos) {
-      parte.gps = {
-        lat: pos.coords.latitude, lon: pos.coords.longitude,
-        precisionM: pos.coords.accuracy, capturadoEn: new Date().toISOString()
-      };
+  /* ---------- Geometría ---------- */
+  function distanciaM(a, b) {
+    var R = 6371008.8, rad = Math.PI / 180;
+    var dLat = (b.lat - a.lat) * rad, dLon = (b.lon - a.lon) * rad;
+    var s = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+            Math.cos(a.lat * rad) * Math.cos(b.lat * rad) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    return 2 * R * Math.asin(Math.min(1, Math.sqrt(s)));
+  }
+
+  /* ---------- Fijos ---------- */
+  function aFijo(pos) {
+    var ahora = Date.now(), ts = pos.timestamp;
+    // Algunos móviles dan horas raras en el fijo: si no cuadra con el reloj, vale la de llegada.
+    var t = (ts && Math.abs(ts - ahora) < 60000) ? ts : ahora;
+    var alt = pos.coords.altitude;
+    return {
+      lat: pos.coords.latitude, lon: pos.coords.longitude,
+      precisionM: Math.round(pos.coords.accuracy),
+      altitudM: (alt === null || alt === undefined || isNaN(alt)) ? null : Math.round(alt),
+      capturadoEn: new Date(t).toISOString(),
+      _t: t, _r: ahora
+    };
+  }
+
+  // Sello para preguntas, adjuntos, notas y elementos (mismo formato que la 2.1, más edadS).
+  function selloDe(f, t) {
+    if (!f) return null;
+    return { lat: f.lat, lon: f.lon, precisionM: f.precisionM, altitudM: f.altitudM,
+             capturadoEn: f.capturadoEn, edadS: Math.round(((t || Date.now()) - f._t) / 1000) };
+  }
+
+  // Copia de la última posición, solo si es reciente (para escribir el EXIF al momento).
+  function geoAhora() {
+    if (!GEO.activo || !GEO.ultima || Date.now() - GEO.ultima._t > CONFIG.geoMaxEdadMs) return null;
+    return selloDe(GEO.ultima);
+  }
+
+  function recibirFijo(f, desdeWatch) {
+    if (!GEO.activo || GEO.oculta) return;              // nada fuera del parte ni en segundo plano
+    if (!GEO.ultima || f._t >= GEO.ultima._t) GEO.ultima = f;
+    GEO.estado = "ok";
+    if (parte && !parte.gps) {
+      parte.gps = { lat: f.lat, lon: f.lon, precisionM: f.precisionM, capturadoEn: f.capturadoEn };
       pintarGps(); guardar(true);
-    }, function (err) {
-      if (!silencioso) {
-        banner(err.code === 1
-          ? "Permiso de ubicación denegado. Actívalo en los ajustes del navegador para este sitio."
-          : "No se ha podido obtener la ubicación ahora mismo.", "warn");
-      }
-    }, { enableHighAccuracy: true, timeout: 12000, maximumAge: 60000 });
-  }
-  $("btnGps").addEventListener("click", function () { banner(""); capturarGps(false); });
-
-  /* ---------- 10b. Ubicación continua: sella respuestas, fotos, notas y elementos ----------
-     Mientras el formulario está abierto se sigue la posición del móvil. Cada vez que el técnico
-     responde, adjunta, anota o crea un elemento, se guarda la última posición buena. Si en ese
-     momento no la hay, se espera a la siguiente (hasta CONFIG.geoEsperaMs). El técnico no hace nada. */
-  var GEO = { ultima: null, watchId: null, estado: "off", pend: [], avisado: false };
-
-  function geoIniciar() {
-    if (!navigator.geolocation) { GEO.estado = "no"; pintarGeo(); return; }
-    if (GEO.watchId !== null) return;
-    GEO.estado = GEO.ultima ? GEO.estado : "buscando"; pintarGeo();
-    GEO.watchId = navigator.geolocation.watchPosition(function (pos) {
-      GEO.ultima = {
-        lat: pos.coords.latitude, lon: pos.coords.longitude,
-        precisionM: Math.round(pos.coords.accuracy),
-        altitudM: (pos.coords.altitude === null || pos.coords.altitude === undefined) ? null : Math.round(pos.coords.altitude),
-        capturadoEn: new Date(pos.timestamp || Date.now()).toISOString(),
-        _t: Date.now()
-      };
-      GEO.estado = "ok";
-      if (parte && !parte.gps) {
-        parte.gps = { lat: GEO.ultima.lat, lon: GEO.ultima.lon, precisionM: GEO.ultima.precisionM, capturadoEn: GEO.ultima.capturadoEn };
-        pintarGps(); guardar(true);
-      }
-      resolverPendientes();
-      pintarGeo();
-      if (ELEM.abierto) pintarGeoElem();
-    }, function (err) {
-      GEO.estado = err.code === 1 ? "denegado" : (GEO.ultima ? "ok" : "sin-senal");
-      pintarGeo();
-      if (err.code === 1 && !GEO.avisado) {
-        GEO.avisado = true;
-        banner("Sin permiso de ubicación: las respuestas y las fotos no quedarán geolocalizadas. " +
-               "Actívalo en Chrome → ⋮ → Ajustes → Configuración de sitios → Ubicación.", "warn");
-      }
-    }, { enableHighAccuracy: true, maximumAge: 10000, timeout: 30000 });
+    }
+    if (GEO.pendiente) {                                 // inicio o visible que no tuvo posición a tiempo
+      var pe = GEO.pendiente; GEO.pendiente = null;
+      agregarPunto(pe.tipo, f, f._t, pe.motivo ? { motivo: pe.motivo } : null);
+    }
+    atenderEsperas(f);
+    if (desdeWatch) quizaDistancia(f);
+    pintarGeo();
+    if (ELEM.abierto) pintarGeoElem();
   }
 
-  function geoParar() {
+  function errorGeo(err) {
+    if (err && err.code === 1) { denegar(); return; }
+    if (!GEO.ultima) GEO.estado = "buscando";
+    pintarGeo();
+  }
+
+  function iniciarWatch() {
+    if (!navigator.geolocation || GEO.watchId !== null) return;
+    GEO.watchId = navigator.geolocation.watchPosition(
+      function (pos) { recibirFijo(aFijo(pos), true); },
+      errorGeo,
+      { enableHighAccuracy: true, maximumAge: 5000, timeout: 20000 }
+    );
+  }
+  function pararWatch() {
     if (GEO.watchId !== null && navigator.geolocation) navigator.geolocation.clearWatch(GEO.watchId);
     GEO.watchId = null;
   }
 
-  // Copia de la última posición, solo si es reciente.
-  function geoAhora() {
-    if (!GEO.ultima || Date.now() - GEO.ultima._t > CONFIG.geoMaxEdadMs) return null;
-    return { lat: GEO.ultima.lat, lon: GEO.ultima.lon, precisionM: GEO.ultima.precisionM,
-             altitudM: GEO.ultima.altitudM, capturadoEn: GEO.ultima.capturadoEn };
+  function pedirFijo() {
+    if (GEO.pidiendo || !navigator.geolocation || !GEO.activo) return;
+    GEO.pidiendo = true;
+    navigator.geolocation.getCurrentPosition(function (pos) {
+      GEO.pidiendo = false;
+      recibirFijo(aFijo(pos), false);
+    }, function (err) {
+      GEO.pidiendo = false;
+      if (err && err.code === 1) denegar();
+    }, { enableHighAccuracy: true, timeout: T.esperaMs, maximumAge: 0 });
   }
 
-  function sellar(fn) {
-    var g = geoAhora();
-    if (g) { fn(g); return; }
-    GEO.pend.push({ t: Date.now(), fn: fn });
+  /* ---------- R2: una posición para un evento ----------
+     cb(fijo | null, horaDelEvento). Con {nueva:true} solo valen fijos posteriores al evento. */
+  function obtenerPosicion(opts, cb) {
+    var t0 = Date.now(), u = GEO.ultima;
+    if (!GEO.activo) { cb(null, t0); return; }
+    if (!opts.nueva && u && t0 - u._t <= T.edadBuenaMs && u.precisionM <= T.precisionBuenaM) { cb(u, t0); return; }
+    var w = { t0: t0, cb: cb, mejor: null, nueva: !!opts.nueva, hecho: false };
+    w.tmr = setTimeout(function () { cerrarEspera(w); }, T.esperaMs);
+    GEO.esperas.push(w);
+    pedirFijo();
   }
-  function resolverPendientes() {
-    var g = geoAhora(); if (!g) return;
-    var ahora = Date.now(), lista = GEO.pend;
-    GEO.pend = [];
-    lista.forEach(function (p) { if (ahora - p.t <= CONFIG.geoEsperaMs) { try { p.fn(g); } catch (e) {} } });
+  function atenderEsperas(f) {
+    GEO.esperas.slice().forEach(function (w) {
+      if (w.nueva && f._t < w.t0 - 1000) return;
+      if (!w.mejor || f.precisionM < w.mejor.precisionM) w.mejor = f;
+      if (f.precisionM <= T.precisionBuenaM) cerrarEspera(w);
+    });
   }
+  function cerrarEspera(w) {
+    if (w.hecho) return;
+    w.hecho = true;
+    clearTimeout(w.tmr);
+    GEO.esperas = GEO.esperas.filter(function (x) { return x !== w; });
+    var f = w.mejor || (w.nueva ? null : GEO.ultima) || null;
+    try { w.cb(f, w.t0); } catch (e) {}
+  }
+
+  /* ---------- La traza ---------- */
+  function agregarPunto(tipo, f, t, extra) {
+    if (!parte || !f || TRAZA.parteId !== parte.id) return null;
+    if ((tipo === "distancia" || tipo === "latido") && TRAZA.puntos.length >= T.maxPuntos) return null;
+    var p = {
+      id: parte.id + ":" + String(++TRAZA.seq).padStart(5, "0"),
+      parteId: parte.id, t: t, tipo: tipo,
+      lat: Number(f.lat.toFixed(7)), lon: Number(f.lon.toFixed(7)),
+      precisionM: f.precisionM, altitudM: f.altitudM,
+      edadS: Math.round((t - f._t) / 1000)
+    };
+    if (extra) Object.keys(extra).forEach(function (c) { if (extra[c] !== undefined && extra[c] !== null) p[c] = extra[c]; });
+    var L = TRAZA.puntos, i = L.length;
+    while (i > 0 && L[i - 1].t > t) i--;              // casi siempre, al final
+    L.splice(i, 0, p);
+    DB.guardarPunto(p).catch(function () {});
+    if (GEO.activo) programarLatido();
+    return p;
+  }
+
+  function ultimoBueno() {
+    for (var i = TRAZA.puntos.length - 1; i >= 0; i--) {
+      if (TRAZA.puntos[i].precisionM <= T.precisionBuenaM) return TRAZA.puntos[i];
+    }
+    return TRAZA.puntos[TRAZA.puntos.length - 1] || null;
+  }
+
+  // R3
+  function quizaDistancia(f) {
+    if (f.precisionM > T.precisionBuenaM) return;
+    var u = ultimoBueno();
+    if (!u) return;
+    if (distanciaM(u, f) > Math.max(T.distanciaMinM, 2 * f.precisionM)) agregarPunto("distancia", f, f._t);
+  }
+
+  // R4: se reprograma después de cada punto.
+  function programarLatido() {
+    clearTimeout(GEO.latidoTmr);
+    if (!GEO.activo || GEO.oculta) return;
+    GEO.latidoTmr = setTimeout(function () {
+      if (!GEO.activo || GEO.oculta) return;
+      obtenerPosicion({}, function (f, t0) {
+        // Un latido con una posición de hace más de 1 min no aporta nada: mejor un hueco honesto.
+        if (f && t0 - f._t <= 60000) agregarPunto("latido", f, t0); else programarLatido();
+      });
+    }, T.latidoMs);
+  }
+
+  /* ---------- Eventos ---------- */
+  var ultimoEv = {};
+  function posEvento(evento, ref, alObtener) {
+    ref = ref || {};
+    obtenerPosicion({}, function (f, t0) {
+      if (f) {
+        // Respuestas: si se cambia la misma pregunta varias veces seguidas, un solo punto.
+        var clave = evento + "|" + (ref.k || "") + "|" + (ref.aid || "") + "|" + (ref.sec || "");
+        var repetido = evento === "respuesta" && ultimoEv[clave] && t0 - ultimoEv[clave] < 15000;
+        ultimoEv[clave] = t0;
+        if (!repetido) agregarPunto("evento", f, t0, { evento: evento, k: ref.k, aid: ref.aid, sec: ref.sec });
+      }
+      if (alObtener) alObtener(f ? selloDe(f, t0) : null, f, t0);
+    });
+  }
+
+  var selloEnCurso = {};
   function sellarRespuesta(k) {
     var parteId = parte && parte.id;
-    sellar(function (g) {
-      if (!parte || parte.id !== parteId) return;
+    if (!GEO.activo) return;
+    selloEnCurso[k] = true;
+    posEvento("respuesta", { k: k }, function (g) {
+      delete selloEnCurso[k];
+      if (!g || !parte || parte.id !== parteId) return;
       parte.geo = parte.geo || {};
       parte.geo[k] = g;
       pintarGeoQ(k); guardar(true);
     });
   }
 
+  // Para audio y vídeo: la posición al empezar, que se usa cuando el archivo llega.
+  function posInicio() {
+    var ini = { t: Date.now(), f: null, gps: null, hecho: false, cb: null };
+    obtenerPosicion({}, function (f, t0) {
+      ini.hecho = true;
+      if (f) { ini.f = f; ini.gps = selloDe(f, t0); }
+      if (ini.cb) ini.cb();
+    });
+    return ini;
+  }
+
+  // Solo cuenta si el técnico se queda en la sección (2 s) y es distinta de la última anotada.
+  var ultimaSec = null;
+  function eventoSeccion(i) {
+    clearTimeout(GEO.secTmr);
+    GEO.secTmr = setTimeout(function () {
+      var tabs = document.querySelectorAll(".sec-tab .c"), id = null;
+      if (tabs[SEC.activa]) id = tabs[SEC.activa].id.replace(/^tabcnt-/, "");
+      if (id && id !== ultimaSec && GEO.activo) { ultimaSec = id; posEvento("seccion", { sec: id }); }
+    }, 2000);
+  }
+
+  /* ---------- R5: visibilidad ---------- */
+  function alOcultar() {
+    if (!GEO.sesion || GEO.oculta) return;
+    var cap = GEO.captura && Date.now() - GEO.captura.t < 5000 ? GEO.captura.tipo : null;
+    GEO.oculta = true;
+    GEO.ocultaMotivo = cap;
+    clearTimeout(GEO.latidoTmr);
+    if (GEO.activo && GEO.ultima) agregarPunto("oculta", GEO.ultima, Date.now(), cap ? { motivo: cap } : null);
+  }
+  function alMostrar() {
+    if (document.visibilityState !== "visible" || !GEO.oculta) return;
+    GEO.oculta = false;
+    var motivo = GEO.ocultaMotivo; GEO.ocultaMotivo = null;
+    if (!GEO.sesion) return;
+    pedirPantalla();
+    if (!GEO.activo) return;
+    pararWatch(); iniciarWatch();                    // algunos Android dejan el watch muerto al volver
+    obtenerPosicion({ nueva: true }, function (f, t0) {
+      if (f) agregarPunto("visible", f, t0, motivo ? { motivo: motivo } : null);
+      else { GEO.pendiente = { tipo: "visible", motivo: motivo }; programarLatido(); }
+    });
+  }
+  document.addEventListener("visibilitychange", function () {
+    if (document.visibilityState === "hidden") alOcultar(); else alMostrar();
+  });
+  window.addEventListener("pagehide", alOcultar);
+  document.addEventListener("freeze", alOcultar);
+  document.addEventListener("resume", alMostrar);
+  window.addEventListener("pageshow", function (e) { if (e.persisted) alMostrar(); });
+
+  /* ---------- R6: pantalla encendida ---------- */
+  function pedirPantalla() {
+    if (!GEO.sesion || !pantallaEncendidaActivada() || !("wakeLock" in navigator)) return;
+    if (document.visibilityState !== "visible" || (WL.lock && !WL.lock.released)) return;
+    navigator.wakeLock.request("screen").then(function (l) {
+      if (!GEO.sesion) { l.release().catch(function () {}); return; }
+      WL.lock = l;
+      if (parte && !parte.wakeLock) { parte.wakeLock = true; guardar(true); }
+    }).catch(function () {});                         // sin avisos: si no se puede, no se puede
+  }
+  function soltarPantalla() {
+    if (WL.lock) { try { WL.lock.release().catch(function () {}); } catch (e) {} }
+    WL.lock = null;
+  }
+
+  /* ---------- Sesión: abrir y cerrar el parte ---------- */
+  function cargarTraza(id) {
+    TRAZA = { parteId: id, puntos: [], seq: 0 };
+    return DB.leerTraza(id).then(function (ps) {
+      if (TRAZA.parteId !== id) return;
+      ps = (ps || []).sort(function (a, b) { return a.t - b.t; });
+      TRAZA.puntos = ps.concat(TRAZA.puntos).sort(function (a, b) { return a.t - b.t; });
+      TRAZA.seq = TRAZA.puntos.reduce(function (m, p) {
+        var n = parseInt(String(p.id).split(":").pop(), 10); return isNaN(n) ? m : Math.max(m, n);
+      }, TRAZA.seq);
+    }).catch(function () {});
+  }
+
+  function abrirSesion() {
+    if (!parte || parte.estado !== "borrador" || GEO.sesion) return;
+    GEO.sesion = true; GEO.oculta = false; GEO.ultima = null; GEO.estado = "off"; GEO.desde = Date.now();
+    var id = parte.id;
+    pedirPantalla();
+    clearInterval(GEO.uiTmr);
+    GEO.uiTmr = setInterval(pintarGeo, 10000);
+    pintarGeo(); pintarAjustePantalla();
+    cargarTraza(id).then(function () {
+      if (!GEO.sesion || !parte || parte.id !== id) return;
+      if (!navigator.geolocation) { GEO.estado = "no"; pintarGeo(); return; }
+      if (parte.avisoUbicacion && parte.avisoUbicacion.aceptado === false) { GEO.estado = "denegado"; pintarGeo(); return; }
+      pedirAviso(function (ok) {
+        if (!GEO.sesion || !parte || parte.id !== id) return;
+        parte.avisoUbicacion = { version: CONFIG.avisoUbicacion.version, aceptado: ok, en: new Date().toISOString() };
+        guardar(true);
+        if (!ok) { GEO.estado = "denegado"; pintarGeo(); return; }
+        iniciarRecorrido();
+      });
+    });
+  }
+
+  function iniciarRecorrido() {
+    GEO.activo = true; GEO.estado = "buscando"; GEO.desde = Date.now();
+    var L = TRAZA.puntos, ult = L[L.length - 1], tipo = "inicio", motivo = null;
+    // Un borrador de antes de la 2.2 (sin traza pero con trabajo hecho) no «empieza»: se reabre.
+    var previo = !ult && !parte.trazaDesde && (Object.keys(parte.respuestas || {}).length ||
+                 Object.keys(parte.adjuntos || {}).length || Object.keys(parte.notas || {}).length || (parte.elementos || []).length);
+    if (previo) { tipo = "visible"; motivo = "reabierto"; }
+    parte.trazaDesde = parte.trazaDesde || new Date().toISOString();
+    if (ult) {
+      tipo = "visible";
+      if (ult.tipo === "fin") {                          // se canceló el envío y se sigue trabajando
+        ult.tipo = "oculta"; ult.motivo = "envio"; DB.guardarPunto(ult).catch(function () {});
+        motivo = "envio";
+      } else if (ult.tipo === "oculta") {
+        motivo = ult.motivo || "reabierto";
+        if (motivo === "parte_cerrado") motivo = "parte_reabierto";
+      } else {
+        motivo = "reabierto";                             // la app se cerró sin avisar
+      }
+    }
+    iniciarWatch();
+    obtenerPosicion({ nueva: true }, function (f, t0) {
+      if (f) agregarPunto(tipo, f, t0, motivo ? { motivo: motivo } : null);
+      else { GEO.pendiente = { tipo: tipo, motivo: motivo }; programarLatido(); }
+    });
+    pintarGeo();
+  }
+
+  // motivo: "fin" (se envía) o "cerrado" (se sale del parte). Devuelve una promesa.
+  function cerrarSesion(motivo) {
+    if (!GEO.sesion) return Promise.resolve();
+    return new Promise(function (res) {
+      function parar() {
+        GEO.esperas.slice().forEach(cerrarEspera);       // los eventos pendientes se quedan con lo que haya
+        if (motivo !== "fin" && GEO.activo && GEO.ultima && !GEO.oculta) {
+          agregarPunto("oculta", GEO.ultima, Date.now(), { motivo: "parte_cerrado" });
+        }
+        GEO.pendiente = null;
+        pararWatch();
+        clearTimeout(GEO.latidoTmr); clearTimeout(GEO.secTmr); clearInterval(GEO.uiTmr);
+        GEO.sesion = false; GEO.activo = false; GEO.estado = "off"; GEO.captura = null;
+        soltarPantalla();
+        pintarGeo();
+        res();
+      }
+      if (motivo === "fin" && GEO.activo) {
+        obtenerPosicion({}, function (f, t0) { if (f) agregarPunto("fin", f, t0); parar(); });
+      } else parar();
+    });
+  }
+
+  function denegar() {
+    GEO.esperas.slice().forEach(cerrarEspera);
+    GEO.activo = false; GEO.estado = "denegado"; GEO.pendiente = null;
+    pararWatch(); clearTimeout(GEO.latidoTmr);
+    if (parte) { parte.ubicacionDenegada = true; guardar(true); }
+    pintarGeo();
+    if (!GEO.avisado) {
+      GEO.avisado = true;
+      banner("Sin permiso de ubicación: el parte funciona igual, pero sin posiciones ni recorrido. " +
+             "Actívalo en Chrome → ⋮ → Ajustes → Configuración de sitios → Ubicación.", "warn");
+    }
+  }
+
+  /* ---------- Aviso de privacidad (una vez por dispositivo y versión del texto) ---------- */
+  function pedirAviso(cb) {
+    if (avisoAceptado()) { cb(true); return; }
+    var A = CONFIG.avisoUbicacion, d = $("dlgAviso");
+    $("avisoTitulo").textContent = A.titulo;
+    $("avisoTexto").textContent = A.texto;
+    $("avisoSi").textContent = A.aceptar;
+    $("avisoNo").textContent = A.rechazar;
+    function fin(ok) {
+      $("avisoSi").onclick = null; $("avisoNo").onclick = null;
+      if (ok) { AVISO_MEM = A.version; ponerAjuste("unei.avisoUbicacion", A.version); }
+      if (d.close) d.close(); else d.removeAttribute("open");
+      cb(ok);
+    }
+    $("avisoSi").onclick = function () { fin(true); };
+    $("avisoNo").onclick = function () { fin(false); };
+    if (d.showModal) d.showModal(); else d.setAttribute("open", "");
+  }
+  $("dlgAviso").addEventListener("cancel", function (e) { e.preventDefault(); });   // hay que elegir
+
+  /* ---------- Indicadores ---------- */
+  function pintarGps() {
+    $("gpsTxt").textContent = parte && parte.gps
+      ? parte.gps.lat.toFixed(5) + ", " + parte.gps.lon.toFixed(5) + " (±" + Math.round(parte.gps.precisionM) + " m)"
+      : "Sin ubicación";
+  }
+
   function pintarGeo() {
     var el = $("geoTxt"); if (!el) return;
-    var cls = "", txt = "GPS";
-    if (GEO.estado === "ok" && GEO.ultima) {
+    var cls = "", txt = "GPS", ahora = Date.now();
+    if (GEO.estado === "denegado") { cls = "bad"; txt = "GPS no"; }
+    else if (GEO.estado === "no") { cls = "bad"; txt = "Sin GPS"; }
+    else if (GEO.activo && GEO.ultima && ahora - GEO.ultima._r <= T.sinGpsMs) {
       cls = GEO.ultima.precisionM > CONFIG.geoPrecisionAviso ? "warn" : "ok";
       txt = "GPS ±" + GEO.ultima.precisionM + " m";
-    } else if (GEO.estado === "buscando" || GEO.estado === "sin-senal") { cls = "warn"; txt = "GPS…"; }
-    else if (GEO.estado === "denegado") { cls = "bad"; txt = "GPS denegado"; }
-    else if (GEO.estado === "no") { cls = "bad"; txt = "Sin GPS"; }
+    } else if (GEO.activo && ahora - GEO.desde > T.sinGpsMs) { cls = "warn"; txt = "Sin GPS"; }
+    else if (GEO.activo) { cls = "warn"; txt = "GPS…"; }
     el.className = "geo " + cls;
     el.lastChild.textContent = txt;
   }
+
+  function pintarAjustePantalla() {
+    var c = $("chkPantalla"); if (c) c.checked = pantallaEncendidaActivada();
+  }
+  $("chkPantalla").addEventListener("change", function () {
+    ponerAjuste("unei.pantallaEncendida", this.checked ? "1" : "0");
+    if (this.checked) pedirPantalla(); else soltarPantalla();
+  });
+
   $("geoTxt").addEventListener("click", function () {
     if (GEO.estado === "denegado") {
-      banner("La app no tiene permiso de ubicación. Actívalo en Chrome → ⋮ → Ajustes → Configuración de sitios → Ubicación, y vuelve a abrir el parte.", "warn");
-    } else if (GEO.ultima) {
-      banner("Última posición: " + textoGeo(GEO.ultima) + ". Se guarda sola con cada respuesta, foto, nota y elemento.", "ok");
+      banner(parte && parte.avisoUbicacion && parte.avisoUbicacion.aceptado === false
+        ? "En este parte has elegido seguir sin ubicación: no se guarda ninguna posición."
+        : "La app no tiene permiso de ubicación. Actívalo en Chrome → ⋮ → Ajustes → Configuración de sitios → Ubicación, y vuelve a abrir el parte.", "warn");
+    } else if (GEO.activo && GEO.ultima) {
+      banner("Última posición: " + textoGeo(GEO.ultima) + ". Se guarda sola con cada respuesta, foto, nota y elemento, " +
+             "y cada pocos minutos o metros mientras el parte está abierto.", "ok");
+    } else if (GEO.activo) {
+      banner("Buscando señal GPS. Al aire libre tarda unos segundos; lo que respondas mientras tanto queda sin posición o con la última que haya.", "warn");
     } else {
-      banner("Buscando señal GPS. Al aire libre tarda unos segundos; las respuestas que des mientras tanto se geolocalizan en cuanto llegue.", "warn");
+      banner("La ubicación solo se usa con un parte abierto en borrador.", "warn");
     }
     window.scrollTo(0, 0);
   });
+
+  $("btnGps").addEventListener("click", function () {
+    banner("");
+    if (!GEO.activo) { $("geoTxt").click(); return; }
+    $("gpsTxt").textContent = "Buscando…";
+    obtenerPosicion({ nueva: true }, function (f) {
+      if (!f) { banner("No se ha podido obtener la ubicación ahora mismo.", "warn"); pintarGps(); return; }
+      parte.gps = { lat: f.lat, lon: f.lon, precisionM: f.precisionM, capturadoEn: f.capturadoEn };
+      pintarGps(); guardar(true);
+    });
+  });
+
+  /* ---------- Salida: traza, reconstrucción 2.1 y análisis del recorrido ---------- */
+  var BREVES = ["camara", "video", "audio", "envio"];   // ocultaciones que provoca la propia app
+
+  function refDePunto(p, P) {
+    var q = p.k ? preguntaDe(p.k) : null, qn = q ? "q" + pad2(q._n) : null;
+    if (p.evento === "adjunto" || p.evento === "adjunto_inicio") {
+      var lista = (P.adjuntos && P.adjuntos[p.k]) || [], i = -1;
+      lista.forEach(function (a, j) { if (a.id === p.aid) i = j; });
+      return i >= 0 ? nombreAdjunto(p.k, i + 1, lista[i].mime).replace(/\.[^.]+$/, "") : (qn ? qn + " (borrado)" : null);
+    }
+    if (p.evento === "respuesta" || p.evento === "nota") return qn;
+    if (p.evento === "elemento" || p.evento === "elemento_editado") {
+      var n = -1;
+      (P.elementos || []).forEach(function (e, j) { if (e.id === p.aid) n = j; });
+      return n >= 0 ? "E" + pad2(n + 1) : "elemento (borrado)";
+    }
+    if (p.evento === "seccion") return p.sec || null;
+    return null;
+  }
+
+  function puntoSalida(p, P) {
+    var o = { t: new Date(p.t).toISOString(), tipo: p.tipo };
+    if (p.tipo === "evento") {
+      o.evento = p.evento;
+      var r = refDePunto(p, P); if (r) o.ref = r;
+    }
+    if (p.motivo) o.motivo = p.motivo;
+    o.lat = p.lat; o.lon = p.lon; o.precisionM = p.precisionM;
+    o.altitudM = p.altitudM === undefined ? null : p.altitudM;
+    o.edadS = p.edadS === undefined ? null : p.edadS;
+    if (p.reconstruido) o.reconstruido = true;
+    return o;
+  }
+
+  // Partes 2.1 (o la parte de un borrador anterior a la 2.2): la traza sale de los sellos de cada evento.
+  function reconstruirTraza(P, desdeMs) {
+    var R = [];
+    function add(g, t, extra) {
+      if (!g || typeof g.lat !== "number" || typeof g.lon !== "number") return;
+      var tf = Date.parse(g.capturadoEn || ""), te = t ? Date.parse(t) : tf;
+      if (isNaN(te)) te = tf;
+      if (isNaN(te) || (desdeMs && te >= desdeMs)) return;
+      var p = { t: te, tipo: extra.tipo || "evento", lat: Number(g.lat.toFixed(7)), lon: Number(g.lon.toFixed(7)),
+                precisionM: Math.round(g.precisionM), altitudM: g.altitudM == null ? null : g.altitudM,
+                edadS: (t && !isNaN(tf)) ? Math.round((te - tf) / 1000) : null, reconstruido: true };
+      if (extra.evento) { p.evento = extra.evento; p.k = extra.k; p.aid = extra.aid; }
+      R.push(p);
+    }
+    if (P.gps) add(P.gps, null, { tipo: "inicio" });
+    Object.keys(P.geo || {}).forEach(function (k) { add(P.geo[k], null, { evento: "respuesta", k: k }); });
+    Object.keys(P.adjuntos || {}).forEach(function (k) {
+      (P.adjuntos[k] || []).forEach(function (a) { add(a.gps, a.creadoEn, { evento: "adjunto", k: k, aid: a.id }); });
+    });
+    Object.keys(P.notas || {}).forEach(function (k) {
+      (P.notas[k] || []).forEach(function (n) { add(n.gps, n.creadoEn, { evento: "nota", k: k, aid: n.id }); });
+    });
+    (P.elementos || []).forEach(function (e) { add(e.gps, e.creadoEn, { evento: "elemento", aid: e.id }); });
+    return R;
+  }
+
+  function trazaCompleta(P, puntos) {
+    var desde = P.trazaDesde ? Date.parse(P.trazaDesde) : null;
+    var todos = (puntos || []).concat(reconstruirTraza(P, desde || (puntos && puntos.length ? puntos[0].t : null)));
+    todos.sort(function (a, b) { return a.t - b.t; });
+    return { puntos: todos, reconstruida: todos.some(function (p) { return p.reconstruido; }) };
+  }
+
+  // Tramos, huecos y distancia. Entrada: puntos de salida (con t en ISO).
+  function analizarRecorrido(tz) {
+    var tramos = [], huecos = [], actual = [];
+    function cerrar() { if (actual.length) tramos.push(actual); actual = []; }
+    for (var i = 0; i < tz.length; i++) {
+      var p = tz[i], a = tz[i - 1];
+      if (a) {
+        var dt = Date.parse(p.t) - Date.parse(a.t), corte = null;
+        if (a.tipo === "oculta") {
+          var breve = BREVES.indexOf(a.motivo) >= 0 && dt <= T.huecoMs;
+          if (!breve) corte = a.motivo === "parte_cerrado" ? "parte cerrado"
+                            : (a.motivo && BREVES.indexOf(a.motivo) >= 0 ? "app oculta (" + a.motivo + ")" : "app oculta");
+        } else if (dt > T.huecoMs) corte = "sin puntos";
+        if (corte) {
+          huecos.push({ desde: a.t, hasta: p.t, minutos: Math.round(dt / 6000) / 10, motivo: corte });
+          cerrar();
+        }
+      }
+      actual.push(p);
+    }
+    var ult = tz[tz.length - 1];
+    if (ult && ult.tipo === "oculta" && BREVES.indexOf(ult.motivo) < 0) {
+      huecos.push({ desde: ult.t, hasta: null, minutos: null, motivo: ult.motivo === "parte_cerrado" ? "parte cerrado" : "app oculta" });
+    }
+    cerrar();
+
+    // En la línea y en la distancia solo entran posiciones fiables; y no se suma el temblor del GPS estando parado.
+    var total = 0;
+    var lineas = tramos.map(function (tr) {
+      var ok = tr.filter(function (p) {
+        return p.precisionM <= CONFIG.geoPrecisionAviso && (p.edadS === null || Math.abs(p.edadS) <= 60);
+      });
+      var d = 0, ancla = ok[0];
+      for (var j = 1; j < ok.length; j++) {
+        var s = distanciaM(ancla, ok[j]);
+        if (s > Math.max(ancla.precisionM, ok[j].precisionM)) { d += s; ancla = ok[j]; }
+      }
+      total += d;
+      return { puntos: ok, todos: tr, distanciaM: Math.round(d), inicio: tr[0].t, fin: tr[tr.length - 1].t };
+    }).filter(function (l) { return l.puntos.length >= 2; });
+    return { tramos: lineas, huecos: huecos, distanciaM: Math.round(total) };
+  }
+
+  function horaCorta(iso) {
+    if (!iso) return "…";
+    var d = new Date(iso); return pad2(d.getHours()) + ":" + pad2(d.getMinutes());
+  }
+  function textoRecorrido(j, conDetalle) {
+    if (j.visita.ubicacionEstado === "denegada") return "sin ubicación (permiso denegado)";
+    if (!j.traza.length) return "sin datos de ubicación";
+    var r = j.resumen, km = (r.distanciaM / 1000).toFixed(2).replace(".", ",");
+    var t = km + " km · " + r.tramos + " tramo" + (r.tramos === 1 ? "" : "s") + " · ";
+    if (!r.huecos.length) return t + "sin huecos";
+    t += r.huecos.length + " hueco" + (r.huecos.length === 1 ? "" : "s");
+    if (conDetalle) {
+      t += " (" + r.huecos.map(function (h) { return horaCorta(h.desde) + "–" + horaCorta(h.hasta) + ", " + h.motivo; }).join("; ") + ")";
+    }
+    return t;
+  }
 
   /* ---------- EXIF: escribe la posición dentro del propio JPEG ----------
      La foto se recomprime al guardarla y eso borra sus metadatos; además Chrome en Android
@@ -1530,7 +2102,9 @@
     ELEM.fotosNuevas = [];
     if (!ELEM.borrador.gps) {
       var bid = ELEM.borrador.id;
-      sellar(function (g) { if (ELEM.borrador && ELEM.borrador.id === bid && !ELEM.borrador.gps) { ELEM.borrador.gps = g; pintarGeoElem(); } });
+      obtenerPosicion({}, function (f, t0) {
+        if (f && ELEM.borrador && ELEM.borrador.id === bid && !ELEM.borrador.gps) { ELEM.borrador.gps = selloDe(f, t0); pintarGeoElem(); }
+      });
     }
     $("elemTitulo").textContent = orig ? "Editar elemento" : "Nuevo elemento";
     $("elemTipos").innerHTML = (EL.tipos || []).map(function (t) {
@@ -1596,19 +2170,18 @@
     var d = $("dlgElem"); if (d.close) d.close(); else d.removeAttribute("open");
   }
 
-  $("elemFotoBtn").addEventListener("click", function () { kActual = "__elem__"; $("inFoto").click(); });
+  $("elemFotoBtn").addEventListener("click", function () { kActual = "__elem__"; marcarCaptura("camara", false); $("inFoto").click(); });
   $("elemGeoBtn").addEventListener("click", function () {
-    var g = geoAhora();
+    if (!GEO.activo) { $("elemAviso").textContent = "La ubicación no está disponible en este parte."; return; }
+    var g = geoAhora(), bid = ELEM.borrador && ELEM.borrador.id;
     if (g) { ELEM.borrador.gps = g; pintarGeoElem(); }
-    else { $("elemAviso").textContent = "Todavía no hay señal GPS; se fijará sola en cuanto llegue."; }
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(function (pos) {
-        if (!ELEM.borrador) return;
-        ELEM.borrador.gps = { lat: pos.coords.latitude, lon: pos.coords.longitude, precisionM: Math.round(pos.coords.accuracy),
-          altitudM: pos.coords.altitude == null ? null : Math.round(pos.coords.altitude), capturadoEn: new Date().toISOString() };
-        pintarGeoElem();
-      }, function () {}, { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 });
-    }
+    else { $("elemAviso").textContent = "Buscando una posición nueva…"; }
+    obtenerPosicion({ nueva: true }, function (f, t0) {
+      if (!f || !ELEM.borrador || ELEM.borrador.id !== bid) return;
+      ELEM.borrador.gps = selloDe(f, t0);
+      $("elemAviso").textContent = "";
+      pintarGeoElem();
+    });
   });
   $("elemCancel").addEventListener("click", function () {
     (ELEM.fotosNuevas || []).forEach(function (id) {
@@ -1637,10 +2210,11 @@
     ELEM.fotosQuitadas = [];
     parte.elementos = parte.elementos || [];
     var i = ELEM.editando ? parte.elementos.map(function (e) { return e.id; }).indexOf(ELEM.editando) : -1;
-    var guardado = b;
+    var guardado = b, esNuevo = i < 0, pE = parte.id;
     if (i >= 0) parte.elementos[i] = guardado; else parte.elementos.push(guardado);
-    if (!guardado.gps) {
-      sellar(function (g) {
+    if (esNuevo || !guardado.gps) {
+      posEvento(esNuevo ? "elemento" : "elemento_editado", { aid: guardado.id }, function (g) {
+        if (!g || !parte || parte.id !== pE) return;
         var e = (parte.elementos || []).filter(function (x) { return x.id === guardado.id; })[0];
         if (e && !e.gps) { e.gps = g; pintarElementos(); guardar(true); }
       });
@@ -1728,7 +2302,7 @@
       : (v === "bandeja" ? "Partes guardados" : "Partes de campo");
     if (v === "bandeja") pintarBandeja();
     if (v === "selector") pintarCatalogo();
-    if (v === "form") geoIniciar(); else geoParar();
+    if (v !== "form") cerrarSesion("cerrado");   // salir del parte = dejar de registrar la ubicación
     window.scrollTo(0, 0);
   }
 
@@ -1795,7 +2369,7 @@
 
   function empezarVisita(id, fichero) {
     banner("");
-    obtenerPlantilla(id, fichero || null).then(function (p) {
+    cerrarSesion("cerrado").then(function () { return obtenerPlantilla(id, fichero || null); }).then(function (p) {
       PLANTILLA = normalizar(p);
       parte = nuevoParte();
       SEC.activa = 0;
@@ -1805,7 +2379,7 @@
     }).then(function () {
       mostrar("form");
       renderExpediente(); renderCabecera(); renderSecciones(); pintarGps(); refrescar();
-      capturarGps(true);
+      abrirSesion();
     }).catch(function (err) {
       banner("No se ha podido abrir la licitación (" + esc(err.message) + ").", "bad");
     });
@@ -1870,7 +2444,7 @@
   }
 
   function abrirParte(id) {
-    DB.leerParte(id).then(function (p) {
+    cerrarSesion("cerrado").then(function () { return DB.leerParte(id); }).then(function (p) {
       if (!p) return null;
       parte = p;
       parte.noAplica = parte.noAplica || {};
@@ -1893,6 +2467,7 @@
       mostrar("form");
       renderExpediente(); renderCabecera(); renderSecciones(); pintarGps(); refrescar();
       banner("");
+      abrirSesion();
     });
   }
 
@@ -1907,6 +2482,7 @@
         });
         (p.elementos || []).forEach(function (e) { (e.fotos || []).forEach(function (f) { tareas.push(DB.borrarMedio(f.id)); }); });
         tareas.push(DB.borrarParte(p.id));
+        tareas.push(DB.borrarTraza(p.id));
       });
       return Promise.all(tareas).then(function () {
         banner("Borrados " + env.length + " parte(s) ya enviados.", "ok");
@@ -1945,9 +2521,16 @@
     return ref + "-" + f + "-" + pad2(h.getHours()) + pad2(h.getMinutes());
   }
 
-  function construirJson() {
+  function construirJson(puntosTraza) {
     var c = calcular();
     parte.fin = new Date().toISOString();
+
+    // Recorrido: puntos registrados en 2.2 + reconstrucción de lo anterior a partir de los sellos (2.1).
+    var tz = trazaCompleta(parte, puntosTraza || []);
+    var traza = tz.puntos.map(function (p) { return puntoSalida(p, parte); });
+    var rec = analizarRecorrido(traza);
+    var ubicacionEstado = traza.length ? "ok"
+      : ((parte.ubicacionDenegada || (parte.avisoUbicacion && parte.avisoUbicacion.aceptado === false)) ? "denegada" : "sin_senal");
 
     var idxAdj = [], idxNotas = [], hallazgos = [];
 
@@ -1974,6 +2557,7 @@
               mime: a.mime, bytes: a.bytes, duracionS: a.duracionS || null,
               creadoEn: a.creadoEn, gps: a.gps || null
             };
+            if (a.tipo === "audio" || a.tipo === "video") o.gpsInicio = a.gpsInicio || null;
             idxAdj.push(o);
             return o;
           });
@@ -2064,9 +2648,16 @@
           "Un valor null significa que no se respondió; no significa que esté mal.",
           "«mapeaA» dice a qué epígrafe del índice de la oferta o a qué Elemento Clave de Éxito alimenta cada pregunta y cada hallazgo. Úsalo para llevar cada evidencia al apartado correcto de la memoria técnica.",
           "«noAplica: true» significa que el técnico ha decidido que la pregunta no aplica en este sitio. No es lo mismo que sin responder, y no puntúa.",
-          "«ubicacion» (en preguntas, adjuntos, notas y elementos) es dónde estaba el móvil al responder, adjuntar o crear: lat, lon en grados WGS84 y «precisionM» en metros. La foto lleva además la misma posición en su EXIF.",
+          "«ubicacion» (en preguntas, adjuntos, notas y elementos) es dónde estaba el móvil al responder, adjuntar o crear: lat, lon en grados WGS84, «precisionM» en metros y, desde la 2.2, «edadS» (antigüedad de la posición en segundos). La foto lleva además la misma posición en su EXIF.",
           "«elementos» son cosas concretas que el técnico ha ido registrando en el recorrido (una papelera, un árbol, una pintada…), cada una con tipo, estado, texto, fotos (media/eNN-MM.jpg) y ubicación. Los que están mal entran también en «hallazgos», con referencia ENN.",
-          "mapa.geojson reúne todo lo geolocalizado del parte para abrirlo en un visor de mapas (QGIS, geojson.io, Power BI)."
+          "«traza» es el recorrido del móvil durante la visita, ordenado por hora. Cada punto trae «t» (hora ISO), «tipo», «lat»/«lon» (WGS84), «precisionM», «altitudM» y «edadS»: los segundos que separan la hora del punto de la hora en que se tomó esa posición (0 = al momento; positivo = posición anterior; negativo = llegó después, como mucho 10 s). Ninguna posición es inventada ni interpolada.",
+          "Tipos de punto de «traza»: «inicio» y «fin» de la visita; «evento» cuando el técnico responde, adjunta, anota, crea un elemento o cambia de sección («evento» dice cuál y «ref» a qué pregunta, archivo o elemento se refiere: q07, q07-02, E01…); «distancia» cada ~25 m andando; «latido» si pasan 4 min sin otros puntos; «oculta» y «visible» cuando la app deja de verse y vuelve.",
+          "La ubicación solo se registra con el parte abierto y en pantalla. Entre un «oculta» y su «visible» no hay datos: es un hueco, no un recorrido. «motivo» en esos puntos dice la causa cuando se conoce: camara, video o audio (la propia app abrió la cámara o la grabadora; si dura menos de 5 min no se cuenta como hueco), envio, parte_cerrado, parte_reabierto o reabierto.",
+          "«resumen.distanciaM» suma el recorrido sin cruzar huecos y sin contar el temblor del GPS estando parado; «resumen.tramos» son los trozos continuos; «resumen.huecos» lista cada interrupción con «desde», «hasta», «minutos» y «motivo» (app oculta, parte cerrado o sin puntos = más de 5 min sin posiciones).",
+          "«visita.ubicacionEstado»: ok (hay posiciones), denegada (sin permiso de ubicación o el técnico eligió seguir sin ella) o sin_senal (con permiso, pero no llegó ninguna posición). «visita.wakeLock» dice si la app consiguió mantener la pantalla encendida.",
+          "En audios y vídeos, «gpsInicio» es dónde empezó la grabación y «gps» dónde terminó.",
+          "Un punto con «reconstruido: true» sale de un parte de la versión 2.1, que no guardaba recorrido: se ha rehecho con las posiciones de sus respuestas, adjuntos, notas y elementos.",
+          "mapa.geojson reúne todo lo geolocalizado del parte para abrirlo en un visor de mapas (QGIS, geojson.io, Power BI): puntos de respuesta, adjunto, nota y elemento; la línea del recorrido por tramos (capa recorrido) y los puntos de la traza que no son eventos (capa traza)."
         ],
         gravedades: {
           no_conforme: "incumple; es una carencia del servicio actual o del estado del centro",
@@ -2078,7 +2669,8 @@
           return { valor: e.v, etiqueta: e.l, significado: e.significado || null };
         })
       },
-      version: "2.1",
+      version: VERSION_FORMATO,
+      compatibleCon: "2.1",
       parteId: parte.id,
       generadoEn: new Date().toISOString(),
       plantilla: { id: PLANTILLA.id, version: PLANTILLA.version || 1, nombre: PLANTILLA.nombre },
@@ -2094,7 +2686,10 @@
         tecnico: parte.cabecera.tecnico || "",
         inicio: parte.inicio,
         fin: parte.fin,
-        duracionMin: dur
+        duracionMin: dur,
+        ubicacionEstado: ubicacionEstado,
+        wakeLock: !!parte.wakeLock,
+        avisoUbicacion: parte.avisoUbicacion || null
       },
       ubicacion: parte.gps,
       datosVisita: parte.cabecera,
@@ -2105,13 +2700,19 @@
         cumplimientoPct: c.pct, noConformes: c.nc, mejorables: c.mej,
         noAplica: Object.keys(parte.noAplica || {}).length,
         geolocalizadas: Object.keys(parte.geo || {}).length,
-        adjuntos: idxAdj.length, notas: idxNotas.length, elementos: elementos.length
+        adjuntos: idxAdj.length, notas: idxNotas.length, elementos: elementos.length,
+        puntosTraza: traza.length,
+        trazaReconstruida: tz.reconstruida,
+        distanciaM: rec.distanciaM,
+        tramos: rec.tramos.length,
+        huecos: rec.huecos
       },
       hallazgos: hallazgos,
       secciones: secciones,
       elementos: elementos,
       adjuntos: idxAdj,
-      notas: idxNotas
+      notas: idxNotas,
+      traza: traza
     };
   }
 
@@ -2136,6 +2737,7 @@
       L.push("- **Ubicación:** " + j.ubicacion.lat.toFixed(5) + ", " + j.ubicacion.lon.toFixed(5) +
              " (±" + Math.round(j.ubicacion.precisionM) + " m)");
     }
+    L.push("- **Recorrido:** " + textoRecorrido(j, true));
     L.push("");
 
     L.push("## Hallazgos");
@@ -2248,6 +2850,23 @@
       punto(el.ubicacion, { capa: "elemento", ref: el.ref, tipo: el.tipoTexto, estado: el.estadoTexto, gravedad: el.gravedad,
                             texto: el.texto, mapeaA: el.mapeaA, fotos: el.fotos.map(function (f) { return f.fichero; }).join(" ") });
     });
+    // 2.2: el recorrido, partido en tramos (en cada «oculta» y en saltos de más de 5 min).
+    var rec = analizarRecorrido(j.traza || []);
+    rec.tramos.forEach(function (tr, i) {
+      F.push({
+        type: "Feature",
+        geometry: { type: "LineString", coordinates: tr.puntos.map(function (p) { return [p.lon, p.lat]; }) },
+        properties: { capa: "recorrido", tramo: i + 1, inicio: tr.inicio, fin: tr.fin, puntos: tr.puntos.length, distanciaM: tr.distanciaM }
+      });
+    });
+    // Los puntos de la traza que no son eventos (los eventos ya están arriba como respuesta, adjunto, nota o elemento).
+    (j.traza || []).forEach(function (p) {
+      if (p.tipo === "evento") return;
+      var pr = { capa: "traza", tipo: p.tipo, t: p.t, precisionM: p.precisionM, edadS: p.edadS };
+      if (p.motivo) pr.motivo = p.motivo;
+      if (p.reconstruido) pr.reconstruido = true;
+      F.push({ type: "Feature", geometry: { type: "Point", coordinates: [p.lon, p.lat] }, properties: pr });
+    });
     return { type: "FeatureCollection", name: (j.centro && j.centro.nombre) || j.plantilla.nombre, features: F };
   }
 
@@ -2319,6 +2938,7 @@
     meta.push(["Cumplimiento", j.resumen.cumplimientoPct === null ? "—" : j.resumen.cumplimientoPct + " %"]);
     meta.push(["Hallazgos", j.resumen.noConformes + " no conformes · " + j.resumen.mejorables + " mejorables"]);
     if (j.ubicacion) meta.push(["Ubicación", j.ubicacion.lat.toFixed(5) + ", " + j.ubicacion.lon.toFixed(5)]);
+    meta.push(["Recorrido", textoRecorrido(j, false)]);
 
     for (var i = 0; i < meta.length; i++) {
       var col = i % 2, fila = Math.floor(i / 2);
@@ -2469,7 +3089,15 @@
   }
 
   function prepararPaquete() {
-    var j = construirJson();
+    var idP = parte.id;
+    var cargar = TRAZA.parteId === idP ? Promise.resolve(TRAZA.puntos.slice()) : DB.leerTraza(idP).catch(function () { return []; });
+    return cargar.then(function (pts) {
+      if (!parte || parte.id !== idP) throw new Error("el parte ha cambiado");
+      return empaquetar(construirJson(pts));
+    });
+  }
+
+  function empaquetar(j) {
     var base = nombreBase();
     var textoJson = JSON.stringify(j, null, 2);
     var md = construirMarkdown(j);
@@ -2559,7 +3187,9 @@
     btn.disabled = true;
     btn.textContent = "Preparando…";
 
-    prepararPaquete().then(function (paq) {
+    // Enviar es terminar la visita: punto «fin» y se deja de registrar la ubicación.
+    var terminar = (parte.estado === "borrador" && GEO.sesion) ? cerrarSesion("fin") : Promise.resolve();
+    terminar.then(prepararPaquete).then(function (paq) {
       paquete = paq;
       parte.estado = "pendiente";
       return guardar(false).then(function () {
@@ -2650,7 +3280,15 @@
       setTimeout(function () { b.textContent = "Copiar"; }, 2500);
     });
   });
-  $("envCerrar").addEventListener("click", cerrarEnvio);
+  function seguirSinEnviar() {
+    // Si se cierra sin enviar, se sigue con la visita: vuelve a borrador y se reanuda el recorrido.
+    if (CONFIG.destino === "compartir" && parte && parte.estado === "pendiente" && vista === "form") {
+      parte.estado = "borrador";
+      guardar(false).then(function () { abrirSesion(); });
+    }
+  }
+  $("envCerrar").addEventListener("click", function () { cerrarEnvio(); seguirSinEnviar(); });
+  $("dlgEnviar").addEventListener("cancel", function () { seguirSinEnviar(); });
 
   /* --- Power Automate --- */
   function subirFlow(paq) {
