@@ -1,64 +1,7 @@
 {
   "actualizado": "2026-09-25",
   "plantillas": [
-    {
-      "id": "exp-2026-014-l2-limp",
-      "fichero": "exp-2026-014-l2-limp.json",
-      "nombre": "Visita técnica — Residencia Ntra. Sra. de la Paz",
-      "expediente": {
-        "codigo": "2026/014",
-        "lote": "2 — Limpieza"
-      },
-      "centro": {
-        "nombre": "Residencia Ntra. Sra. de la Paz"
-      },
-      "version": 1
-    },
-    {
-      "id": "exp-2026-014",
-      "fichero": "exp-2026-014.json",
-      "nombre": "Visita técnica previa — Limpieza Residencia Ntra. Sra.",
-      "expediente": {
-        "codigo": "2026/014",
-        "lote": "2 — Limpieza"
-      },
-      "centro": {
-        "nombre": "Residencia Ntra. Sra. de la Paz"
-      },
-      "version": 1
-    },
-    {
-      "id": "exp-2076-2025",
-      "fichero": "exp-2076-2025.json",
-      "nombre": "Visita técnica — Zonas verdes de Campillos",
-      "expediente": {
-        "codigo": "2076/2025"
-      },
-      "centro": {
-        "nombre": "Zonas verdes de Campillos"
-      },
-      "version": 1
-    },
-    {
-      "id": "limpieza-base",
-      "fichero": "limpieza-base.json",
-      "nombre": "Control de calidad de limpieza",
-      "expediente": {},
-      "centro": {},
-      "version": 3
-    },
-    {
-      "id": "bormujos-5344-26-inf-verde",
-      "fichero": "bormujos-5344-26-inf-verde.json",
-      "nombre": "Visita técnica — Infraestructura verde de Bormujos",
-      "expediente": {
-        "codigo": "5344/2026"
-      },
-      "centro": {
-        "nombre": "Infraestructura verde de Bormujos"
-      },
-      "version": 1
-    },
+    
     {
       "id": "exp-1726-26-campillos-z1",
       "fichero": "exp-1726-26-campillos-z1.json",
