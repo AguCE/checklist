@@ -436,6 +436,11 @@
         "mapea_a": "3. Frecuencia de barrido en urbanizaciones residenciales y espacios públicos periféricos"
       },
       {
+        "v": "vertido-residuos",
+        "l": "Punto de vertido de residuos",
+        "mapea_a": "3. Frecuencia de barrido en urbanizaciones residenciales y espacios públicos periféricos"
+      },
+      {
         "v": "otro",
         "l": "Otro",
         "mapea_a": "General"
