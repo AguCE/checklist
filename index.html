@@ -157,6 +157,8 @@
   .adj-item.nota { width: 100%; padding: 9px 30px 9px 11px; font-size: 13px; line-height: 1.4; }
   .adj-item .tag { position: absolute; left: 3px; bottom: 3px; background: rgba(20,26,24,.72); color: #fff; font-size: 8.5px; letter-spacing: .04em; padding: 1px 4px; border-radius: 4px; font-variant-numeric: tabular-nums; }
   .adj-item .del { position: absolute; top: 3px; right: 3px; width: 22px; height: 22px; border: 0; border-radius: 6px; background: rgba(20,26,24,.72); color: #fff; font-size: 14px; line-height: 1; padding: 0; }
+  .adj-item .toel { position: absolute; top: 3px; left: 3px; width: 22px; height: 22px; border: 0; border-radius: 6px; background: rgba(12,107,91,.82); color: #fff; padding: 0; display: grid; place-items: center; }
+  .adj-item .toel svg { width: 13px; height: 13px; fill: #fff; }
 
   /* ---------- Barra inferior ---------- */
   .actionbar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 30; background: var(--surface); border-top: 1px solid var(--line); padding: 10px 16px; padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px)); }
@@ -178,6 +180,10 @@
   .fila-main { flex: 1; min-width: 0; }
   .fila-main strong { display: block; font-size: 14px; font-weight: 600; }
   .fila-main span { font-size: 12px; color: var(--ink-3); display: block; }
+  .fila-open { flex: 1; min-width: 0; display: flex; align-items: center; gap: 11px; background: none; border: 0; padding: 0; text-align: left; color: inherit; font: inherit; }
+  .fila-del { flex: none; width: 32px; height: 32px; border: 1px solid var(--line); background: var(--surface-2); color: var(--bad); border-radius: 8px; padding: 0; display: grid; place-items: center; }
+  .fila-del svg { width: 15px; height: 15px; fill: currentColor; }
+  .fila-del.confirmar { background: var(--bad-soft); border-color: var(--bad); }
   .estado { flex: none; font-size: 10.5px; font-weight: 600; text-transform: uppercase; letter-spacing: .05em; padding: 4px 8px; border-radius: 6px; }
   .estado.borrador { background: var(--na-soft); color: var(--na); }
   .estado.pendiente { background: var(--warn-soft); color: var(--warn); }
@@ -445,6 +451,8 @@
     maxLadoPdf: 900,       // px del lado mayor al incrustar en el PDF
     avisoAdjuntos: 40,     // a partir de aquí, avisamos
     avisoBytes: 80 * 1024 * 1024,
+    avisoVideoBytes: 25 * 1024 * 1024,   // un vídeo por encima de esto se avisa (no se recomprime)
+    avisoFueraSitio: { radioCentroM: 1500, distanciaAnclaM: 3000 },   // responder lejos del sitio: aviso una vez
     geoMaxEdadMs: 120000,  // una posición de hace más de 2 min no sirve para sellar
     geoPrecisionAviso: 50, // metros: por encima, se marca como precisión baja (y no entra en la línea del recorrido)
 
@@ -457,7 +465,8 @@
       latidoMs: 4 * 60000,        // R4: latido si pasan 4 min sin puntos
       huecoMs: 5 * 60000,         // más de 5 min entre dos puntos = hueco
       sinGpsMs: 60000,            // R8: aviso discreto de «Sin GPS»
-      maxPuntos: 2000             // tope de seguridad de puntos de distancia y latido por parte
+      maxPuntos: 2000,            // tope de seguridad de puntos de distancia y latido por parte
+      velocidadPieMaxMS: 2.8      // m/s (~10 km/h): por encima, el segmento se marca como vehículo
     },
     pantallaEncendida: true,      // R6: valor por defecto del ajuste «Mantener la pantalla encendida»
 
@@ -472,8 +481,8 @@
       rechazar: "Seguir sin ubicación"
     }
   };
-  var VERSION_APP = "2.2";
-  var VERSION_FORMATO = "2.2";
+  var VERSION_APP = "2.4";
+  var VERSION_FORMATO = "2.2";   // el parte.json 2.3 es un superconjunto compatible del 2.2 (campos nuevos opcionales)
 
   /* =====================================================================
      2. UTILIDADES
@@ -864,7 +873,8 @@
     foto:  '<svg viewBox="0 0 24 24"><path d="M9 3 7.2 5H4a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-3.2L15 3H9Zm3 5.5a5 5 0 1 1 0 10 5 5 0 0 1 0-10Zm0 2a3 3 0 1 0 0 6 3 3 0 0 0 0-6Z"/></svg>',
     video: '<svg viewBox="0 0 24 24"><path d="M4 5h11a2 2 0 0 1 2 2v2.5l4-2.5v10l-4-2.5V17a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2Z"/></svg>',
     audio: '<svg viewBox="0 0 24 24"><path d="M12 14a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v5a3 3 0 0 0 3 3Zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.92V21h2v-3.08A7 7 0 0 0 19 11h-2Z"/></svg>',
-    nota:  '<svg viewBox="0 0 24 24"><path d="M4 4h16v12l-4 4H4V4Zm12 14.2V16h2.2L16 18.2ZM7 8h10v2H7V8Zm0 4h7v2H7v-2Z"/></svg>'
+    nota:  '<svg viewBox="0 0 24 24"><path d="M4 4h16v12l-4 4H4V4Zm12 14.2V16h2.2L16 18.2ZM7 8h10v2H7V8Zm0 4h7v2H7v-2Z"/></svg>',
+    estrella: '<svg viewBox="0 0 24 24"><path d="M12 2.5l2.9 6 6.6.6-5 4.3 1.5 6.4L12 16.9 6 19.8l1.5-6.4-5-4.3 6.6-.6 2.9-6z"/></svg>'
   };
 
   function textoGeo(g) {
@@ -1048,6 +1058,7 @@
       if (a.tipo === "foto") {
         return '<div class="adj-item media"><img src="' + url + '" alt="Foto">' +
                '<span class="tag">' + esc(etiqueta) + '</span>' + (a.gps ? '<span class="pin" title="' + esc(textoGeo(a.gps)) + '">\u{1F4CD}</span>' : "") +
+               (PLANTILLA.elementos ? '<button type="button" class="toel" data-toel="' + a.id + '" data-k="' + esc(k) + '" aria-label="Convertir en elemento de interés" title="Convertir en elemento de interés">' + ICO.estrella + '</button>' : "") +
                '<button type="button" class="del" data-del="' + a.id + '" data-k="' + esc(k) + '" aria-label="Quitar">×</button></div>';
       }
       if (a.tipo === "video") {
@@ -1132,6 +1143,9 @@
     var ef = e.target.closest("[data-elemfoto-del]");
     if (ef) { quitarFotoBorrador(ef.dataset.elemfotoDel); return; }
 
+    var te = e.target.closest("[data-toel]");
+    if (te) { convertirFotoEnElemento(te.dataset.k, te.dataset.toel); return; }
+
     var del = e.target.closest("[data-del]");
     if (del) { quitarAdjunto(del.dataset.k, del.dataset.del); return; }
 
@@ -1141,6 +1155,9 @@
       pintarAdjuntos(dn.dataset.k); guardar(true);
       return;
     }
+
+    var bp = e.target.closest("[data-borrar-parte]");
+    if (bp) { borrarParteBorrador(bp.dataset.borrarParte, bp); return; }
 
     var fp = e.target.closest("[data-parte]");
     if (fp) { abrirParte(fp.dataset.parte); return; }
@@ -1186,8 +1203,25 @@
       });
     } else {
       var ini = GEO.captura && (GEO.captura.tipo === tipo) ? GEO.captura.ini : null;
-      anadirMedio(kF, tipo, f, (f.type || "").split(";")[0] || (tipo === "video" ? "video/mp4" : "audio/mpeg"), null, ini);
+      var mimeMV = (f.type || "").split(";")[0] || (tipo === "video" ? "video/mp4" : "audio/mpeg");
+      duracionMedia(f, tipo, function (seg) {
+        anadirMedio(kF, tipo, f, mimeMV, seg, ini);
+      });
     }
+  }
+
+  // Lee la duración en segundos de un vídeo o audio desde sus metadatos (o null si no se puede).
+  function duracionMedia(file, tipo, cb) {
+    try {
+      var el = document.createElement(tipo === "audio" ? "audio" : "video");
+      var url = URL.createObjectURL(file), hecho = false;
+      var fin = function (val) { if (hecho) return; hecho = true; URL.revokeObjectURL(url); cb(val); };
+      el.preload = "metadata";
+      el.onloadedmetadata = function () { var d = el.duration; fin(isFinite(d) && d > 0 ? Math.round(d) : null); };
+      el.onerror = function () { fin(null); };
+      el.src = url;
+      setTimeout(function () { fin(null); }, 4000);   // red de seguridad si nunca llega el metadato
+    } catch (e) { cb(null); }
   }
 
   function redimensionar(file, maxLado, calidad, cb) {
@@ -1240,6 +1274,10 @@
       refrescar();
       guardar(true);
 
+      if (tipo === "video" && meta.bytes > CONFIG.avisoVideoBytes) {
+        banner("El vídeo ocupa " + mb(meta.bytes) + ". Para que el parte no pese demasiado, graba clips cortos (10–20 s).", "warn");
+      }
+
       if (ini) {
         var aplicarIni = function () {
           if (!ini.gps || !parte || parte.id !== parteId) return;
@@ -1267,6 +1305,24 @@
     }).catch(function () {
       banner("No se ha podido guardar el archivo en el móvil. Comprueba que queda espacio.", "bad");
     });
+  }
+
+  function convertirFotoEnElemento(k, adjId) {
+    if (!PLANTILLA.elementos) return;
+    var a = (parte.adjuntos[k] || []).filter(function (x) { return x.id === adjId; })[0];
+    if (!a || a.tipo !== "foto") return;
+    // Duplicamos el blob en un medio nuevo: así la foto sigue en la pregunta y el elemento es
+    // independiente (borrar una no afecta a la otra, pese a que ambas pasan por DB.borrarMedio).
+    DB.leerMedio(adjId).then(function (m) {
+      if (!m || !m.blob) { banner("No se encuentra la foto para convertirla en elemento.", "warn"); return; }
+      var nid = uid();
+      var meta = { id: nid, tipo: "foto", mime: a.mime || "image/jpeg", bytes: m.blob.size, creadoEn: new Date().toISOString() };
+      if (a.gps) meta.gps = a.gps;
+      DB.guardarMedio({ id: nid, parteId: parte.id, blob: m.blob }).then(function () {
+        mediosCache[nid] = URL.createObjectURL(m.blob);
+        abrirElemento(null, meta);
+      }).catch(function () { banner("No se ha podido preparar la foto para el elemento.", "bad"); });
+    }).catch(function () { banner("No se ha podido leer la foto.", "bad"); });
   }
 
   function quitarAdjunto(k, id) {
@@ -1392,7 +1448,8 @@
   function aFijo(pos) {
     var ahora = Date.now(), ts = pos.timestamp;
     // Algunos móviles dan horas raras en el fijo: si no cuadra con el reloj, vale la de llegada.
-    var t = (ts && Math.abs(ts - ahora) < 60000) ? ts : ahora;
+    // Y nunca después de la llegada (reloj del móvil adelantado): si no, la edad saldría negativa.
+    var t = (ts && Math.abs(ts - ahora) < 60000) ? Math.min(ts, ahora) : ahora;
     var alt = pos.coords.altitude;
     return {
       lat: pos.coords.latitude, lon: pos.coords.longitude,
@@ -1566,8 +1623,27 @@
       if (!g || !parte || parte.id !== parteId) return;
       parte.geo = parte.geo || {};
       parte.geo[k] = g;
+      quizaFueraSitio(g);
       pintarGeoQ(k); guardar(true);
     });
+  }
+
+  // Aviso (una vez por parte) si se responde lejos del sitio de la visita. Referencia: el «centro» de
+  // la plantilla si trae coordenadas; si no, la primera posición de la visita (solo distancias gruesas).
+  function quizaFueraSitio(g) {
+    if (GEO.fueraAvisado || !g || g.precisionM > CONFIG.geoPrecisionAviso) return;
+    var c = PLANTILLA.centro || {}, ref = null, limite = 0;
+    if (typeof c.lat === "number" && typeof c.lon === "number") {
+      ref = { lat: c.lat, lon: c.lon }; limite = c.radioM || CONFIG.avisoFueraSitio.radioCentroM;
+    } else if (parte.gps) {
+      ref = { lat: parte.gps.lat, lon: parte.gps.lon }; limite = CONFIG.avisoFueraSitio.distanciaAnclaM;
+    }
+    if (!ref) return;
+    var d = distanciaM(ref, g);
+    if (d > limite) {
+      GEO.fueraAvisado = true;
+      banner("Estás respondiendo a " + Math.round(d) + " m del sitio de la visita. Comprueba que es el lugar correcto.", "warn");
+    }
   }
 
   // Para audio y vídeo: la posición al empezar, que se usa cuando el archivo llega.
@@ -1630,6 +1706,11 @@
       if (!GEO.sesion) { l.release().catch(function () {}); return; }
       WL.lock = l;
       if (parte && !parte.wakeLock) { parte.wakeLock = true; guardar(true); }
+      l.addEventListener("release", function () {
+        if (WL.lock === l) WL.lock = null;
+        // Algunos móviles sueltan el lock al atenuar la pantalla; si seguimos en la visita y visibles, se vuelve a pedir.
+        if (GEO.sesion && document.visibilityState === "visible") pedirPantalla();
+      });
     }).catch(function () {});                         // sin avisos: si no se puede, no se puede
   }
   function soltarPantalla() {
@@ -1652,7 +1733,7 @@
 
   function abrirSesion() {
     if (!parte || parte.estado !== "borrador" || GEO.sesion) return;
-    GEO.sesion = true; GEO.oculta = false; GEO.ultima = null; GEO.estado = "off"; GEO.desde = Date.now();
+    GEO.sesion = true; GEO.oculta = false; GEO.ultima = null; GEO.estado = "off"; GEO.desde = Date.now(); GEO.fueraAvisado = false;
     var id = parte.id;
     pedirPantalla();
     clearInterval(GEO.uiTmr);
@@ -1834,6 +1915,7 @@
 
   function puntoSalida(p, P) {
     var o = { t: new Date(p.t).toISOString(), tipo: p.tipo };
+    if (p.id) o.id = p.id;                              // para poder referenciar cada vértice en el GeoJSON
     if (p.tipo === "evento") {
       o.evento = p.evento;
       var r = refDePunto(p, P); if (r) o.ref = r;
@@ -1906,20 +1988,29 @@
     cerrar();
 
     // En la línea y en la distancia solo entran posiciones fiables; y no se suma el temblor del GPS estando parado.
-    var total = 0;
+    // Cada segmento aceptado se clasifica por velocidad: andando o en vehículo (los saltos de coche no son recorrido a pie).
+    var total = 0, totalPie = 0, totalVeh = 0;
     var lineas = tramos.map(function (tr) {
       var ok = tr.filter(function (p) {
         return p.precisionM <= CONFIG.geoPrecisionAviso && (p.edadS === null || Math.abs(p.edadS) <= 60);
       });
-      var d = 0, ancla = ok[0];
+      var d = 0, dPie = 0, dVeh = 0, ancla = ok[0];
       for (var j = 1; j < ok.length; j++) {
         var s = distanciaM(ancla, ok[j]);
-        if (s > Math.max(ancla.precisionM, ok[j].precisionM)) { d += s; ancla = ok[j]; }
+        if (s > Math.max(ancla.precisionM, ok[j].precisionM)) {
+          var dt = (Date.parse(ok[j].t) - Date.parse(ancla.t)) / 1000;
+          var veh = dt > 0 && (s / dt) > T.velocidadPieMaxMS;
+          ok[j].modo = veh ? "vehiculo" : "pie";
+          d += s; if (veh) dVeh += s; else dPie += s;
+          ancla = ok[j];
+        }
       }
-      total += d;
-      return { puntos: ok, todos: tr, distanciaM: Math.round(d), inicio: tr[0].t, fin: tr[tr.length - 1].t };
+      total += d; totalPie += dPie; totalVeh += dVeh;
+      return { puntos: ok, todos: tr, distanciaM: Math.round(d), distanciaPieM: Math.round(dPie),
+               distanciaVehiculoM: Math.round(dVeh), inicio: tr[0].t, fin: tr[tr.length - 1].t };
     }).filter(function (l) { return l.puntos.length >= 2; });
-    return { tramos: lineas, huecos: huecos, distanciaM: Math.round(total) };
+    return { tramos: lineas, huecos: huecos, distanciaM: Math.round(total),
+             distanciaPieM: Math.round(totalPie), distanciaVehiculoM: Math.round(totalVeh) };
   }
 
   function horaCorta(iso) {
@@ -2093,13 +2184,19 @@
     ajustarAltura();
   }
 
-  function abrirElemento(id) {
+  function abrirElemento(id, semillaFoto) {
     var EL = PLANTILLA.elementos;
     var orig = id ? (parte.elementos || []).filter(function (e) { return e.id === id; })[0] : null;
     ELEM.editando = orig ? orig.id : null;
     ELEM.borrador = orig ? JSON.parse(JSON.stringify(orig))
                          : { id: uid(), tipo: null, estado: null, texto: "", fotos: [], gps: geoAhora(), creadoEn: new Date().toISOString() };
     ELEM.fotosNuevas = [];
+    if (!orig && semillaFoto) {
+      // Elemento creado a partir de una foto ya adjunta a una pregunta (blob ya duplicado y cacheado).
+      ELEM.borrador.fotos = [semillaFoto];
+      ELEM.fotosNuevas.push(semillaFoto.id);         // si se cancela, se limpia como una foto nueva más
+      if (semillaFoto.gps) ELEM.borrador.gps = semillaFoto.gps;
+    }
     if (!ELEM.borrador.gps) {
       var bid = ELEM.borrador.id;
       obtenerPosicion({}, function (f, t0) {
@@ -2436,9 +2533,15 @@
           (p.cabecera && p.cabecera.tecnico) || "",
           p.resumen ? p.resumen.respondidas + "/" + p.resumen.preguntas : ""
         ].filter(Boolean).join(" · ");
-        return '<button type="button" class="fila" data-parte="' + esc(p.id) + '">' +
-          '<span class="fila-main"><strong>' + esc(titulo) + "</strong><span>" + esc(sub) + "</span></span>" +
-          '<span class="estado ' + esc(p.estado) + '">' + esc(p.estado) + "</span></button>";
+        return '<div class="fila">' +
+          '<button type="button" class="fila-open" data-parte="' + esc(p.id) + '">' +
+            '<span class="fila-main"><strong>' + esc(titulo) + "</strong><span>" + esc(sub) + "</span></span>" +
+            '<span class="estado ' + esc(p.estado) + '">' + esc(p.estado) + "</span></button>" +
+          (p.estado === "borrador"
+            ? '<button type="button" class="fila-del" data-borrar-parte="' + esc(p.id) + '" title="Borrar borrador" aria-label="Borrar borrador">' +
+              '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3h6l1 2h4v2H4V5h4l1-2Zm-3 6h12l-1 11a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2L6 9Zm4 2v8h2v-8h-2Zm4 0v8h2v-8h-2Z"/></svg></button>'
+            : "") +
+          "</div>";
       }).join("");
     });
   }
@@ -2469,6 +2572,34 @@
       banner("");
       abrirSesion();
     });
+  }
+
+  // Borra un parte en borrador (con su media y su traza). Pide un segundo toque para confirmar.
+  function borrarParteBorrador(id, btn) {
+    if (!btn || btn.dataset.confirmar !== "1") {
+      if (btn) {
+        btn.dataset.confirmar = "1"; btn.classList.add("confirmar");
+        setTimeout(function () { if (btn.isConnected) { btn.dataset.confirmar = ""; btn.classList.remove("confirmar"); } }, 3500);
+      }
+      banner("Toca otra vez la papelera para borrar este borrador.", "warn");
+      return;
+    }
+    DB.leerParte(id).then(function (p) {
+      if (!p) { pintarBandeja(); return; }
+      if (p.estado !== "borrador") { banner("Solo se pueden borrar partes en borrador.", "warn"); pintarBandeja(); return; }
+      var tareas = [];
+      Object.keys(p.adjuntos || {}).forEach(function (k) {
+        (p.adjuntos[k] || []).forEach(function (a) { tareas.push(DB.borrarMedio(a.id)); });
+      });
+      (p.elementos || []).forEach(function (e) { (e.fotos || []).forEach(function (f) { tareas.push(DB.borrarMedio(f.id)); }); });
+      tareas.push(DB.borrarParte(p.id));
+      tareas.push(DB.borrarTraza(p.id));
+      return Promise.all(tareas).then(function () {
+        if (parte && parte.id === id) parte = null;   // por si estaba cargado en memoria
+        banner("Borrador borrado.", "ok");
+        pintarBandeja();
+      });
+    }).catch(function () { banner("No se ha podido borrar el borrador.", "bad"); });
   }
 
   $("btnLimpiar").addEventListener("click", function () {
@@ -2574,7 +2705,13 @@
             gravedad: grav
           };
           if (na) out.noAplica = true;
-          if (parte.geo && parte.geo[k]) out.ubicacion = parte.geo[k];
+          // Solo geolocalizamos una pregunta que de verdad tiene respuesta (o N/A, o evidencia si es
+          // de tipo adjunto). Si no, el sello quedó de un campo que se tocó y se dejó vacío: no se exporta.
+          var respondida = na ||
+            (q.tipo === "adjunto"
+              ? ((parte.adjuntos[k] || []).length > 0 || (parte.notas[k] || []).length > 0)
+              : (v !== undefined && v !== null && v !== "" && !(Array.isArray(v) && !v.length)));
+          if (respondida && parte.geo && parte.geo[k]) out.ubicacion = parte.geo[k];
           if (q.ayuda) out.ayuda = q.ayuda;
           if (q.mapea_a) out.mapeaA = q.mapea_a;   // epígrafe del índice o ECE que alimenta
           if (q.unidad) out.unidad = q.unidad;
@@ -2634,6 +2771,13 @@
 
     var dur = null;
     if (parte.inicio && parte.fin) dur = Math.max(1, Math.round((new Date(parte.fin) - new Date(parte.inicio)) / 60000));
+    // Duración activa: suma de los tramos del recorrido (sin contar huecos ni la noche entre dos días).
+    // Evita que reabrir el parte otro día infle la duración de la visita.
+    var durActiva = null;
+    if (rec.tramos.length) {
+      var msActivos = rec.tramos.reduce(function (a, tr) { return a + Math.max(0, Date.parse(tr.fin) - Date.parse(tr.inicio)); }, 0);
+      if (msActivos > 0) durActiva = Math.max(1, Math.round(msActivos / 60000));
+    }
 
     return {
       _guia: {
@@ -2654,10 +2798,12 @@
           "Tipos de punto de «traza»: «inicio» y «fin» de la visita; «evento» cuando el técnico responde, adjunta, anota, crea un elemento o cambia de sección («evento» dice cuál y «ref» a qué pregunta, archivo o elemento se refiere: q07, q07-02, E01…); «distancia» cada ~25 m andando; «latido» si pasan 4 min sin otros puntos; «oculta» y «visible» cuando la app deja de verse y vuelve.",
           "La ubicación solo se registra con el parte abierto y en pantalla. Entre un «oculta» y su «visible» no hay datos: es un hueco, no un recorrido. «motivo» en esos puntos dice la causa cuando se conoce: camara, video o audio (la propia app abrió la cámara o la grabadora; si dura menos de 5 min no se cuenta como hueco), envio, parte_cerrado, parte_reabierto o reabierto.",
           "«resumen.distanciaM» suma el recorrido sin cruzar huecos y sin contar el temblor del GPS estando parado; «resumen.tramos» son los trozos continuos; «resumen.huecos» lista cada interrupción con «desde», «hasta», «minutos» y «motivo» (app oculta, parte cerrado o sin puntos = más de 5 min sin posiciones).",
+          "«resumen.distanciaPieM» y «resumen.distanciaVehiculoM» reparten esa distancia entre lo andado y lo recorrido en vehículo (segmentos a más de ~10 km/h). Cada punto y cada vértice llevan «modo»: «pie» o «vehiculo».",
+          "«visita.duracionMin» es la duración ACTIVA de la visita (suma de los tramos del recorrido, sin huecos ni la noche entre dos días si el parte se reabrió); «visita.duracionBrutaMin» es el tiempo de reloj entre el inicio y el fin, que puede estar inflado si el parte se reanudó otro día.",
           "«visita.ubicacionEstado»: ok (hay posiciones), denegada (sin permiso de ubicación o el técnico eligió seguir sin ella) o sin_senal (con permiso, pero no llegó ninguna posición). «visita.wakeLock» dice si la app consiguió mantener la pantalla encendida.",
           "En audios y vídeos, «gpsInicio» es dónde empezó la grabación y «gps» dónde terminó.",
           "Un punto con «reconstruido: true» sale de un parte de la versión 2.1, que no guardaba recorrido: se ha rehecho con las posiciones de sus respuestas, adjuntos, notas y elementos.",
-          "mapa.geojson reúne todo lo geolocalizado del parte para abrirlo en un visor de mapas (QGIS, geojson.io, Power BI): puntos de respuesta, adjunto, nota y elemento; la línea del recorrido por tramos (capa recorrido) y los puntos de la traza que no son eventos (capa traza)."
+          "mapa.geojson reúne todo lo geolocalizado del parte para abrirlo en un visor de mapas (QGIS, geojson.io, Power BI): puntos de respuesta, adjunto, nota y elemento; la línea del recorrido por tramos (capa recorrido) y los puntos de la traza que no son eventos (capa traza). Como GeoJSON no admite datos por vértice, cada línea de la capa recorrido lleva en «properties.vertices» un array alineado con sus coordenadas, con «id», «t» (hora), «tipo», «ref», «modo» y «edadS» de cada vértice; los puntos de la capa traza llevan también «id» y «modo»."
         ],
         gravedades: {
           no_conforme: "incumple; es una carencia del servicio actual o del estado del centro",
@@ -2686,7 +2832,8 @@
         tecnico: parte.cabecera.tecnico || "",
         inicio: parte.inicio,
         fin: parte.fin,
-        duracionMin: dur,
+        duracionMin: durActiva != null ? durActiva : dur,
+        duracionBrutaMin: dur,
         ubicacionEstado: ubicacionEstado,
         wakeLock: !!parte.wakeLock,
         avisoUbicacion: parte.avisoUbicacion || null
@@ -2704,6 +2851,9 @@
         puntosTraza: traza.length,
         trazaReconstruida: tz.reconstruida,
         distanciaM: rec.distanciaM,
+        distanciaPieM: rec.distanciaPieM,
+        distanciaVehiculoM: rec.distanciaVehiculoM,
+        duracionActivaMin: durActiva,
         tramos: rec.tramos.length,
         huecos: rec.huecos
       },
@@ -2856,13 +3006,23 @@
       F.push({
         type: "Feature",
         geometry: { type: "LineString", coordinates: tr.puntos.map(function (p) { return [p.lon, p.lat]; }) },
-        properties: { capa: "recorrido", tramo: i + 1, inicio: tr.inicio, fin: tr.fin, puntos: tr.puntos.length, distanciaM: tr.distanciaM }
+        properties: {
+          capa: "recorrido", tramo: i + 1, inicio: tr.inicio, fin: tr.fin,
+          puntos: tr.puntos.length, distanciaM: tr.distanciaM,
+          distanciaPieM: tr.distanciaPieM, distanciaVehiculoM: tr.distanciaVehiculoM,
+          // id, hora y tipo de cada vértice, en el mismo orden que «coordinates» (GeoJSON no deja
+          // propiedades por vértice dentro de la geometría, así que van aquí en paralelo).
+          vertices: tr.puntos.map(function (p) {
+            return { id: p.id || null, t: p.t, tipo: p.tipo, ref: p.ref || null, modo: p.modo || null, edadS: p.edadS, precisionM: p.precisionM };
+          })
+        }
       });
     });
     // Los puntos de la traza que no son eventos (los eventos ya están arriba como respuesta, adjunto, nota o elemento).
     (j.traza || []).forEach(function (p) {
       if (p.tipo === "evento") return;
-      var pr = { capa: "traza", tipo: p.tipo, t: p.t, precisionM: p.precisionM, edadS: p.edadS };
+      var pr = { capa: "traza", id: p.id || null, tipo: p.tipo, t: p.t, precisionM: p.precisionM, edadS: p.edadS };
+      if (p.modo) pr.modo = p.modo;
       if (p.motivo) pr.motivo = p.motivo;
       if (p.reconstruido) pr.reconstruido = true;
       F.push({ type: "Feature", geometry: { type: "Point", coordinates: [p.lon, p.lat] }, properties: pr });
