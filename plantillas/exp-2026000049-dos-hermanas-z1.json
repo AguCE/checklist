@@ -638,9 +638,3 @@
     ]
   }
 }
-
-## Registro de ejecucion
-<!-- victoria:registro fase=05 skill=checklist-campo version=0.3.0 -->
-| Skill | Version | Inicio | Fin | Duracion |
-|---|---|---|---|---|
-| checklist-campo | 0.3.0 | 2026-10-22 06:59:08 | 2026-10-22 10:46:23 | 3 h 47 m 15 s |
