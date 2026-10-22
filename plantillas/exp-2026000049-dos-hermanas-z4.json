@@ -1,0 +1,640 @@
+{
+  "id": "exp-2026000049-dos-hermanas-z4",
+  "version": 1,
+  "nombre": "Dos Hermanas · Pabellón de los Montecillos (2026000049)",
+  "requiereApp": "2.0",
+  "origen": {
+    "generadoDesde": "checklist-dos-hermanas-v3.xlsx",
+    "skill": "checklist-campo",
+    "convertidoEl": "2026-10-22"
+  },
+  "expediente": {
+    "codigo": "2026000049",
+    "objeto": "Plan Impulsa Deportes — toma de datos para la valoración económica",
+    "lote": "único",
+    "organismo": "Ayuntamiento de Dos Hermanas — Delegación de Deportes"
+  },
+  "centro": {
+    "nombre": "Dos Hermanas — Pabellón de los Montecillos",
+    "direccion": "Dos Hermanas (Sevilla)",
+    "zona": 4
+  },
+  "cabecera": [
+    {
+      "id": "tecnico",
+      "etiqueta": "Técnico",
+      "tipo": "texto",
+      "requerido": true
+    },
+    {
+      "id": "fecha",
+      "etiqueta": "Fecha",
+      "tipo": "fecha"
+    },
+    {
+      "id": "acompanante",
+      "etiqueta": "Acompañado por",
+      "tipo": "texto"
+    },
+    {
+      "id": "visita",
+      "etiqueta": "Tipo de visita",
+      "tipo": "opcion",
+      "opciones": [
+        "Recorrido de comprobación",
+        "Visita técnica previa",
+        "Incidencia"
+      ]
+    }
+  ],
+  "escala": [
+    {
+      "v": "ok",
+      "l": "Bien",
+      "peso": 1,
+      "tono": "ok",
+      "significado": "cumple lo exigido"
+    },
+    {
+      "v": "mej",
+      "l": "Mejorable",
+      "peso": 0.5,
+      "tono": "warn",
+      "significado": "cumple con deficiencias"
+    },
+    {
+      "v": "nc",
+      "l": "No conforme",
+      "peso": 0,
+      "tono": "bad",
+      "significado": "no cumple"
+    },
+    {
+      "v": "na",
+      "l": "N/A",
+      "peso": null,
+      "tono": "na",
+      "significado": "no aplica; no puntúa"
+    }
+  ],
+  "secciones": [
+    {
+      "id": "uso-y-accesos",
+      "titulo": "Uso y accesos",
+      "preguntas": [
+        {
+          "id": "q001",
+          "enunciado": "Espacios de la instalación",
+          "tipo": "opcion_multiple",
+          "opciones": [
+            "Pabellón cubierto",
+            "Campo de césped artificial",
+            "Campo de césped natural",
+            "Pista de atletismo",
+            "Pistas exteriores",
+            "Pádel o tenis",
+            "Piscina",
+            "Gimnasio o salas",
+            "Gradas"
+          ],
+          "requerido": true,
+          "ayuda": "Marca todos los que haya. Las preguntas de césped, piscina o canastas que no apliquen se contestan con «No aplica».",
+          "mapea_a": "1. Cuadrante operativo y dotación por turno (7.1)"
+        },
+        {
+          "id": "q002",
+          "enunciado": "Accesos de usuarios abiertos a la vez en hora punta",
+          "tipo": "numero",
+          "requerido": true,
+          "unidad": "ud",
+          "ayuda": "Cada acceso abierto que haya que atender condiciona el cuadrante.",
+          "mapea_a": "1. Cuadrante operativo y dotación por turno (7.1)"
+        },
+        {
+          "id": "q003",
+          "enunciado": "¿Cómo se controla hoy el acceso?",
+          "tipo": "opcion",
+          "opciones": [
+            "Mostrador con personal",
+            "Torno o tarjeta",
+            "Sin control fijo",
+            "Mixto"
+          ],
+          "requerido": true,
+          "mapea_a": "1. Cuadrante operativo y dotación por turno (7.1)"
+        },
+        {
+          "id": "q004",
+          "enunciado": "Tareas de mantenimiento que hoy se hacen por la mañana (reparar, regar, cortar, limpiezas a fondo)",
+          "tipo": "texto",
+          "largo": true,
+          "ayuda": "Pregúntalo al personal municipal. Por la tarde predomina el montaje y la atención al usuario: ayuda a decidir los perfiles de cada franja.",
+          "mapea_a": "2. Perfiles por franja y personal con discapacidad (7.2)"
+        }
+      ]
+    },
+    {
+      "id": "agua-caliente-y-legionel",
+      "titulo": "Agua caliente y legionela",
+      "preguntas": [
+        {
+          "id": "q005",
+          "enunciado": "Producción de agua caliente sanitaria",
+          "tipo": "opcion_multiple",
+          "opciones": [
+            "Caldera de gas",
+            "Caldera de gasóleo",
+            "Aerotermia",
+            "Placas solares térmicas",
+            "Termos eléctricos",
+            "Sin agua caliente"
+          ],
+          "requerido": true,
+          "ayuda": "Puede haber varias a la vez. Haz una foto de cada equipo como Elemento de interés.",
+          "mapea_a": "3. Legionela: control diario, equipos de medida y empresa externa (7.3)"
+        },
+        {
+          "id": "q006",
+          "enunciado": "Acumuladores y depósitos de agua",
+          "tipo": "numero",
+          "requerido": true,
+          "unidad": "ud",
+          "ayuda": "Cada uno entra en el control de legionela y en el presupuesto de la empresa externa.",
+          "mapea_a": "3. Legionela: control diario, equipos de medida y empresa externa (7.3)"
+        },
+        {
+          "id": "q007",
+          "enunciado": "¿Tiene la instalación plan de legionela con mapa de puntos de control?",
+          "tipo": "opcion",
+          "opciones": [
+            "Sí, lo he visto",
+            "Dicen que sí, no lo he visto",
+            "No",
+            "No consta"
+          ],
+          "requerido": true,
+          "ayuda": "El plan lo hace la propiedad (Ayuntamiento). Pide verlo y fotografía el mapa.",
+          "mapea_a": "3. Legionela: control diario, equipos de medida y empresa externa (7.3)"
+        },
+        {
+          "id": "q008",
+          "enunciado": "Puntos de control diario del circuito (temperatura, pH, cloro)",
+          "tipo": "numero",
+          "requerido": true,
+          "unidad": "ud",
+          "ayuda": "Del mapa del plan. Marca el tiempo diario que exige el control a primera hora.",
+          "mapea_a": "3. Legionela: control diario, equipos de medida y empresa externa (7.3)"
+        },
+        {
+          "id": "q009",
+          "enunciado": "¿Quién hace hoy los registros diarios?",
+          "tipo": "opcion",
+          "opciones": [
+            "Personal municipal",
+            "Empresa externa",
+            "Nadie de forma regular",
+            "No consta"
+          ],
+          "requerido": true,
+          "mapea_a": "3. Legionela: control diario, equipos de medida y empresa externa (7.3)"
+        },
+        {
+          "id": "q010",
+          "enunciado": "Equipos de medida que hay en la instalación",
+          "tipo": "opcion_multiple",
+          "opciones": [
+            "Fotómetro",
+            "Turbidímetro",
+            "Termómetro de contacto",
+            "Ninguno"
+          ],
+          "requerido": true,
+          "ayuda": "Si faltan, UNEI tendría que dotar fotómetro y turbidímetro (unos 700-800 € por instalación).",
+          "mapea_a": "3. Legionela: control diario, equipos de medida y empresa externa (7.3)"
+        },
+        {
+          "id": "q011",
+          "enunciado": "Empresa externa de legionela (analíticas y tratamientos): nombre, frecuencia y quién la paga",
+          "tipo": "texto",
+          "requerido": true,
+          "ayuda": "Pregúntalo. Si el contrato es como el de piscinas, la contrataría UNEI.",
+          "mapea_a": "3. Legionela: control diario, equipos de medida y empresa externa (7.3)"
+        }
+      ]
+    },
+    {
+      "id": "climatizacion-energia-y-",
+      "titulo": "Climatización, energía y mantenimientos reglamentarios",
+      "preguntas": [
+        {
+          "id": "q012",
+          "enunciado": "Equipos de climatización, ventilación y energía",
+          "tipo": "opcion_multiple",
+          "opciones": [
+            "Splits",
+            "Cassettes o equipos centrales",
+            "Climatizadoras",
+            "Ventilación forzada",
+            "Placas fotovoltaicas",
+            "Ninguno"
+          ],
+          "requerido": true,
+          "ayuda": "Fotografía la placa de cada equipo como Elemento de interés.",
+          "mapea_a": "4. Mantenimiento reglamentario y subcontratas: RITE, climatización, solar, PCI, DEA, equipos motorizados (7.4)"
+        },
+        {
+          "id": "q013",
+          "enunciado": "Número de equipos de climatización y ventilación",
+          "tipo": "numero",
+          "unidad": "ud",
+          "ayuda": "Para pedir presupuesto de mantenimiento RITE.",
+          "mapea_a": "4. Mantenimiento reglamentario y subcontratas: RITE, climatización, solar, PCI, DEA, equipos motorizados (7.4)"
+        },
+        {
+          "id": "q014",
+          "enunciado": "Otros equipos con mantenimiento obligatorio u oneroso",
+          "tipo": "opcion_multiple",
+          "opciones": [
+            "Grupo de presión",
+            "Canastas motorizadas o colgantes",
+            "Desfibrilador (DEA)",
+            "Extintores y BIE",
+            "Alarma o CCTV",
+            "Ascensor o plataforma",
+            "Riego automático",
+            "Sala de filtros"
+          ],
+          "requerido": true,
+          "ayuda": "Las canastas colgantes tienen motor y su mantenimiento sería de UNEI.",
+          "mapea_a": "4. Mantenimiento reglamentario y subcontratas: RITE, climatización, solar, PCI, DEA, equipos motorizados (7.4)"
+        },
+        {
+          "id": "q015",
+          "enunciado": "¿Quién mantiene hoy cada equipo y quién lo paga?",
+          "tipo": "texto",
+          "largo": true,
+          "requerido": true,
+          "ayuda": "Empresa, frecuencia y si es contrato centralizado del Ayuntamiento. Fotografía las pegatinas de revisión.",
+          "mapea_a": "4. Mantenimiento reglamentario y subcontratas: RITE, climatización, solar, PCI, DEA, equipos motorizados (7.4)"
+        },
+        {
+          "id": "q016",
+          "enunciado": "¿Está el DEA dado de alta en la Junta y con revisión anual al día?",
+          "tipo": "opcion",
+          "opciones": [
+            "Sí",
+            "No",
+            "No hay DEA",
+            "No consta"
+          ],
+          "ayuda": "El pliego solo exige formación en su uso, pero conviene saber si el mantenimiento podría recaer en UNEI.",
+          "mapea_a": "4. Mantenimiento reglamentario y subcontratas: RITE, climatización, solar, PCI, DEA, equipos motorizados (7.4)"
+        }
+      ]
+    },
+    {
+      "id": "pavimentos-limpieza-y-pr",
+      "titulo": "Pavimentos, limpieza y productos",
+      "preguntas": [
+        {
+          "id": "q017",
+          "enunciado": "Pavimentos que hay que limpiar",
+          "tipo": "opcion_multiple",
+          "opciones": [
+            "Madera o parqué",
+            "PVC o sintético de pista",
+            "Terrazo o gres",
+            "Hormigón",
+            "Césped artificial",
+            "Tartán"
+          ],
+          "requerido": true,
+          "ayuda": "El pavimento decide la máquina y el producto: madera y PVC no admiten productos agresivos.",
+          "mapea_a": "8. Productos de limpieza y fungibles (7.8)"
+        },
+        {
+          "id": "q018",
+          "enunciado": "¿Necesita algún pavimento productos específicos?",
+          "tipo": "opcion",
+          "opciones": [
+            "No",
+            "Sí (anótalo en nota)",
+            "No consta"
+          ],
+          "requerido": true,
+          "ayuda": "Si es así, anota marca y producto: suelen ser más caros que los convencionales.",
+          "mapea_a": "8. Productos de limpieza y fungibles (7.8)"
+        },
+        {
+          "id": "q019",
+          "enunciado": "¿Quién pone hoy los productos de limpieza y los fungibles (papel, jabón)?",
+          "tipo": "opcion",
+          "opciones": [
+            "Ayuntamiento",
+            "Empresa actual",
+            "Mixto",
+            "No consta"
+          ],
+          "requerido": true,
+          "ayuda": "En las piscinas los pone el Ayuntamiento. Si aquí también, la partida es casi solo mano de obra.",
+          "mapea_a": "8. Productos de limpieza y fungibles (7.8)"
+        },
+        {
+          "id": "q020",
+          "enunciado": "Número de vestuarios",
+          "tipo": "numero",
+          "requerido": true,
+          "unidad": "ud",
+          "mapea_a": "8. Productos de limpieza y fungibles (7.8)"
+        },
+        {
+          "id": "q021",
+          "enunciado": "Número de piezas sanitarias (inodoros, urinarios, lavabos y duchas)",
+          "tipo": "numero",
+          "requerido": true,
+          "unidad": "ud",
+          "ayuda": "Base del consumo de fungibles.",
+          "mapea_a": "8. Productos de limpieza y fungibles (7.8)"
+        },
+        {
+          "id": "q022",
+          "enunciado": "Maquinaria de limpieza municipal en la instalación",
+          "tipo": "opcion_multiple",
+          "opciones": [
+            "Fregadora de conductor sentado",
+            "Fregadora de empuje",
+            "Barredora",
+            "Aspiradora industrial",
+            "Ninguna"
+          ],
+          "requerido": true,
+          "ayuda": "Lo que no haya, lo pone UNEI (la fregadora de pabellón es la pieza cara).",
+          "mapea_a": "9. Vehículos, maquinaria y herramienta (7.9)"
+        },
+        {
+          "id": "q023",
+          "enunciado": "Estado de esa maquinaria",
+          "tipo": "escala",
+          "ayuda": "Si está mal, cuenta como si no existiera.",
+          "mapea_a": "9. Vehículos, maquinaria y herramienta (7.9)"
+        }
+      ]
+    },
+    {
+      "id": "cesped-y-zonas-verdes",
+      "titulo": "Césped y zonas verdes",
+      "preguntas": [
+        {
+          "id": "q024",
+          "enunciado": "Superficie de césped artificial",
+          "tipo": "numero",
+          "unidad": "m2",
+          "ayuda": "Aproximada. Cepillado mínimo dos veces por semana.",
+          "mapea_a": "5. Césped artificial y zonas verdes (7.5)"
+        },
+        {
+          "id": "q025",
+          "enunciado": "Maquinaria para el césped que hay en la instalación",
+          "tipo": "opcion_multiple",
+          "opciones": [
+            "Cepillo de arrastre",
+            "Cepilladora",
+            "Recebadora",
+            "Ninguna"
+          ],
+          "requerido": true,
+          "mapea_a": "5. Césped artificial y zonas verdes (7.5)"
+        },
+        {
+          "id": "q026",
+          "enunciado": "Descompactación: quién la hace, cada cuánto y cuándo fue la última",
+          "tipo": "texto",
+          "ayuda": "Suele subcontratarse una vez al año o cada dos.",
+          "mapea_a": "5. Césped artificial y zonas verdes (7.5)"
+        },
+        {
+          "id": "q027",
+          "enunciado": "¿Hay césped natural o zonas verdes que segar y regar?",
+          "tipo": "opcion",
+          "opciones": [
+            "No",
+            "Sí, poco",
+            "Sí, bastante"
+          ],
+          "requerido": true,
+          "ayuda": "Implica cortacésped o desbrozadora y horas de mañana.",
+          "mapea_a": "5. Césped artificial y zonas verdes (7.5)"
+        }
+      ]
+    },
+    {
+      "id": "diagnostico-inicial",
+      "titulo": "Diagnóstico inicial",
+      "preguntas": [
+        {
+          "id": "q028",
+          "enunciado": "Estado general de las instalaciones técnicas (agua, climatización, electricidad)",
+          "tipo": "escala",
+          "requerido": true,
+          "ayuda": "Es el acta de entrega: lo que esté roto antes de empezar no debe pagarlo UNEI.",
+          "mapea_a": "10. Diagnóstico inicial y riesgo de reposición"
+        },
+        {
+          "id": "q029",
+          "enunciado": "Equipos o elementos fuera de servicio",
+          "tipo": "escala",
+          "requerido": true,
+          "ayuda": "Regístralos uno a uno como «Deficiencia previa», con foto.",
+          "mapea_a": "10. Diagnóstico inicial y riesgo de reposición"
+        },
+        {
+          "id": "q030",
+          "enunciado": "Estado de vestuarios y aseos (grifería, fluxores, cisternas, taquillas)",
+          "tipo": "escala",
+          "requerido": true,
+          "ayuda": "Fluxores: pulsadores de descarga. Anota si son antivandálicos.",
+          "mapea_a": "10. Diagnóstico inicial y riesgo de reposición"
+        },
+        {
+          "id": "q031",
+          "enunciado": "Deficiencias que hay que dejar por escrito antes de empezar",
+          "tipo": "texto",
+          "largo": true,
+          "ayuda": "Lo que pondríamos en el acta de entrega.",
+          "mapea_a": "10. Diagnóstico inicial y riesgo de reposición"
+        }
+      ]
+    },
+    {
+      "id": "herramienta-almacen-y-lo",
+      "titulo": "Herramienta, almacén y logística",
+      "preguntas": [
+        {
+          "id": "q032",
+          "enunciado": "Herramienta y repuestos que hay hoy en la instalación",
+          "tipo": "opcion_multiple",
+          "opciones": [
+            "Herramienta de fontanería",
+            "Herramienta eléctrica",
+            "Escaleras",
+            "Stock de lámparas",
+            "Stock de grifería y cisternas",
+            "Pintura",
+            "Nada"
+          ],
+          "requerido": true,
+          "ayuda": "Lo que falte lo pone UNEI.",
+          "mapea_a": "9. Vehículos, maquinaria y herramienta (7.9)"
+        },
+        {
+          "id": "q033",
+          "enunciado": "¿Hay trabajos en altura (luminarias de pista, cristales)?",
+          "tipo": "opcion",
+          "opciones": [
+            "No",
+            "Sí, con escalera",
+            "Sí, con plataforma o andamio",
+            "Lo hace otra empresa"
+          ],
+          "requerido": true,
+          "ayuda": "Plataforma o andamio: alquiler o subcontrata.",
+          "mapea_a": "9. Vehículos, maquinaria y herramienta (7.9)"
+        },
+        {
+          "id": "q034",
+          "enunciado": "Espacio para guardar material y máquinas de UNEI",
+          "tipo": "escala",
+          "requerido": true,
+          "ayuda": "Con llave y separado del material municipal.",
+          "mapea_a": "9. Vehículos, maquinaria y herramienta (7.9)"
+        },
+        {
+          "id": "q035",
+          "enunciado": "Aparcamiento para las furgonetas del servicio",
+          "tipo": "opcion",
+          "opciones": [
+            "Dentro del recinto",
+            "En la calle, fácil",
+            "Difícil"
+          ],
+          "mapea_a": "9. Vehículos, maquinaria y herramienta (7.9)"
+        }
+      ]
+    },
+    {
+      "id": "valoracion-global",
+      "titulo": "Valoración global",
+      "preguntas": [
+        {
+          "id": "q048",
+          "enunciado": "Impresión general: ¿cuánto coste no previsto intuyes en esta instalación?",
+          "tipo": "escala",
+          "ayuda": "Tu valoración de conjunto de la zona; cuenta en el cumplimiento.",
+          "mapea_a": "11. Otros costes no previstos (7.10)"
+        },
+        {
+          "id": "q049",
+          "enunciado": "Principales costes no previstos detectados",
+          "tipo": "texto",
+          "largo": true,
+          "mapea_a": "11. Otros costes no previstos (7.10)"
+        },
+        {
+          "id": "q050",
+          "enunciado": "Dificultad del servicio en esta instalación",
+          "tipo": "opcion",
+          "opciones": [
+            "Baja",
+            "Media",
+            "Alta"
+          ],
+          "mapea_a": "1. Cuadrante operativo y dotación por turno (7.1)"
+        },
+        {
+          "id": "q051",
+          "enunciado": "Observaciones para el cuadrante y la valoración económica",
+          "tipo": "texto",
+          "largo": true,
+          "mapea_a": "ECE-01"
+        }
+      ]
+    }
+  ],
+  "elementos": {
+    "titulo": "Elementos de interés",
+    "ayuda": "Crea un elemento por cada cosa concreta que merezca quedar registrada: una papelera rota, un árbol con el alcorque sucio, una pintada, un punto negro. Foto, una línea de texto y la ubicación se guarda sola.",
+    "estado": true,
+    "tipos": [
+      {
+        "v": "caldera",
+        "l": "Caldera o aerotermia",
+        "mapea_a": "4. Mantenimiento reglamentario y subcontratas: RITE, climatización, solar, PCI, DEA, equipos motorizados (7.4)"
+      },
+      {
+        "v": "acumulador",
+        "l": "Acumulador o depósito de agua",
+        "mapea_a": "3. Legionela: control diario, equipos de medida y empresa externa (7.3)"
+      },
+      {
+        "v": "solar",
+        "l": "Placas solares o fotovoltaica",
+        "mapea_a": "4. Mantenimiento reglamentario y subcontratas: RITE, climatización, solar, PCI, DEA, equipos motorizados (7.4)"
+      },
+      {
+        "v": "clima",
+        "l": "Climatización o ventilación",
+        "mapea_a": "4. Mantenimiento reglamentario y subcontratas: RITE, climatización, solar, PCI, DEA, equipos motorizados (7.4)"
+      },
+      {
+        "v": "grupo_presion",
+        "l": "Grupo de presión o bomba",
+        "mapea_a": "4. Mantenimiento reglamentario y subcontratas: RITE, climatización, solar, PCI, DEA, equipos motorizados (7.4)"
+      },
+      {
+        "v": "canasta",
+        "l": "Canasta motorizada o equipo con motor",
+        "mapea_a": "4. Mantenimiento reglamentario y subcontratas: RITE, climatización, solar, PCI, DEA, equipos motorizados (7.4)"
+      },
+      {
+        "v": "dea_pci",
+        "l": "DEA, extintor o BIE",
+        "mapea_a": "4. Mantenimiento reglamentario y subcontratas: RITE, climatización, solar, PCI, DEA, equipos motorizados (7.4)"
+      },
+      {
+        "v": "cuadro",
+        "l": "Cuadro eléctrico o iluminación de pista",
+        "mapea_a": "4. Mantenimiento reglamentario y subcontratas: RITE, climatización, solar, PCI, DEA, equipos motorizados (7.4)"
+      },
+      {
+        "v": "riego",
+        "l": "Riego o zona de césped",
+        "mapea_a": "5. Césped artificial y zonas verdes (7.5)"
+      },
+      {
+        "v": "maquinaria",
+        "l": "Maquinaria municipal aprovechable",
+        "mapea_a": "9. Vehículos, maquinaria y herramienta (7.9)"
+      },
+      {
+        "v": "medio_falta",
+        "l": "Medio que tendrá que poner UNEI",
+        "mapea_a": "9. Vehículos, maquinaria y herramienta (7.9)"
+      },
+      {
+        "v": "pavimento",
+        "l": "Pavimento que exige producto o máquina específica",
+        "mapea_a": "8. Productos de limpieza y fungibles (7.8)"
+      },
+      {
+        "v": "deficiencia",
+        "l": "Deficiencia previa (acta de entrega)",
+        "mapea_a": "10. Diagnóstico inicial y riesgo de reposición"
+      },
+      {
+        "v": "otro",
+        "l": "Otro con coste",
+        "mapea_a": "11. Otros costes no previstos (7.10)"
+      }
+    ]
+  }
+}

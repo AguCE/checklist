@@ -1,0 +1,328 @@
+{
+  "id": "exp-2026000049-dos-hermanas-general",
+  "version": 1,
+  "nombre": "Dos Hermanas · Entrevista con la Delegación de Deportes (2026000049)",
+  "requiereApp": "2.0",
+  "origen": {
+    "generadoDesde": "checklist-dos-hermanas-v3.xlsx",
+    "skill": "checklist-campo",
+    "convertidoEl": "2026-10-22"
+  },
+  "expediente": {
+    "codigo": "2026000049",
+    "objeto": "Plan Impulsa Deportes — toma de datos para la valoración económica",
+    "lote": "único",
+    "organismo": "Ayuntamiento de Dos Hermanas — Delegación de Deportes"
+  },
+  "centro": {
+    "nombre": "Dos Hermanas — Entrevista con la Delegación de Deportes",
+    "direccion": "Dos Hermanas (Sevilla)"
+  },
+  "cabecera": [
+    {
+      "id": "tecnico",
+      "etiqueta": "Técnico",
+      "tipo": "texto",
+      "requerido": true
+    },
+    {
+      "id": "fecha",
+      "etiqueta": "Fecha",
+      "tipo": "fecha"
+    },
+    {
+      "id": "acompanante",
+      "etiqueta": "Acompañado por",
+      "tipo": "texto"
+    },
+    {
+      "id": "visita",
+      "etiqueta": "Tipo de visita",
+      "tipo": "opcion",
+      "opciones": [
+        "Recorrido de comprobación",
+        "Visita técnica previa",
+        "Incidencia"
+      ]
+    }
+  ],
+  "escala": [
+    {
+      "v": "ok",
+      "l": "Bien",
+      "peso": 1,
+      "tono": "ok",
+      "significado": "cumple lo exigido"
+    },
+    {
+      "v": "mej",
+      "l": "Mejorable",
+      "peso": 0.5,
+      "tono": "warn",
+      "significado": "cumple con deficiencias"
+    },
+    {
+      "v": "nc",
+      "l": "No conforme",
+      "peso": 0,
+      "tono": "bad",
+      "significado": "no cumple"
+    },
+    {
+      "v": "na",
+      "l": "N/A",
+      "peso": null,
+      "tono": "na",
+      "significado": "no aplica; no puntúa"
+    }
+  ],
+  "secciones": [
+    {
+      "id": "entrevista-con-la-delega",
+      "titulo": "Entrevista con la Delegación de Deportes",
+      "preguntas": [
+        {
+          "id": "q036",
+          "enunciado": "Eventos al año: cuántos, en qué meses y dónde (instalaciones, vía pública, parques)",
+          "tipo": "texto",
+          "largo": true,
+          "requerido": true,
+          "ayuda": "Bolsa del pliego: 1.092 h de oficial y 3.276 h de peón al año. Pide el calendario del último año.",
+          "mapea_a": "6. Eventos y refuerzos: bolsa de horas (7.6)"
+        },
+        {
+          "id": "q037",
+          "enunciado": "Dotación típica que piden por evento y con cuánta antelación avisan",
+          "tipo": "texto",
+          "requerido": true,
+          "ayuda": "Ejemplo: media maratón con 2 oficiales y 5 peones, avisada con 15 días.",
+          "mapea_a": "6. Eventos y refuerzos: bolsa de horas (7.6)"
+        },
+        {
+          "id": "q038",
+          "enunciado": "¿Las horas de eventos se planifican en turnos fijos o se piden como bolsa?",
+          "tipo": "opcion",
+          "opciones": [
+            "Bolsa a demanda",
+            "Turnos fijos",
+            "Mixto",
+            "No lo saben aún"
+          ],
+          "requerido": true,
+          "ayuda": "Si es bolsa, se cubre con correturnos de jornada irregular, no quitando personal de una instalación.",
+          "mapea_a": "6. Eventos y refuerzos: bolsa de horas (7.6)"
+        },
+        {
+          "id": "q039",
+          "enunciado": "Días del año en que cierran las instalaciones (1 de enero, 25 de diciembre, fiestas locales)",
+          "tipo": "texto",
+          "requerido": true,
+          "ayuda": "El pliego cuenta 52 semanas completas: confirma si se abre los 365 días.",
+          "mapea_a": "7. Festivos y calendario de apertura (7.7)"
+        },
+        {
+          "id": "q040",
+          "enunciado": "Horario en festivos entre semana",
+          "tipo": "opcion",
+          "opciones": [
+            "Horario de domingo",
+            "Horario de sábado",
+            "Horario normal",
+            "Cerrado",
+            "Depende del festivo"
+          ],
+          "requerido": true,
+          "mapea_a": "7. Festivos y calendario de apertura (7.7)"
+        },
+        {
+          "id": "q041",
+          "enunciado": "¿Quién pondrá los productos de limpieza y los fungibles en este contrato?",
+          "tipo": "opcion",
+          "opciones": [
+            "Ayuntamiento",
+            "Adjudicatario",
+            "No lo saben"
+          ],
+          "requerido": true,
+          "ayuda": "El pliego no lo dice.",
+          "mapea_a": "8. Productos de limpieza y fungibles (7.8)"
+        },
+        {
+          "id": "q042",
+          "enunciado": "Legionela: ¿la empresa externa la contrata el Ayuntamiento o la tendría que contratar UNEI, como en piscinas?",
+          "tipo": "opcion",
+          "opciones": [
+            "Ayuntamiento",
+            "Adjudicatario",
+            "No lo saben"
+          ],
+          "requerido": true,
+          "mapea_a": "3. Legionela: control diario, equipos de medida y empresa externa (7.3)"
+        },
+        {
+          "id": "q043",
+          "enunciado": "Mantenimientos reglamentarios (RITE, PCI, DEA, ascensores): ¿contrato centralizado del Ayuntamiento?",
+          "tipo": "opcion",
+          "opciones": [
+            "Sí, todos",
+            "Algunos (anótalos)",
+            "No, los asume el adjudicatario",
+            "No lo saben"
+          ],
+          "requerido": true,
+          "mapea_a": "4. Mantenimiento reglamentario y subcontratas: RITE, climatización, solar, PCI, DEA, equipos motorizados (7.4)"
+        },
+        {
+          "id": "q044",
+          "enunciado": "Materiales de reparación (grifos, lámparas, cisternas, pintura): ¿los compra siempre la Delegación?",
+          "tipo": "opcion",
+          "opciones": [
+            "Siempre la Delegación",
+            "La Delegación, salvo pequeño material",
+            "No está claro"
+          ],
+          "requerido": true,
+          "ayuda": "El pliego dice que la Delegación compra lo que se repone y UNEI pone herramientas y útiles.",
+          "mapea_a": "9. Vehículos, maquinaria y herramienta (7.9)"
+        },
+        {
+          "id": "q045",
+          "enunciado": "Maquinaria que pondrá la Delegación a disposición del contrato",
+          "tipo": "texto",
+          "ayuda": "Fregadoras, cepillos de césped, escaleras, vehículos.",
+          "mapea_a": "9. Vehículos, maquinaria y herramienta (7.9)"
+        },
+        {
+          "id": "q046",
+          "enunciado": "Requisitos de uniformidad: prendas, cantidades y renovación",
+          "tipo": "texto",
+          "ayuda": "El estudio del Ayuntamiento solo calcula 70 € por persona y año.",
+          "mapea_a": "9. Vehículos, maquinaria y herramienta (7.9)"
+        },
+        {
+          "id": "q047",
+          "enunciado": "¿Algo que suelan olvidar las empresas en este tipo de servicio?",
+          "tipo": "texto",
+          "largo": true,
+          "ayuda": "Pregunta abierta para el 7.10.",
+          "mapea_a": "11. Otros costes no previstos (7.10)"
+        }
+      ]
+    },
+    {
+      "id": "valoracion-global",
+      "titulo": "Valoración global",
+      "preguntas": [
+        {
+          "id": "q048",
+          "enunciado": "Impresión general: ¿cuánto coste no previsto intuyes en esta instalación?",
+          "tipo": "escala",
+          "ayuda": "Tu valoración de conjunto de la zona; cuenta en el cumplimiento.",
+          "mapea_a": "11. Otros costes no previstos (7.10)"
+        },
+        {
+          "id": "q049",
+          "enunciado": "Principales costes no previstos detectados",
+          "tipo": "texto",
+          "largo": true,
+          "mapea_a": "11. Otros costes no previstos (7.10)"
+        },
+        {
+          "id": "q050",
+          "enunciado": "Dificultad del servicio en esta instalación",
+          "tipo": "opcion",
+          "opciones": [
+            "Baja",
+            "Media",
+            "Alta"
+          ],
+          "mapea_a": "1. Cuadrante operativo y dotación por turno (7.1)"
+        },
+        {
+          "id": "q051",
+          "enunciado": "Observaciones para el cuadrante y la valoración económica",
+          "tipo": "texto",
+          "largo": true,
+          "mapea_a": "ECE-01"
+        }
+      ]
+    }
+  ],
+  "elementos": {
+    "titulo": "Elementos de interés",
+    "ayuda": "Crea un elemento por cada cosa concreta que merezca quedar registrada: una papelera rota, un árbol con el alcorque sucio, una pintada, un punto negro. Foto, una línea de texto y la ubicación se guarda sola.",
+    "estado": true,
+    "tipos": [
+      {
+        "v": "caldera",
+        "l": "Caldera o aerotermia",
+        "mapea_a": "4. Mantenimiento reglamentario y subcontratas: RITE, climatización, solar, PCI, DEA, equipos motorizados (7.4)"
+      },
+      {
+        "v": "acumulador",
+        "l": "Acumulador o depósito de agua",
+        "mapea_a": "3. Legionela: control diario, equipos de medida y empresa externa (7.3)"
+      },
+      {
+        "v": "solar",
+        "l": "Placas solares o fotovoltaica",
+        "mapea_a": "4. Mantenimiento reglamentario y subcontratas: RITE, climatización, solar, PCI, DEA, equipos motorizados (7.4)"
+      },
+      {
+        "v": "clima",
+        "l": "Climatización o ventilación",
+        "mapea_a": "4. Mantenimiento reglamentario y subcontratas: RITE, climatización, solar, PCI, DEA, equipos motorizados (7.4)"
+      },
+      {
+        "v": "grupo_presion",
+        "l": "Grupo de presión o bomba",
+        "mapea_a": "4. Mantenimiento reglamentario y subcontratas: RITE, climatización, solar, PCI, DEA, equipos motorizados (7.4)"
+      },
+      {
+        "v": "canasta",
+        "l": "Canasta motorizada o equipo con motor",
+        "mapea_a": "4. Mantenimiento reglamentario y subcontratas: RITE, climatización, solar, PCI, DEA, equipos motorizados (7.4)"
+      },
+      {
+        "v": "dea_pci",
+        "l": "DEA, extintor o BIE",
+        "mapea_a": "4. Mantenimiento reglamentario y subcontratas: RITE, climatización, solar, PCI, DEA, equipos motorizados (7.4)"
+      },
+      {
+        "v": "cuadro",
+        "l": "Cuadro eléctrico o iluminación de pista",
+        "mapea_a": "4. Mantenimiento reglamentario y subcontratas: RITE, climatización, solar, PCI, DEA, equipos motorizados (7.4)"
+      },
+      {
+        "v": "riego",
+        "l": "Riego o zona de césped",
+        "mapea_a": "5. Césped artificial y zonas verdes (7.5)"
+      },
+      {
+        "v": "maquinaria",
+        "l": "Maquinaria municipal aprovechable",
+        "mapea_a": "9. Vehículos, maquinaria y herramienta (7.9)"
+      },
+      {
+        "v": "medio_falta",
+        "l": "Medio que tendrá que poner UNEI",
+        "mapea_a": "9. Vehículos, maquinaria y herramienta (7.9)"
+      },
+      {
+        "v": "pavimento",
+        "l": "Pavimento que exige producto o máquina específica",
+        "mapea_a": "8. Productos de limpieza y fungibles (7.8)"
+      },
+      {
+        "v": "deficiencia",
+        "l": "Deficiencia previa (acta de entrega)",
+        "mapea_a": "10. Diagnóstico inicial y riesgo de reposición"
+      },
+      {
+        "v": "otro",
+        "l": "Otro con coste",
+        "mapea_a": "11. Otros costes no previstos (7.10)"
+      }
+    ]
+  }
+}
