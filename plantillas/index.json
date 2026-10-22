@@ -1,5 +1,5 @@
 {
-  "actualizado": "2026-09-25",
+  "actualizado": "2026-10-22",
   "plantillas": [
     {
       "id": "exp-2026-014-l2-limp",
@@ -147,6 +147,84 @@
       },
       "centro": {
         "nombre": "Campillos — Servicio general, mercadillo y medios"
+      },
+      "version": 1
+    },
+    {
+      "id": "exp-2026000049-dos-hermanas-general",
+      "fichero": "exp-2026000049-dos-hermanas-general.json",
+      "nombre": "Dos Hermanas · Entrevista con la Delegación de Deportes (2026000049)",
+      "expediente": {
+        "codigo": "2026000049",
+        "lote": "único"
+      },
+      "centro": {
+        "nombre": "Dos Hermanas — Entrevista con la Delegación de Deportes"
+      },
+      "version": 1
+    },
+    {
+      "id": "exp-2026000049-dos-hermanas-z1",
+      "fichero": "exp-2026000049-dos-hermanas-z1.json",
+      "nombre": "Dos Hermanas · Estadio Miguel Román (2026000049)",
+      "expediente": {
+        "codigo": "2026000049",
+        "lote": "único"
+      },
+      "centro": {
+        "nombre": "Dos Hermanas — Estadio Miguel Román"
+      },
+      "version": 1
+    },
+    {
+      "id": "exp-2026000049-dos-hermanas-z2",
+      "fichero": "exp-2026000049-dos-hermanas-z2.json",
+      "nombre": "Dos Hermanas · Pabellón Entretorres (2026000049)",
+      "expediente": {
+        "codigo": "2026000049",
+        "lote": "único"
+      },
+      "centro": {
+        "nombre": "Dos Hermanas — Pabellón Entretorres"
+      },
+      "version": 1
+    },
+    {
+      "id": "exp-2026000049-dos-hermanas-z3",
+      "fichero": "exp-2026000049-dos-hermanas-z3.json",
+      "nombre": "Dos Hermanas · Polideportivo Ramón y Cajal (2026000049)",
+      "expediente": {
+        "codigo": "2026000049",
+        "lote": "único"
+      },
+      "centro": {
+        "nombre": "Dos Hermanas — Polideportivo Ramón y Cajal"
+      },
+      "version": 1
+    },
+    {
+      "id": "exp-2026000049-dos-hermanas-z4",
+      "fichero": "exp-2026000049-dos-hermanas-z4.json",
+      "nombre": "Dos Hermanas · Pabellón de los Montecillos (2026000049)",
+      "expediente": {
+        "codigo": "2026000049",
+        "lote": "único"
+      },
+      "centro": {
+        "nombre": "Dos Hermanas — Pabellón de los Montecillos"
+      },
+      "version": 1
+    },
+    {
+      "id": "exp-2026000049-dos-hermanas-z5",
+      "fichero": "exp-2026000049-dos-hermanas-z5.json",
+      "nombre": "Dos Hermanas · Estadio Manuel Utrilla (2026000049)",
+      "expediente": {
+        "codigo": "2026000049",
+        "lote": "único"
+      },
+      "centro": {
+        "nombre": "Dos Hermanas — Estadio Manuel Utrilla"
       },
       "version": 1
     }
