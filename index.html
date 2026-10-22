@@ -189,6 +189,21 @@
   .estado.pendiente { background: var(--warn-soft); color: var(--warn); }
   .estado.enviado { background: var(--ok-soft); color: var(--ok); }
   .estado.offline { background: var(--ok-soft); color: var(--ok); }
+  /* ---------- Grupos por expediente ---------- */
+  .grupo { border-bottom: 1px solid var(--line); }
+  .grupo:last-child { border-bottom: 0; }
+  .grupo > summary { list-style: none; cursor: pointer; display: flex; align-items: center; gap: 10px; padding: 11px 15px; background: var(--surface-2); }
+  .grupo > summary::-webkit-details-marker { display: none; }
+  .grupo > summary:focus-visible { outline: 2px solid var(--accent, currentColor); outline-offset: -2px; }
+  .grupo-chev { flex: none; width: 16px; height: 16px; fill: var(--ink-3); transition: transform .15s; }
+  .grupo[open] .grupo-chev { transform: rotate(90deg); }
+  .grupo-main { flex: 1; min-width: 0; }
+  .grupo-main strong { display: block; font-size: 14px; font-weight: 700; }
+  .grupo-main span { display: block; font-size: 12px; color: var(--ink-3); }
+  .grupo-n { flex: none; font-size: 11px; font-weight: 600; color: var(--ink-3); background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 2px 8px; font-variant-numeric: tabular-nums; }
+  .grupo-acc { flex: none; font-size: 10.5px; font-weight: 600; text-transform: uppercase; letter-spacing: .05em; padding: 4px 8px; border-radius: 6px; background: var(--na-soft); color: var(--na); border: 0; font-family: inherit; cursor: pointer; }
+  .grupo .fila { padding-left: 41px; }
+  @media (prefers-reduced-motion: reduce) { .grupo-chev { transition: none; } }
   .empty { padding: 30px 16px; text-align: center; color: var(--ink-3); font-size: 13.5px; }
 
   .banner { border-radius: 10px; padding: 11px 13px; font-size: 13.5px; margin-bottom: 14px; border: 1px solid var(--line); background: var(--surface-2); color: var(--ink-2); }
@@ -1161,6 +1176,9 @@
 
     var fp = e.target.closest("[data-parte]");
     if (fp) { abrirParte(fp.dataset.parte); return; }
+
+    var dg = e.target.closest("[data-descargar-grupo]");
+    if (dg) { e.preventDefault(); descargarGrupo(dg.dataset.descargarGrupo); return; }
 
     var fl = e.target.closest("[data-plantilla]");
     if (fl) { empezarVisita(fl.dataset.plantilla, fl.dataset.fichero); return; }
@@ -2409,6 +2427,69 @@
   /* =====================================================================
      13. SELECTOR DE LICITACIONES
      ===================================================================== */
+  /* --- Agrupar por expediente (catálogo y bandeja) --- */
+  var CHEV = '<svg class="grupo-chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6-1.4-1.4L12.2 12 7.6 7.4 9 6Z"/></svg>';
+  function lugarDe(centro, nombre) {
+    var c = (centro && centro.nombre) || "";
+    if (c.indexOf(" — ") !== -1) return c.split(" — ")[0].trim();
+    if ((nombre || "").indexOf(" · ") !== -1) return nombre.split(" · ")[0].trim();
+    return c;
+  }
+  function agruparPorExpediente(filas, expDe, centroDe, nombreDe) {
+    var orden = [], mapa = {};
+    filas.forEach(function (f) {
+      var e = expDe(f) || {};
+      var clave = e.codigo || "Sin expediente";
+      if (!mapa[clave]) { mapa[clave] = { clave: clave, filas: [], lugar: "" }; orden.push(clave); }
+      mapa[clave].filas.push(f);
+      if (!mapa[clave].lugar) mapa[clave].lugar = lugarDe(centroDe ? centroDe(f) : f.centro, nombreDe ? nombreDe(f) : f.nombre);
+    });
+    orden.reverse();
+    var sin = orden.indexOf("Sin expediente");
+    if (sin !== -1) orden.push(orden.splice(sin, 1)[0]);
+    return orden.map(function (k) {
+      var g = mapa[k];
+      g.titulo = g.lugar || (k === "Sin expediente" ? k : "Expediente " + k);
+      g.exp = k === "Sin expediente" ? (g.lugar ? k : "") : "Exp. " + k;
+      return g;
+    });
+  }
+  function nombreEnGrupo(f, g) {
+    var n = f.nombre || f.id;
+    var cod = (f.expediente && f.expediente.codigo) || "";
+    if (cod) n = n.replace(" (" + cod + ")", "");
+    if (g.lugar && n.indexOf(g.lugar + " · ") === 0) n = n.slice(g.lugar.length + 3);
+    return n;
+  }
+  function gruposAbiertos(tipo) {
+    try { return JSON.parse(leerAjuste("grupos-" + tipo, "[]")) || []; } catch (e) { return []; }
+  }
+  function recordarGrupo(tipo, clave, abierto) {
+    var a = gruposAbiertos(tipo).filter(function (k) { return k !== clave; });
+    if (abierto) a.push(clave);
+    ponerAjuste("grupos-" + tipo, JSON.stringify(a));
+  }
+  ["catList", "bandejaList"].forEach(function (id) {
+    $(id).addEventListener("toggle", function (e) {
+      var d = e.target;
+      if (d && d.classList && d.classList.contains("grupo")) recordarGrupo(id === "catList" ? "cat" : "bandeja", d.dataset.grupo, d.open);
+    }, true);
+  });
+  function descargarGrupo(clave) {
+    DB.listarPlant().then(function (guardadas) {
+      var ya = {}; guardadas.forEach(function (g) { ya[g.id] = true; });
+      var pend = CATALOGO.filter(function (f) { return ((f.expediente && f.expediente.codigo) || "Sin expediente") === clave && !ya[f.id]; });
+      banner("Descargando " + pend.length + " plantilla" + (pend.length === 1 ? "" : "s") + "…");
+      var fallos = 0;
+      return pend.reduce(function (prom, f) {
+        return prom.then(function () { return obtenerPlantilla(f.id, f.fichero || null).catch(function () { fallos++; }); });
+      }, Promise.resolve()).then(function () {
+        banner(fallos ? "No se han podido descargar " + fallos + " de " + pend.length + ". Reintenta con cobertura." : "Expediente " + clave + " descargado. Ya puedes usarlo sin cobertura.", fallos ? "warn" : "ok");
+        pintarCatalogo();
+      });
+    });
+  }
+
   function pintarCatalogo() {
     DB.listarPlant().then(function (guardadas) {
       var mapa = {};
@@ -2431,17 +2512,32 @@
         return;
       }
 
-      $("catList").innerHTML = filas.map(function (f) {
-        var e = f.expediente || {}, c = f.centro || {};
-        var meta = [e.codigo, e.lote, c.nombre].filter(Boolean).join(" · ");
-        var cacheada = !!mapa[f.id];
-        return '<button type="button" class="fila" data-plantilla="' + esc(f.id) + '" data-fichero="' + esc(f.fichero || "") + '">' +
-          '<span class="fila-main"><strong>' + esc(f.nombre) + "</strong>" +
-          (meta ? "<span>" + esc(meta) + "</span>" : "") + "</span>" +
-          (cacheada
-            ? '<span class="estado offline">offline</span>'
-            : '<span class="estado borrador" data-descargar="' + esc(f.id) + '" data-fichero="' + esc(f.fichero || "") + '">descargar</span>') +
-          "</button>";
+      var grupos = agruparPorExpediente(filas, function (f) { return f.expediente; });
+      var abiertos = gruposAbiertos("cat");
+      $("catList").innerHTML = grupos.map(function (g) {
+        var descargadas = g.filas.filter(function (f) { return !!mapa[f.id]; }).length;
+        var faltan = g.filas.length - descargadas;
+        var sub = [g.exp, descargadas + " de " + g.filas.length + " descargada" + (g.filas.length === 1 ? "" : "s")].filter(Boolean).join(" · ");
+        var abierto = abiertos.indexOf(g.clave) !== -1 || grupos.length === 1;
+        return '<details class="grupo" data-grupo="' + esc(g.clave) + '"' + (abierto ? " open" : "") + ">" +
+          "<summary>" + CHEV +
+            '<span class="grupo-main"><strong>' + esc(g.titulo) + "</strong><span>" + esc(sub) + "</span></span>" +
+            (faltan > 1 ? '<button type="button" class="grupo-acc" data-descargar-grupo="' + esc(g.clave) + '" title="Descargar todas las plantillas del expediente">descargar</button>' : "") +
+            '<span class="grupo-n">' + g.filas.length + "</span>" +
+          "</summary>" +
+          g.filas.map(function (f) {
+            var e = f.expediente || {};
+            var meta = [e.lote && e.lote !== "único" ? "Lote " + e.lote : ""].filter(Boolean).join(" · ");
+            var cacheada = !!mapa[f.id];
+            return '<button type="button" class="fila" data-plantilla="' + esc(f.id) + '" data-fichero="' + esc(f.fichero || "") + '">' +
+              '<span class="fila-main"><strong>' + esc(nombreEnGrupo(f, g)) + "</strong>" +
+              (meta ? "<span>" + esc(meta) + "</span>" : "") + "</span>" +
+              (cacheada
+                ? '<span class="estado offline">offline</span>'
+                : '<span class="estado borrador" data-descargar="' + esc(f.id) + '" data-fichero="' + esc(f.fichero || "") + '">descargar</span>') +
+              "</button>";
+          }).join("") +
+          "</details>";
       }).join("");
     });
   }
@@ -2524,11 +2620,23 @@
       ps.sort(function (a, b) { return (b.inicio || "").localeCompare(a.inicio || ""); });
       $("bandejaCount").textContent = ps.length + " parte" + (ps.length === 1 ? "" : "s");
       if (!ps.length) { $("bandejaList").innerHTML = '<div class="empty">Todavía no hay partes en este móvil.</div>'; return; }
-      $("bandejaList").innerHTML = ps.map(function (p) {
+      var gruposB = agruparPorExpediente(ps, function (p) { return (p.plantilla || {}).expediente; },
+        function (p) { return (p.plantilla || {}).centro; }, function (p) { return (p.plantilla || {}).nombre; });
+      var abiertosB = gruposAbiertos("bandeja");
+      $("bandejaList").innerHTML = gruposB.map(function (g, gi) {
+        var pend = g.filas.filter(function (p) { return p.estado !== "enviado"; }).length;
+        var sub = [g.exp, pend ? pend + " sin enviar" : "todo enviado"].filter(Boolean).join(" · ");
+        var abierto = abiertosB.indexOf(g.clave) !== -1 || gruposB.length === 1 || (gi === 0 && !abiertosB.length);
+        return '<details class="grupo" data-grupo="' + esc(g.clave) + '"' + (abierto ? " open" : "") + ">" +
+          "<summary>" + CHEV +
+            '<span class="grupo-main"><strong>' + esc(g.titulo) + "</strong><span>" + esc(sub) + "</span></span>" +
+            '<span class="grupo-n">' + g.filas.length + "</span>" +
+          "</summary>" +
+          g.filas.map(function (p) {
         var pl = p.plantilla || {};
         var titulo = (pl.centro && pl.centro.nombre) || pl.nombre || "(sin licitación)";
+        if (g.lugar && titulo.indexOf(g.lugar + " — ") === 0) titulo = titulo.slice(g.lugar.length + 3);
         var sub = [
-          (pl.expediente && pl.expediente.codigo) || "",
           fechaES(p.cabecera && p.cabecera.fecha),
           (p.cabecera && p.cabecera.tecnico) || "",
           p.resumen ? p.resumen.respondidas + "/" + p.resumen.preguntas : ""
@@ -2542,6 +2650,8 @@
               '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3h6l1 2h4v2H4V5h4l1-2Zm-3 6h12l-1 11a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2L6 9Zm4 2v8h2v-8h-2Zm4 0v8h2v-8h-2Z"/></svg></button>'
             : "") +
           "</div>";
+          }).join("") +
+          "</details>";
       }).join("");
     });
   }
