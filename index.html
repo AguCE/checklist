@@ -644,6 +644,10 @@
         el.tipos.forEach(function (t, i) {
           if (!t || !t.v || !t.l) e.push("elementos.tipos[" + (i + 1) + "]: necesita «v» y «l».");
         });
+        if (el.escala !== undefined && (!Array.isArray(el.escala) || !el.escala.length ||
+            el.escala.some(function (o) { return !o || !o.v || !o.l; }))) {
+          e.push("«elementos.escala» debe ser una lista de estados con «v» y «l».");
+        }
       }
     }
     return e;
@@ -679,9 +683,27 @@
       .catch(function () { CATALOGO = []; return CATALOGO; });
   }
 
+  // Versión publicada en el catálogo (index.json) para una plantilla; 1 si no consta.
+  function versionCatalogo(id) {
+    var c = CATALOGO.filter(function (f) { return f.id === id; })[0];
+    return (c && c.version) || 1;
+  }
+  function desactualizada(guardada) {
+    return !!(guardada && guardada.datos && (guardada.datos.version || 1) < versionCatalogo(guardada.id));
+  }
+
   function obtenerPlantilla(id, fichero) {
     return DB.leerPlant(id).then(function (guardada) {
-      if (guardada && guardada.datos) return guardada.datos;
+      var vieja = desactualizada(guardada);
+      if (guardada && guardada.datos && !vieja) return guardada.datos;
+      return descargarDeServidor(id, fichero).catch(function (err) {
+        if (vieja) return guardada.datos;   // sin cobertura: sigue con la que ya tenía
+        throw err;
+      });
+    });
+  }
+  function descargarDeServidor(id, fichero) {
+    return Promise.resolve().then(function () {
       return fetch("plantillas/" + (fichero || (id + ".json")), { cache: "no-cache" })
         .then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
         .then(function (p) {
@@ -2171,8 +2193,13 @@
     var t = (PLANTILLA.elementos.tipos || []).filter(function (x) { return x.v === v; })[0];
     return t || { v: v, l: v || "—" };
   }
+  // Estados de los elementos de interés: la plantilla puede traer los suyos (p. ej. «Fuera de servicio»).
+  function escalaElem() {
+    var el = PLANTILLA && PLANTILLA.elementos;
+    return el && Array.isArray(el.escala) && el.escala.length ? el.escala : PLANTILLA.escala;
+  }
   function tonoEstado(v) {
-    var o = PLANTILLA.escala.filter(function (e) { return e.v === v; })[0];
+    var o = escalaElem().filter(function (e) { return e.v === v; })[0];
     return o ? { l: o.l, tono: o.tono || "na" } : null;
   }
 
@@ -2229,7 +2256,7 @@
     }).join("");
     var conEstado = EL.estado !== false;
     $("elemEstado").hidden = !conEstado; $("elemEstadoLbl").hidden = !conEstado;
-    $("elemEstado").innerHTML = PLANTILLA.escala.map(function (o) {
+    $("elemEstado").innerHTML = escalaElem().map(function (o) {
       var rid = "ees-" + slug(o.v, 20);
       return '<div><input type="radio" name="elemEstado" id="' + rid + '" value="' + esc(o.v) + '" data-tono="' + esc(o.tono || "") + '"' +
              (ELEM.borrador.estado === o.v ? " checked" : "") + '><label for="' + rid + '">' + esc(o.l) + "</label></div>";
@@ -2477,7 +2504,7 @@
   });
   function descargarGrupo(clave) {
     DB.listarPlant().then(function (guardadas) {
-      var ya = {}; guardadas.forEach(function (g) { ya[g.id] = true; });
+      var ya = {}; guardadas.forEach(function (g) { if (!desactualizada(g)) ya[g.id] = true; });
       var pend = CATALOGO.filter(function (f) { return ((f.expediente && f.expediente.codigo) || "Sin expediente") === clave && !ya[f.id]; });
       banner("Descargando " + pend.length + " plantilla" + (pend.length === 1 ? "" : "s") + "…");
       var fallos = 0;
@@ -2515,26 +2542,28 @@
       var grupos = agruparPorExpediente(filas, function (f) { return f.expediente; });
       var abiertos = gruposAbiertos("cat");
       $("catList").innerHTML = grupos.map(function (g) {
-        var descargadas = g.filas.filter(function (f) { return !!mapa[f.id]; }).length;
+        var descargadas = g.filas.filter(function (f) { return !!mapa[f.id] && !desactualizada(mapa[f.id]); }).length;
         var faltan = g.filas.length - descargadas;
         var sub = [g.exp, descargadas + " de " + g.filas.length + " descargada" + (g.filas.length === 1 ? "" : "s")].filter(Boolean).join(" · ");
         var abierto = abiertos.indexOf(g.clave) !== -1 || grupos.length === 1;
         return '<details class="grupo" data-grupo="' + esc(g.clave) + '"' + (abierto ? " open" : "") + ">" +
           "<summary>" + CHEV +
             '<span class="grupo-main"><strong>' + esc(g.titulo) + "</strong><span>" + esc(sub) + "</span></span>" +
-            (faltan > 1 ? '<button type="button" class="grupo-acc" data-descargar-grupo="' + esc(g.clave) + '" title="Descargar todas las plantillas del expediente">descargar</button>' : "") +
+            (faltan > 1 ? '<button type="button" class="grupo-acc" data-descargar-grupo="' + esc(g.clave) + '" title="Descargar todas las plantillas del expediente">' +
+              (g.filas.some(function (f) { return mapa[f.id] && desactualizada(mapa[f.id]); }) ? "actualizar" : "descargar") + "</button>" : "") +
             '<span class="grupo-n">' + g.filas.length + "</span>" +
           "</summary>" +
           g.filas.map(function (f) {
             var e = f.expediente || {};
             var meta = [e.lote && e.lote !== "único" ? "Lote " + e.lote : ""].filter(Boolean).join(" · ");
-            var cacheada = !!mapa[f.id];
+            var cacheada = !!mapa[f.id] && !desactualizada(mapa[f.id]);
+            var accion = mapa[f.id] ? "actualizar" : "descargar";
             return '<button type="button" class="fila" data-plantilla="' + esc(f.id) + '" data-fichero="' + esc(f.fichero || "") + '">' +
               '<span class="fila-main"><strong>' + esc(nombreEnGrupo(f, g)) + "</strong>" +
               (meta ? "<span>" + esc(meta) + "</span>" : "") + "</span>" +
               (cacheada
                 ? '<span class="estado offline">offline</span>'
-                : '<span class="estado borrador" data-descargar="' + esc(f.id) + '" data-fichero="' + esc(f.fichero || "") + '">descargar</span>') +
+                : '<span class="estado borrador" data-descargar="' + esc(f.id) + '" data-fichero="' + esc(f.fichero || "") + '">' + accion + "</span>") +
               "</button>";
           }).join("") +
           "</details>";
@@ -2552,7 +2581,7 @@
 
   function descargarPlantilla(id, fichero) {
     banner("Descargando…");
-    obtenerPlantilla(id, fichero || null).then(function () {
+    descargarDeServidor(id, fichero || null).then(function () {
       banner("Licitación descargada. Ya puedes usarla sin cobertura.", "ok");
       pintarCatalogo();
     }).catch(function (err) {
@@ -2852,8 +2881,9 @@
 
     // Elementos de interés: cada uno con su tipo, estado, texto, fotos y ubicación.
     var elementos = (parte.elementos || []).map(function (el, i) {
-      var n = i + 1, grav = el.estado ? gravedadDe({ tipo: "escala" }, el.estado) : null;
-      var est = el.estado ? PLANTILLA.escala.filter(function (x) { return x.v === el.estado; })[0] : null;
+      var est = el.estado ? escalaElem().filter(function (x) { return x.v === el.estado; })[0] : null;
+      var n = i + 1, grav = null;
+      if (est && est.peso !== null && est.peso !== undefined) grav = est.peso === 0 ? "no_conforme" : est.peso < 1 ? "mejorable" : "conforme";
       var o = {
         n: n, ref: "E" + pad2(n), id: el.id,
         tipo: el.tipo, tipoTexto: el.tipoL || el.tipo, mapeaA: el.mapea_a || null,
@@ -2922,6 +2952,9 @@
           null: "la pregunta no puntúa (texto, número, N/A o sin responder)"
         },
         escala: PLANTILLA.escala.map(function (e) {
+          return { valor: e.v, etiqueta: e.l, significado: e.significado || null };
+        }),
+        escalaElementos: escalaElem().map(function (e) {
           return { valor: e.v, etiqueta: e.l, significado: e.significado || null };
         })
       },
