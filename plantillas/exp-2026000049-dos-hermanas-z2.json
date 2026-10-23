@@ -1,12 +1,12 @@
 {
   "id": "exp-2026000049-dos-hermanas-z2",
-  "version": 1,
+  "version": 2,
   "nombre": "Dos Hermanas · Pabellón Entretorres (2026000049)",
   "requiereApp": "2.0",
   "origen": {
-    "generadoDesde": "checklist-dos-hermanas-v3.xlsx",
+    "generadoDesde": "checklist-dos-hermanas-v4.xlsx",
     "skill": "checklist-campo",
-    "convertidoEl": "2026-10-22"
+    "convertidoEl": "2026-10-23"
   },
   "expediente": {
     "codigo": "2026000049",
@@ -219,6 +219,14 @@
           "requerido": true,
           "ayuda": "Pregúntalo. Si el contrato es como el de piscinas, la contrataría UNEI.",
           "mapea_a": "3. Legionela: control diario, equipos de medida y empresa externa (7.3)"
+        },
+        {
+          "id": "q061",
+          "enunciado": "Estado general de los elementos de esta sección",
+          "tipo": "escala",
+          "requerido": true,
+          "ayuda": "Calderas, acumuladores, termos y circuito de agua caliente. Lo que esté roto o parado, regístralo además como elemento de interés con estado «Fuera de servicio».",
+          "mapea_a": "10. Diagnóstico inicial y riesgo de reposición"
         }
       ]
     },
@@ -289,6 +297,14 @@
           ],
           "ayuda": "El pliego solo exige formación en su uso, pero conviene saber si el mantenimiento podría recaer en UNEI.",
           "mapea_a": "4. Mantenimiento reglamentario y subcontratas: RITE, climatización, solar, PCI, DEA, equipos motorizados (7.4)"
+        },
+        {
+          "id": "q062",
+          "enunciado": "Estado general de los elementos de esta sección",
+          "tipo": "escala",
+          "requerido": true,
+          "ayuda": "Climatización, ventilación, placas, grupo de presión, DEA, extintores y alarmas. Lo que esté roto o parado, regístralo además como elemento de interés con estado «Fuera de servicio».",
+          "mapea_a": "10. Diagnóstico inicial y riesgo de reposición"
         }
       ]
     },
@@ -340,23 +356,6 @@
           "mapea_a": "8. Productos de limpieza y fungibles (7.8)"
         },
         {
-          "id": "q020",
-          "enunciado": "Número de vestuarios",
-          "tipo": "numero",
-          "requerido": true,
-          "unidad": "ud",
-          "mapea_a": "8. Productos de limpieza y fungibles (7.8)"
-        },
-        {
-          "id": "q021",
-          "enunciado": "Número de piezas sanitarias (inodoros, urinarios, lavabos y duchas)",
-          "tipo": "numero",
-          "requerido": true,
-          "unidad": "ud",
-          "ayuda": "Base del consumo de fungibles.",
-          "mapea_a": "8. Productos de limpieza y fungibles (7.8)"
-        },
-        {
           "id": "q022",
           "enunciado": "Maquinaria de limpieza municipal en la instalación",
           "tipo": "opcion_multiple",
@@ -377,6 +376,82 @@
           "tipo": "escala",
           "ayuda": "Si está mal, cuenta como si no existiera.",
           "mapea_a": "9. Vehículos, maquinaria y herramienta (7.9)"
+        },
+        {
+          "id": "q063",
+          "enunciado": "Estado general de los elementos de esta sección",
+          "tipo": "escala",
+          "requerido": true,
+          "ayuda": "Suelos de pista, pasillos y gradas: desgaste, juntas, zonas que no se dejan limpiar bien. Lo que esté roto o parado, regístralo además como elemento de interés con estado «Fuera de servicio».",
+          "mapea_a": "10. Diagnóstico inicial y riesgo de reposición"
+        }
+      ]
+    },
+    {
+      "id": "vestuarios-y-aseos",
+      "titulo": "Vestuarios y aseos",
+      "preguntas": [
+        {
+          "id": "q020",
+          "enunciado": "Número de vestuarios",
+          "tipo": "numero",
+          "requerido": true,
+          "unidad": "ud",
+          "mapea_a": "8. Productos de limpieza y fungibles (7.8)"
+        },
+        {
+          "id": "q021",
+          "enunciado": "Número de piezas sanitarias (inodoros, urinarios, lavabos y duchas)",
+          "tipo": "numero",
+          "requerido": true,
+          "unidad": "ud",
+          "ayuda": "Base del consumo de fungibles.",
+          "mapea_a": "8. Productos de limpieza y fungibles (7.8)"
+        },
+        {
+          "id": "q052",
+          "enunciado": "Grifería de lavabos y duchas",
+          "tipo": "escala",
+          "requerido": true,
+          "ayuda": "Goteos, temporizadores que no cortan, duchas sin presión o sin agua caliente.",
+          "mapea_a": "10. Diagnóstico inicial y riesgo de reposición"
+        },
+        {
+          "id": "q053",
+          "enunciado": "Fluxores (pulsadores de descarga)",
+          "tipo": "escala",
+          "requerido": true,
+          "ayuda": "Si no hay fluxores, «N/A».",
+          "mapea_a": "10. Diagnóstico inicial y riesgo de reposición"
+        },
+        {
+          "id": "q054",
+          "enunciado": "¿Son antivandálicos los fluxores y la grifería?",
+          "tipo": "opcion",
+          "opciones": [
+            "Sí, todos",
+            "Algunos",
+            "No",
+            "No consta"
+          ],
+          "ayuda": "Los antivandálicos duran más pero el repuesto es más caro.",
+          "mapea_a": "8. Productos de limpieza y fungibles (7.8)"
+        },
+        {
+          "id": "q055",
+          "enunciado": "Cisternas",
+          "tipo": "escala",
+          "requerido": true,
+          "ayuda": "Fugas, mecanismos rotos, tapas que faltan.",
+          "mapea_a": "10. Diagnóstico inicial y riesgo de reposición"
+        },
+        {
+          "id": "q056",
+          "enunciado": "Taquillas",
+          "tipo": "escala",
+          "requerido": true,
+          "ayuda": "Puertas, cerraduras y bisagras. Anota en una nota cuántas hay rotas.",
+          "mapea_a": "10. Diagnóstico inicial y riesgo de reposición"
         }
       ]
     },
@@ -424,43 +499,55 @@
           "requerido": true,
           "ayuda": "Implica cortacésped o desbrozadora y horas de mañana.",
           "mapea_a": "5. Césped artificial y zonas verdes (7.5)"
+        },
+        {
+          "id": "q064",
+          "enunciado": "Estado general de los elementos de esta sección",
+          "tipo": "escala",
+          "requerido": true,
+          "ayuda": "Césped artificial (desgaste, relleno, costuras), césped natural y riego. Si no hay césped, «N/A». Lo que esté roto o parado, regístralo además como elemento de interés con estado «Fuera de servicio».",
+          "mapea_a": "10. Diagnóstico inicial y riesgo de reposición"
         }
       ]
     },
     {
-      "id": "diagnostico-inicial",
-      "titulo": "Diagnóstico inicial",
+      "id": "equipamiento-deportivo",
+      "titulo": "Equipamiento deportivo",
       "preguntas": [
         {
-          "id": "q028",
-          "enunciado": "Estado general de las instalaciones técnicas (agua, climatización, electricidad)",
+          "id": "q057",
+          "enunciado": "Canastas y anclajes",
           "tipo": "escala",
           "requerido": true,
-          "ayuda": "Es el acta de entrega: lo que esté roto antes de empezar no debe pagarlo UNEI.",
+          "ayuda": "Tablero, aro, red, estructura y anclaje al suelo, pared o techo. Si no hay canastas, «N/A».",
           "mapea_a": "10. Diagnóstico inicial y riesgo de reposición"
         },
         {
-          "id": "q029",
-          "enunciado": "Equipos o elementos fuera de servicio",
+          "id": "q058",
+          "enunciado": "Manipulación de las canastas",
+          "tipo": "opcion",
+          "opciones": [
+            "Manual",
+            "Mecánica",
+            "De los dos tipos"
+          ],
+          "ayuda": "Mecánica: con motor (colgantes o abatibles). Su mantenimiento sería de UNEI: fotografía el motor o la placa como elemento de interés.",
+          "mapea_a": "4. Mantenimiento reglamentario y subcontratas: RITE, climatización, solar, PCI, DEA, equipos motorizados (7.4)"
+        },
+        {
+          "id": "q059",
+          "enunciado": "Porterías y anclajes",
           "tipo": "escala",
           "requerido": true,
-          "ayuda": "Regístralos uno a uno como «Deficiencia previa», con foto.",
+          "ayuda": "Estructura, redes y anclajes o contrapesos. Si no hay porterías, «N/A».",
           "mapea_a": "10. Diagnóstico inicial y riesgo de reposición"
         },
         {
-          "id": "q030",
-          "enunciado": "Estado de vestuarios y aseos (grifería, fluxores, cisternas, taquillas)",
+          "id": "q060",
+          "enunciado": "Poste de voleibol y anclajes",
           "tipo": "escala",
           "requerido": true,
-          "ayuda": "Fluxores: pulsadores de descarga. Anota si son antivandálicos.",
-          "mapea_a": "10. Diagnóstico inicial y riesgo de reposición"
-        },
-        {
-          "id": "q031",
-          "enunciado": "Deficiencias que hay que dejar por escrito antes de empezar",
-          "tipo": "texto",
-          "largo": true,
-          "ayuda": "Lo que pondríamos en el acta de entrega.",
+          "ayuda": "Postes, red, tensor y casquillos del suelo. Si no hay, «N/A».",
           "mapea_a": "10. Diagnóstico inicial y riesgo de reposición"
         }
       ]
@@ -540,6 +627,14 @@
           "mapea_a": "11. Otros costes no previstos (7.10)"
         },
         {
+          "id": "q031",
+          "enunciado": "Deficiencias que hay que dejar por escrito antes de empezar",
+          "tipo": "texto",
+          "largo": true,
+          "ayuda": "Lo que pondríamos en el acta de entrega: lo que ya está mal antes de empezar no debe pagarlo UNEI.",
+          "mapea_a": "10. Diagnóstico inicial y riesgo de reposición"
+        },
+        {
           "id": "q050",
           "enunciado": "Dificultad del servicio en esta instalación",
           "tipo": "opcion",
@@ -562,7 +657,7 @@
   ],
   "elementos": {
     "titulo": "Elementos de interés",
-    "ayuda": "Crea un elemento por cada cosa concreta que merezca quedar registrada: una papelera rota, un árbol con el alcorque sucio, una pintada, un punto negro. Foto, una línea de texto y la ubicación se guarda sola.",
+    "ayuda": "Crea un elemento por cada cosa concreta que pueda costar dinero o que ya esté mal: un equipo, una canasta, un grifo que gotea. Foto, una línea de texto y su estado; la ubicación se guarda sola. Si no funciona, marca «Fuera de servicio».",
     "estado": true,
     "tipos": [
       {
@@ -626,6 +721,16 @@
         "mapea_a": "8. Productos de limpieza y fungibles (7.8)"
       },
       {
+        "v": "equipamiento",
+        "l": "Canasta, portería o poste de voleibol",
+        "mapea_a": "10. Diagnóstico inicial y riesgo de reposición"
+      },
+      {
+        "v": "vestuario",
+        "l": "Grifería, fluxor, cisterna o taquilla",
+        "mapea_a": "10. Diagnóstico inicial y riesgo de reposición"
+      },
+      {
         "v": "deficiencia",
         "l": "Deficiencia previa (acta de entrega)",
         "mapea_a": "10. Diagnóstico inicial y riesgo de reposición"
@@ -634,6 +739,43 @@
         "v": "otro",
         "l": "Otro con coste",
         "mapea_a": "11. Otros costes no previstos (7.10)"
+      }
+    ],
+    "escala": [
+      {
+        "v": "ok",
+        "l": "Bien",
+        "peso": 1,
+        "tono": "ok",
+        "significado": "funciona y está bien"
+      },
+      {
+        "v": "mej",
+        "l": "Mejorable",
+        "peso": 0.5,
+        "tono": "warn",
+        "significado": "funciona con deficiencias"
+      },
+      {
+        "v": "nc",
+        "l": "No conforme",
+        "peso": 0,
+        "tono": "bad",
+        "significado": "mal estado o no cumple"
+      },
+      {
+        "v": "fs",
+        "l": "Fuera de servicio",
+        "peso": 0,
+        "tono": "bad",
+        "significado": "no funciona: va al acta de entrega"
+      },
+      {
+        "v": "na",
+        "l": "N/A",
+        "peso": null,
+        "tono": "na",
+        "significado": "no aplica; no puntúa"
       }
     ]
   }

@@ -1,12 +1,12 @@
 {
   "id": "exp-2026000049-dos-hermanas-general",
-  "version": 1,
+  "version": 2,
   "nombre": "Dos Hermanas · Entrevista con la Delegación de Deportes (2026000049)",
   "requiereApp": "2.0",
   "origen": {
-    "generadoDesde": "checklist-dos-hermanas-v3.xlsx",
+    "generadoDesde": "checklist-dos-hermanas-v4.xlsx",
     "skill": "checklist-campo",
-    "convertidoEl": "2026-10-22"
+    "convertidoEl": "2026-10-23"
   },
   "expediente": {
     "codigo": "2026000049",
@@ -250,7 +250,7 @@
   ],
   "elementos": {
     "titulo": "Elementos de interés",
-    "ayuda": "Crea un elemento por cada cosa concreta que merezca quedar registrada: una papelera rota, un árbol con el alcorque sucio, una pintada, un punto negro. Foto, una línea de texto y la ubicación se guarda sola.",
+    "ayuda": "Crea un elemento por cada cosa concreta que pueda costar dinero o que ya esté mal: un equipo, una canasta, un grifo que gotea. Foto, una línea de texto y su estado; la ubicación se guarda sola. Si no funciona, marca «Fuera de servicio».",
     "estado": true,
     "tipos": [
       {
@@ -314,6 +314,16 @@
         "mapea_a": "8. Productos de limpieza y fungibles (7.8)"
       },
       {
+        "v": "equipamiento",
+        "l": "Canasta, portería o poste de voleibol",
+        "mapea_a": "10. Diagnóstico inicial y riesgo de reposición"
+      },
+      {
+        "v": "vestuario",
+        "l": "Grifería, fluxor, cisterna o taquilla",
+        "mapea_a": "10. Diagnóstico inicial y riesgo de reposición"
+      },
+      {
         "v": "deficiencia",
         "l": "Deficiencia previa (acta de entrega)",
         "mapea_a": "10. Diagnóstico inicial y riesgo de reposición"
@@ -322,6 +332,43 @@
         "v": "otro",
         "l": "Otro con coste",
         "mapea_a": "11. Otros costes no previstos (7.10)"
+      }
+    ],
+    "escala": [
+      {
+        "v": "ok",
+        "l": "Bien",
+        "peso": 1,
+        "tono": "ok",
+        "significado": "funciona y está bien"
+      },
+      {
+        "v": "mej",
+        "l": "Mejorable",
+        "peso": 0.5,
+        "tono": "warn",
+        "significado": "funciona con deficiencias"
+      },
+      {
+        "v": "nc",
+        "l": "No conforme",
+        "peso": 0,
+        "tono": "bad",
+        "significado": "mal estado o no cumple"
+      },
+      {
+        "v": "fs",
+        "l": "Fuera de servicio",
+        "peso": 0,
+        "tono": "bad",
+        "significado": "no funciona: va al acta de entrega"
+      },
+      {
+        "v": "na",
+        "l": "N/A",
+        "peso": null,
+        "tono": "na",
+        "significado": "no aplica; no puntúa"
       }
     ]
   }
